@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Лаборатория Сириус — физика 7 класса</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBFBF7; --ink:#1F2340; --muted:#6B6F85; --surf:#FFFFFF; --grid:#E6E4EC; --line:#E4E2EA;
+  --plum:#9B2D67; --teal:#50ADA8; --green:#367A55; --lime:#99CC42; --pink:#F8D3E8; --soft:#F3F1F7;
+  --brand:#5B3C9E;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16121A; --ink:#F1EEF6; --muted:#A39FB3; --surf:#211B29; --grid:#372F42; --line:#372F42;
+    --pink:#4A2340; --soft:#272031; --brand:#B79CF2; --plum:#D0568F;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16121A; --ink:#F1EEF6; --muted:#A39FB3; --surf:#211B29; --grid:#372F42; --line:#372F42;
+  --pink:#4A2340; --soft:#272031; --brand:#B79CF2; --plum:#D0568F;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:'Golos Text',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:16px;line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto}
+.view{animation:viewIn .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* header */
+.top{display:flex;align-items:center;gap:10px;padding:16px 20px}
+.logo{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;text-align:left;border-radius:10px}
+.logo svg{width:38px;height:auto;flex:none}
+.logo b{font-size:22px;font-weight:800;color:var(--brand);letter-spacing:-.2px}
+.logo span{font-size:22px;font-weight:500;color:var(--muted);margin-left:-4px}
+
+/* home */
+.hero{padding:18px 20px 6px}
+.hero h1{margin:0;font-size:clamp(34px,9vw,52px);line-height:1.05;font-weight:800;letter-spacing:-1px}
+.hero p{margin:12px 0 0;color:var(--muted);font-size:18px;max-width:36ch}
+.progress{margin:20px 20px 4px;display:flex;align-items:center;gap:14px;font-weight:600;color:var(--muted);font-size:15px}
+.bar{flex:1;height:10px;border-radius:6px;background:var(--grid);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--lime);border-radius:6px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.chips{display:flex;gap:8px;padding:14px 20px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:0;border-radius:999px;padding:9px 16px;background:var(--soft);font-weight:600;font-size:15px;color:var(--ink);
+  transition:background-color .18s,color .18s,border-color .18s,transform .12s}
+.chip:active{transform:scale(.96)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.chip .n{opacity:.55;font-weight:500;margin-left:6px}
+.cards{display:grid;gap:16px;padding:6px 20px 40px}
+@media(min-width:640px){.cards{grid-template-columns:1fr 1fr}}
+.card{position:relative;border-radius:30px;padding:24px;min-height:300px;display:flex;flex-direction:column;
+  background:var(--c);color:#fff;text-align:left;border:0;width:100%;text-decoration:none;
+  transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
+@media(hover:hover){.card:hover{transform:translateY(-3px);box-shadow:0 18px 32px -20px var(--c)}
+  .card:hover .go{transform:translateX(3px)}}
+.card:active{transform:scale(.985)}
+.card:focus-visible{outline-offset:4px}
+.card .pb{height:8px;width:56%;border-radius:5px;background:rgba(255,255,255,.28);margin:0 0 22px 8px;overflow:hidden}
+.card .pb i{display:block;height:100%;width:0;background:var(--lime);border-radius:5px;transition:width .7s cubic-bezier(.2,.8,.2,1) .2s}
+.card.seen.ready .pb i{width:100%}
+.tag{align-self:flex-start;background:rgba(255,255,255,.2);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+.card h2{margin:14px 0 8px;font-size:28px;line-height:1.12;font-weight:800;letter-spacing:-.4px}
+.card p{margin:0;opacity:.88;font-size:16px}
+.card .foot{margin-top:auto;padding-top:22px;display:flex;align-items:flex-end;gap:12px;justify-content:space-between}
+.card .meta{font-size:15px;opacity:.8;display:flex;align-items:center;gap:8px}
+.go{background:var(--lime);color:#1B2A0A;font-weight:700;font-size:18px;border-radius:16px;padding:14px 28px;border:0;flex:1;text-align:center;max-width:220px;transition:transform .2s}
+
+/* lab */
+.labhead{background:var(--lab);color:#fff;padding:14px 20px 78px}
+.back{background:rgba(255,255,255,.18);border:0;border-radius:999px;color:#fff;font-weight:600;padding:8px 16px 8px 12px;display:inline-flex;gap:6px;align-items:center;font-size:15px;transition:background-color .15s}
+.back:hover{background:rgba(255,255,255,.28)}
+.labhead h1{margin:18px 0 6px;font-size:clamp(30px,8vw,44px);line-height:1.08;font-weight:800;letter-spacing:-.7px}
+.labhead p{margin:0;opacity:.9;max-width:40ch}
+.labhead .tag{margin-top:16px;display:inline-block}
+.sheet{margin-top:-58px;position:relative;padding:0 14px 60px}
+.stage{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surf);border-radius:26px;
+  padding:8px;box-shadow:0 2px 0 var(--line), 0 12px 30px -18px rgba(31,35,64,.5)}
+.stage canvas{display:block;width:100%;aspect-ratio:640/400;border-radius:20px;touch-action:pan-y}
+.stage .paused{position:absolute;right:20px;top:18px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:700;
+  border-radius:999px;padding:4px 12px;opacity:0;transform:translateY(-4px);transition:opacity .2s,transform .2s;pointer-events:none}
+.stage.is-paused .paused{opacity:1;transform:none}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:16px 6px 4px}
+.btn{border-radius:16px;padding:12px 20px;font-weight:700;border:2px solid var(--line);background:var(--surf);
+  display:inline-flex;align-items:center;gap:8px;transition:transform .12s,background-color .15s,border-color .15s}
+.btn:active{transform:scale(.96)}
+.btn svg{width:18px;height:18px;flex:none}
+.btn.main{background:var(--lime);border-color:var(--lime);color:#1B2A0A}
+@media(hover:hover){.btn:not(.main):hover{border-color:var(--muted)}}
+.outs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 6px}
+.out{background:var(--soft);border-radius:18px;padding:12px 14px;min-width:0}
+.out small{display:block;color:var(--muted);font-size:13px;line-height:1.25}
+.out b.long{font-size:16px}
+.out b{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;display:block;overflow-wrap:anywhere;line-height:1.3;margin-top:2px}
+.sheet h2{font-size:24px;font-weight:800;letter-spacing:-.4px;margin:26px 6px 12px}
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin:0 6px 10px}
+.presets .chip{border:2px solid var(--line);background:var(--surf)}
+.presets .chip[aria-pressed="true"]{background:var(--lab);border-color:var(--lab);color:#fff}
+.ctl{background:var(--surf);border:2px solid var(--line);border-radius:22px;padding:14px 16px;margin:10px 6px}
+.ctl .r{display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:600;font-size:15px}
+.val{background:var(--pink);border-radius:999px;padding:3px 12px;font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap;display:inline-block}
+.val.pop{animation:pop .22s ease-out}
+@keyframes pop{40%{transform:scale(1.08)}}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;width:100%;margin:12px 0 2px;height:28px;accent-color:var(--lab);--fill:50%;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:5px;background:linear-gradient(to right,var(--lab) var(--fill),var(--grid) var(--fill))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:var(--surf);
+  border:4px solid var(--lab);margin-top:-9px;box-shadow:0 2px 6px rgba(31,35,64,.25);transition:transform .12s}
+input[type=range]:active::-webkit-slider-thumb{transform:scale(1.15)}
+input[type=range]::-moz-range-track{height:8px;border-radius:5px;background:var(--grid)}
+input[type=range]::-moz-range-progress{height:8px;border-radius:5px;background:var(--lab)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--surf);border:4px solid var(--lab)}
+input[type=range]:focus-visible{outline:none}
+input[type=range]:focus-visible::-webkit-slider-thumb{outline:3px solid var(--brand);outline-offset:2px}
+.seg{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.seg button{flex:1 1 auto;border:2px solid var(--line);background:var(--soft);border-radius:14px;padding:10px;font-weight:600;transition:background-color .15s,border-color .15s,color .15s,transform .12s}
+.seg button:active{transform:scale(.97)}
+.seg button[aria-pressed="true"]{background:var(--lab);border-color:var(--lab);color:#fff}
+.note{border-radius:26px;padding:20px 22px;margin:14px 6px;background:var(--pink)}
+.note b{font-weight:800}
+.note.f{background:var(--soft)}
+.note .fm{font-size:20px;font-weight:600;margin:6px 0;font-variant-numeric:tabular-nums}
+.note .fm.t{font-size:17px;line-height:1.4}
+.note ul,.note ol{margin:8px 0 0;padding-left:20px}
+.note li{margin:6px 0}
+.nextlab{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:22px 6px 0;padding:20px 22px;border-radius:26px;
+  background:var(--c);color:#fff;text-decoration:none;transition:transform .2s cubic-bezier(.2,.8,.2,1)}
+.nextlab small{display:block;opacity:.8;font-size:14px;font-weight:600}
+.nextlab b{display:block;font-size:22px;font-weight:800;letter-spacing:-.3px;line-height:1.15}
+.nextlab svg{flex:none;width:44px;height:44px;border-radius:14px;background:var(--lime);color:#1B2A0A;padding:12px;transition:transform .2s}
+@media(hover:hover){.nextlab:hover svg{transform:translateX(3px)}}
+.nextlab:active{transform:scale(.985)}
+.cards{perspective:1200px}
+.card{--rx:0deg;--ry:0deg;--mx:50%;--my:30%;overflow:hidden}
+.card::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .25s;
+  background:radial-gradient(420px circle at var(--mx) var(--my),rgba(255,255,255,.22),transparent 45%)}
+@media(hover:hover) and (pointer:fine){.card:hover{transform:translateY(-4px) rotateX(var(--rx)) rotateY(var(--ry))}.card:hover::after{opacity:1}}
+.stage{perspective:1400px}
+.stage canvas{--rx:0deg;--ry:0deg;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+@media (prefers-reduced-motion:reduce){
+  .card:hover,.stage canvas{transform:none!important}
+  .view,.val.pop{animation:none}
+  .bar i,.card,.card .pb i,.go,.nextlab,.nextlab svg{transition:none}
+}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+(function(){
+'use strict';
+const W=640,H=400;
+const $=(s,r=document)=>r.querySelector(s);
+const NF={};
+const f1=(x,d=1)=>{x=Number(x);if(!isFinite(x))return '—';if(Math.abs(x)<0.5*Math.pow(10,-d))x=0;
+  return (NF[d]||(NF[d]=new Intl.NumberFormat('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d}))).format(x)};
+const fJ=x=>Math.abs(x)>=10000?f1(x/1000,1)+' кДж':f1(x,Math.abs(x)<10?2:0)+' Дж';
+const fWt=x=>Math.abs(x)>=10000?f1(x/1000,1)+' кВт':f1(x,0)+' Вт';
+const fPa=x=>Math.abs(x)>=10000?f1(x/1000,1)+' кПа':f1(x,0)+' Па';
+const rad=d=>d*Math.PI/180, deg=r=>r*180/Math.PI;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const sm=t=>{t=clamp(t,0,1);return t*t*(3-2*t)};
+const ease=(c,t,dt,k)=>c+(t-c)*(1-Math.exp(-dt*k));
+const rgb=h=>{h=String(h).trim();if(h.startsWith('rgb')){const m=h.match(/[\d.]+/g)||[0,0,0];return [+m[0],+m[1],+m[2]]}h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]};
+const rgba=(h,a)=>{const c=rgb(h);return `rgba(${c[0]},${c[1]},${c[2]},${a})`};
+const mixc=(a,b,t)=>{const x=rgb(a),y=rgb(b);return `rgb(${Math.round(x[0]+(y[0]-x[0])*t)},${Math.round(x[1]+(y[1]-x[1])*t)},${Math.round(x[2]+(y[2]-x[2])*t)})`};
+const gauss=()=>{let u=0,v=0;while(!u)u=Math.random();v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+const FONT="'Golos Text',system-ui,sans-serif";
+const G=9.8;
+let TS=1;
+
+let C={};
+function readColors(){
+  const cs=getComputedStyle(document.documentElement);
+  ['ink','muted','surf','grid','plum','teal','green','lime','soft','pink','line'].forEach(k=>C[k]=cs.getPropertyValue('--'+k).trim());
+  C.dark=rgb(C.surf).reduce((a,b)=>a+b,0)<300;
+}
+function arrow(g,x1,y1,x2,y2,col,w){
+  w=w||3;const L=Math.hypot(x2-x1,y2-y1);if(L<2)return;
+  const a=Math.atan2(y2-y1,x2-x1),h=Math.min(9+w,L*.9);
+  g.strokeStyle=col;g.fillStyle=col;g.lineWidth=w;g.lineCap='round';
+  g.beginPath();g.moveTo(x1,y1);g.lineTo(x2-Math.cos(a)*h*.6,y2-Math.sin(a)*h*.6);g.stroke();
+  g.beginPath();g.moveTo(x2,y2);g.lineTo(x2-h*Math.cos(a-.42),y2-h*Math.sin(a-.42));g.lineTo(x2-h*Math.cos(a+.42),y2-h*Math.sin(a+.42));g.closePath();g.fill();
+}
+function txt(g,s,x,y,o){
+  o=o||{};g.font=`${o.w||600} ${(o.s||14)*TS}px ${FONT}`;g.fillStyle=o.c||C.ink;g.textAlign=o.a||'left';g.textBaseline=o.b||'alphabetic';g.fillText(s,x,y);
+}
+function badge(g,s,x,y,col,a){
+  g.font=`700 ${14*TS}px ${FONT}`;const w=g.measureText(s).width+28;
+  const bx=a==='right'?x-w:a==='center'?x-w/2:x;
+  g.fillStyle=col;g.beginPath();g.roundRect(bx,y,w,34,12);g.fill();
+  txt(g,s,bx+w/2,y+22,{a:'center',c:'#fff',s:14,w:700});
+}
+/* динамометр: крючок в (x,y), корпус уходит в направлении ang */
+function dyn(g,x,y,ang,F,Fmax,len){
+  len=len||100;
+  g.save();g.translate(x,y);g.rotate(ang);
+  g.strokeStyle=C.ink;g.lineWidth=2.5;g.lineCap='round';
+  g.beginPath();g.moveTo(0,0);g.lineTo(12,0);g.stroke();
+  g.fillStyle=C.surf;g.beginPath();g.roundRect(12,-11,len,22,8);g.fill();g.stroke();
+  g.strokeStyle=C.muted;g.lineWidth=1;
+  for(let i=0;i<=10;i++){const xx=22+i*(len-30)/10;g.beginPath();g.moveTo(xx,-11);g.lineTo(xx,i%5?-6:-3);g.stroke()}
+  const px=22+clamp(F/Fmax,0,1)*(len-30);
+  g.strokeStyle=C.ink;g.lineWidth=1.6;g.beginPath();g.moveTo(px,0);
+  const n=9;for(let i=1;i<=n;i++){g.lineTo(px+(len+4-px)*i/n,i%2?4:-4)}g.stroke();
+  g.fillStyle=C.plum;g.fillRect(px-2,-8,4,16);
+  g.strokeStyle=C.ink;g.lineWidth=2.5;g.beginPath();g.arc(len+22,0,9,0,7);g.stroke();
+  g.restore();
+}
+/* ===== 3D-рендер: косоугольная проекция, свет сверху-слева ===== */
+const DX=0.62,DY=-0.42; // направление «вглубь»
+const lighten=(h,k)=>mixc(h,'#ffffff',k), darken=(h,k)=>mixc(h,'#000000',k);
+const SPR=new Map();
+function sprite(r,col){
+  const q=Math.max(2,Math.round(r*2)/2),key=q+'|'+col;let c=SPR.get(key);
+  if(!c){const s=3,R=q*s,pad=2;c=document.createElement('canvas');c.width=c.height=Math.ceil(2*R+pad*2);
+    const x=c.getContext('2d'),m=R+pad,gr=x.createRadialGradient(m-R*.38,m-R*.42,R*.08,m,m,R);
+    gr.addColorStop(0,lighten(col,.75));gr.addColorStop(.35,lighten(col,.15));gr.addColorStop(.85,col);gr.addColorStop(1,darken(col,.35));
+    x.fillStyle=gr;x.beginPath();x.arc(m,m,R,0,7);x.fill();
+    if(SPR.size>600)SPR.clear();SPR.set(key,c)}
+  return c;
+}
+/* шар с объёмом */
+function sph(g,x,y,r,col){if(r<=0)return;const c=sprite(r,col),d=c.width/3;g.drawImage(c,x-d/2,y-d/2,d,d)}
+/* мягкая тень на полу */
+function shadow(g,x,y,rx,a){a=a===undefined?.22:a;if(rx<=0)return;g.save();g.translate(x,y);g.scale(1,.28);
+  const gr=g.createRadialGradient(0,0,0,0,0,rx);gr.addColorStop(0,`rgba(0,0,0,${C.dark?a*1.6:a})`);gr.addColorStop(1,'rgba(0,0,0,0)');
+  g.fillStyle=gr;g.beginPath();g.arc(0,0,rx,0,7);g.fill();g.restore()}
+/* брусок: передняя грань (x,y,w,h), глубина d */
+function box3(g,x,y,w,h,col,d,o){
+  o=o||{};d=d===undefined?Math.min(26,w*.35+6):d;const ox=d*DX,oy=d*DY;
+  if(o.shadow!==false)shadow(g,x+w/2+ox/2,y+h+oy/2+1,w*.62+d*.3,.18);
+  g.lineJoin='round';
+  g.fillStyle=lighten(col,.28);g.beginPath();g.moveTo(x,y);g.lineTo(x+ox,y+oy);g.lineTo(x+w+ox,y+oy);g.lineTo(x+w,y);g.closePath();g.fill();
+  g.fillStyle=darken(col,.22);g.beginPath();g.moveTo(x+w,y);g.lineTo(x+w+ox,y+oy);g.lineTo(x+w+ox,y+h+oy);g.lineTo(x+w,y+h);g.closePath();g.fill();
+  const gr=g.createLinearGradient(x,y,x,y+h);gr.addColorStop(0,lighten(col,.08));gr.addColorStop(1,darken(col,.08));
+  g.fillStyle=gr;g.fillRect(x,y,w,h);
+  if(o.stroke){g.strokeStyle=o.stroke;g.lineWidth=o.lw||2;g.beginPath();g.moveTo(x,y+h);g.lineTo(x,y);g.lineTo(x+ox,y+oy);g.lineTo(x+w+ox,y+oy);g.lineTo(x+w+ox,y+h+oy);g.lineTo(x+w,y+h);g.closePath();g.moveTo(x,y);g.lineTo(x+w,y);g.lineTo(x+w+ox,y+oy);g.moveTo(x+w,y);g.lineTo(x+w,y+h);g.stroke()}
+  g.fillStyle='rgba(255,255,255,.35)';g.fillRect(x,y,w,1.5);
+}
+/* вертикальный цилиндр: центр cx, верх y1, низ y2, радиус rx */
+function cyl(g,cx,y1,y2,rx,col,o){
+  o=o||{};const ry=o.ry||rx*.3;if(y2<y1)return;
+  if(o.shadow)shadow(g,cx,y2+2,rx*1.25,.2);
+  const gr=g.createLinearGradient(cx-rx,0,cx+rx,0);
+  gr.addColorStop(0,darken(col,.18));gr.addColorStop(.3,lighten(col,.35));gr.addColorStop(.55,col);gr.addColorStop(1,darken(col,.38));
+  g.fillStyle=gr;g.beginPath();g.moveTo(cx-rx,y1);g.lineTo(cx-rx,y2);g.ellipse(cx,y2,rx,ry,0,Math.PI,0,true);g.lineTo(cx+rx,y1);g.closePath();g.fill();
+  if(o.top!==false){g.fillStyle=o.topc||lighten(col,.3);g.beginPath();g.ellipse(cx,y1,rx,ry,0,0,7);g.fill();
+    g.strokeStyle=darken(col,.15);g.lineWidth=1;g.stroke()}
+  if(o.stroke){g.strokeStyle=o.stroke;g.lineWidth=o.lw||2;g.beginPath();g.moveTo(cx-rx,y1);g.lineTo(cx-rx,y2);g.ellipse(cx,y2,rx,ry,0,Math.PI,0,true);g.lineTo(cx+rx,y1);g.stroke()}
+}
+/* прозрачный стеклянный сосуд (прямоугольный аквариум) с жидкостью до уровня ly */
+function tank3(g,x,y,w,h,d,ly,lcol,o){
+  o=o||{};const ox=d*DX,oy=d*DY,b=y+h;
+  // задняя стенка
+  g.fillStyle=C.dark?'rgba(255,255,255,.04)':'rgba(31,35,64,.035)';g.fillRect(x+ox,y+oy,w,h);
+  g.strokeStyle=rgba(C.ink,.25);g.lineWidth=1.5;g.strokeRect(x+ox,y+oy,w,h);
+  g.beginPath();g.moveTo(x,b);g.lineTo(x+ox,b+oy);g.moveTo(x,y);g.lineTo(x+ox,y+oy);g.stroke();
+  if(ly!==null&&ly!==undefined&&ly<b){
+    const ga=o.alpha||.55;ly=Math.max(ly,y);
+    g.fillStyle=rgba(lcol,ga*.55);g.beginPath();g.moveTo(x+w,ly);g.lineTo(x+w+ox,ly+oy);g.lineTo(x+w+ox,b+oy);g.lineTo(x+w,b);g.closePath();g.fill();
+    g.fillStyle=rgba(lighten(lcol,.35),ga*.9);g.beginPath();g.moveTo(x,ly);g.lineTo(x+ox,ly+oy);g.lineTo(x+w+ox,ly+oy);g.lineTo(x+w,ly);g.closePath();g.fill();
+    if(o.mid)o.mid();
+    const gr=g.createLinearGradient(0,ly,0,b);gr.addColorStop(0,rgba(lcol,ga*.75));gr.addColorStop(1,rgba(darken(lcol,.25),ga));
+    g.fillStyle=gr;g.fillRect(x,ly,w,b-ly);
+  }else if(o.mid)o.mid();
+}
+function tank3front(g,x,y,w,h,d){
+  const ox=d*DX,oy=d*DY;g.strokeStyle=C.ink;g.lineWidth=3;g.lineJoin='round';
+  g.beginPath();g.moveTo(x,y);g.lineTo(x,y+h);g.lineTo(x+w,y+h);g.lineTo(x+w,y);g.stroke();
+  g.lineWidth=2;g.beginPath();g.moveTo(x+w,y);g.lineTo(x+w+ox,y+oy);g.lineTo(x+w+ox,y+h+oy);g.lineTo(x+w,y+h);g.moveTo(x,y);g.lineTo(x+ox,y+oy);g.lineTo(x+w+ox,y+oy);g.stroke();
+  g.fillStyle='rgba(255,255,255,.18)';g.fillRect(x+6,y+8,5,h-16);
+}
+/* пол-подиум: полоса с перспективой */
+function floor3(g,y,x1,x2,col,d){
+  x1=x1===undefined?0:x1;x2=x2===undefined?W:x2;d=d||40;col=col||C.soft;const ox=d*DX,oy=d*DY;
+  g.fillStyle=col;g.beginPath();g.moveTo(x1,y);g.lineTo(x1+ox,y+oy);g.lineTo(x2+ox,y+oy);g.lineTo(x2,y);g.closePath();g.fill();
+  g.fillStyle=darken(col,.08);g.fillRect(x1,y,x2-x1,6);
+}
+/* призма: передняя грань — многоугольник pts, вытянутый вглубь на d */
+function prism3(g,pts,d,col,o){
+  o=o||{};const ox=d*DX,oy=d*DY,n=pts.length;let A=0;
+  for(let i=0;i<n;i++){const p=pts[i],q=pts[(i+1)%n];A+=p[0]*q[1]-q[0]*p[1]}
+  const sgn=A>0?1:-1;
+  for(let i=0;i<n;i++){const p=pts[i],q=pts[(i+1)%n],ex=q[0]-p[0],ey=q[1]-p[1],L=Math.hypot(ex,ey)||1;
+    const nx=sgn*ey/L,ny=-sgn*ex/L;if(nx*DX+ny*DY<=0.001)continue;
+    const lit=clamp(-ny*.8-nx*.25,-1,1);
+    g.fillStyle=lit>0?lighten(col,.12+lit*.25):darken(col,.12-lit*.15);
+    g.beginPath();g.moveTo(p[0],p[1]);g.lineTo(q[0],q[1]);g.lineTo(q[0]+ox,q[1]+oy);g.lineTo(p[0]+ox,p[1]+oy);g.closePath();g.fill()}
+  g.fillStyle=o.front||col;g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();g.fill();
+  if(o.stroke){g.strokeStyle=o.stroke;g.lineWidth=o.lw||2;g.stroke()}
+}
+
+/* ===================== LABS ===================== */
+const LABS=[];
+
+/* 1. Агрегатные состояния */
+LABS.push({
+  id:'states',title:'Три состояния вещества',cat:'Строение вещества',color:'#3E8E8A',
+  short:'Лёд, вода и пар состоят из одинаковых молекул. Различаются они расположением и движением молекул.',
+  params:[{id:'t',label:'Температура',min:-40,max:140,step:1,val:-15,unit:'°C'}],
+  presets:[['Лёд, −20 °C',{t:-20}],['Вода, 25 °C',{t:25}],['Почти кипит, 99 °C',{t:99}],['Пар, 120 °C',{t:120}]],
+  restartOn:[],
+  def:'Одно и то же вещество может быть твёрдым, жидким или газообразным. В твёрдом теле молекулы расположены в строгом порядке и только колеблются около своих мест. В жидкости молекулы находятся близко друг к другу, но перескакивают с места на место — поэтому жидкость текучая. В газе расстояния между молекулами намного больше самих молекул, молекулы движутся быстро и занимают весь сосуд.',
+  fhead:'Главное',
+  formulas:['твёрдое тело сохраняет форму и объём','жидкость сохраняет объём, но принимает форму сосуда','газ не имеет ни своей формы, ни постоянного объёма'],
+  tryit:['Медленно нагревайте лёд до 0 °C и следите, как разрушается кристаллическая решётка.','Сравните, как далеко друг от друга молекулы в воде и в паре.','Охладите пар ниже 100 °C — молекулы снова соберутся в жидкость.'],
+  state(P){return P.t<0?'s':P.t<100?'l':'g'},
+  init(S,P){
+    const cols=8,rows=6,sp=21,cx=250,bottom=366;S.R=8;S.box=[50,40,450,372];S.time=0;S.parts=[];S.cols=cols;
+    const st=this.state(P);
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+      const sx=cx-(cols-1)*sp/2+c*sp,sy=bottom-S.R-r*sp;
+      const p={sx,sy,x:sx,y:sy,vx:0,vy:0,ph:Math.random()*6.28};
+      if(st==='g'){p.x=70+Math.random()*360;p.y=60+Math.random()*290;const a=Math.random()*6.28;p.vx=Math.cos(a)*150;p.vy=Math.sin(a)*150}
+      S.parts.push(p);
+    }
+  },
+  step(S,P,dt){
+    const st=this.state(P),n=4,h=dt/n,[x0,y0,x1,y1]=S.box,R=S.R,ps=S.parts,D=2*R+1;S.time+=dt;
+    const vt=st==='g'?150*Math.sqrt((P.t+273)/373):18+P.t*0.35;
+    for(let it=0;it<n;it++){
+      for(const p of ps){p.ax=0;p.ay=st==='l'?700:0}
+      if(st!=='s'){
+        for(let i=0;i<ps.length;i++){const a=ps[i];for(let j=i+1;j<ps.length;j++){const b=ps[j];
+          const dx=b.x-a.x,dy=b.y-a.y,d2=dx*dx+dy*dy;
+          if(d2<D*D&&d2>1e-4){const d=Math.sqrt(d2),f=(D-d)*600/d;a.ax-=dx*f;a.ay-=dy*f;b.ax+=dx*f;b.ay+=dy*f}
+          else if(st==='l'&&d2<(D+10)*(D+10)&&d2>1e-4){const d=Math.sqrt(d2),f=(d-D)*40/d;a.ax+=dx*f;a.ay+=dy*f;b.ax-=dx*f;b.ay-=dy*f}
+        }}
+      }
+      for(const p of ps){
+        if(st==='s'){p.ax+=-90*(p.x-p.sx)-9*p.vx;p.ay+=-90*(p.y-p.sy)-9*p.vy}
+        p.vx+=p.ax*h;p.vy+=p.ay*h;
+        const sp=Math.hypot(p.vx,p.vy);
+        if(st==='s'){if(sp>320){p.vx*=320/sp;p.vy*=320/sp}}
+        else if(sp>1e-3){const k=1+(vt/sp-1)*Math.min(1,h*(st==='g'?2:6));p.vx*=k;p.vy*=k}
+        else{const a=Math.random()*6.28;p.vx=Math.cos(a)*vt;p.vy=Math.sin(a)*vt}
+        p.x+=p.vx*h;p.y+=p.vy*h;
+        if(p.x<x0+R){p.x=x0+R;p.vx=Math.abs(p.vx)}if(p.x>x1-R){p.x=x1-R;p.vx=-Math.abs(p.vx)}
+        if(p.y<y0+R){p.y=y0+R;p.vy=Math.abs(p.vy)}if(p.y>y1-R){p.y=y1-R;p.vy=-Math.abs(p.vy)}
+      }
+    }
+  },
+  draw(g,S,P){
+    const st=this.state(P),[x0,y0,x1,y1]=S.box,ps=S.parts,R=S.R;
+    const D3=34;g.fillStyle=C.soft;g.fillRect(x0,y0,x1-x0,y1-y0);tank3(g,x0,y0,x1-x0,y1-y0,D3,null);
+    const A=st==='s'?0.6+(P.t+40)/40*1.8:0;
+    const pos=p=>st==='s'?[p.x+A*Math.sin(S.time*23+p.ph),p.y+A*Math.cos(S.time*19+p.ph*1.3)]:[p.x,p.y];
+    const Q=ps.map(pos),ox=18*DX,oy=18*DY;
+    if(st==='s'){
+      // задний слой кристалла
+      g.globalAlpha=.45;g.strokeStyle=rgba(C.teal,0.5);g.lineWidth=1.5;g.beginPath();
+      for(let i=0;i<ps.length;i++){const c=i%S.cols;g.moveTo(Q[i][0],Q[i][1]);g.lineTo(Q[i][0]+ox,Q[i][1]+oy);
+        if(c<S.cols-1){g.moveTo(Q[i][0]+ox,Q[i][1]+oy);g.lineTo(Q[i+1][0]+ox,Q[i+1][1]+oy)}
+        if(i+S.cols<ps.length){g.moveTo(Q[i][0]+ox,Q[i][1]+oy);g.lineTo(Q[i+S.cols][0]+ox,Q[i+S.cols][1]+oy)}}
+      g.stroke();for(const q of Q)sph(g,q[0]+ox,q[1]+oy,R*.85,C.teal);g.globalAlpha=1;
+      g.strokeStyle=rgba(C.teal,0.6);g.lineWidth=2;g.beginPath();
+      for(let i=0;i<ps.length;i++){const c=i%S.cols;
+        if(c<S.cols-1){g.moveTo(Q[i][0],Q[i][1]);g.lineTo(Q[i+1][0],Q[i+1][1])}
+        if(i+S.cols<ps.length){g.moveTo(Q[i][0],Q[i][1]);g.lineTo(Q[i+S.cols][0],Q[i+S.cols][1])}}
+      g.stroke();
+    }
+    if(st!=='s')for(let i=0;i<Q.length;i++){const q=Q[i];if(i%3===0){g.globalAlpha=.5;sph(g,q[0]+ox*.6,q[1]+oy*.6,R*.8,C.teal);g.globalAlpha=1}}
+    for(let i=0;i<Q.length;i++){const q=Q[i];if(st!=='s'&&i%3===0)continue;sph(g,q[0],q[1],R,C.teal)}
+    tank3front(g,x0,y0,x1-x0,y1-y0,D3);
+    badge(g,st==='s'?'Твёрдое: лёд':st==='l'?'Жидкое: вода':'Газ: водяной пар',x0+14,y0+14,LABC(this));
+    // термометр
+    const tx=540,top=52,bot=320,ty=v=>bot-(v+40)/180*(bot-top);
+    shadow(g,tx,bot+48,22);g.fillStyle=C.surf;g.strokeStyle=C.ink;g.lineWidth=3;g.beginPath();g.roundRect(tx-9,top-8,18,bot-top+20,9);g.fill();g.stroke();
+    g.beginPath();g.arc(tx,bot+28,17,0,7);g.fill();g.stroke();
+    {const gr=g.createLinearGradient(tx-4,0,tx+4,0);gr.addColorStop(0,lighten(C.plum,.35));gr.addColorStop(1,darken(C.plum,.25));g.fillStyle=gr;g.fillRect(tx-4,ty(P.t),8,bot+28-ty(P.t))}
+    sph(g,tx,bot+28,12,C.plum);g.fillStyle='rgba(255,255,255,.45)';g.fillRect(tx-6,top,2.5,bot-top);
+    for(const v of [-40,0,50,100,140]){const y=ty(v),key=v===0||v===100;
+      g.strokeStyle=key?C.ink:C.muted;g.lineWidth=key?2:1;g.beginPath();g.moveTo(tx+12,y);g.lineTo(tx+(key?26:20),y);g.stroke();
+      txt(g,(v<0?'−'+(-v):v)+'°',tx+30,y+4,{s:12,c:key?C.ink:C.muted,w:key?700:500})}
+  },
+  outs(S,P){const st=this.state(P);
+    return[['Состояние',st==='s'?'твёрдое (лёд)':st==='l'?'жидкое (вода)':'газ (пар)'],
+      ['Молекулы',st==='s'?'колеблются на местах':st==='l'?'близко, перескакивают':'далеко, летают'],
+      ['Форма',st==='s'?'сохраняет':'не сохраняет'],['Объём',st==='g'?'занимает весь сосуд':'сохраняет']]}
+});
+
+/* 2. Диффузия */
+LABS.push({
+  id:'diffusion',title:'Диффузия',cat:'Строение вещества',color:'#9B2D67',
+  short:'Молекулы двух веществ сами собой перемешиваются. Как на это влияет температура?',
+  params:[
+    {id:'t',label:'Температура',min:0,max:100,step:1,val:20,unit:'°C'},
+    {id:'N',label:'Число молекул',min:40,max:200,step:10,val:120,unit:''},
+    {id:'med',label:'Вещества',type:'seg',val:'g',options:[['g','Газы'],['l','Жидкости']]}
+  ],
+  presets:[['Холодно, 0 °C',{t:0}],['Горячо, 100 °C',{t:100}],['Жидкости',{med:'l'}]],
+  restartOn:['N','med'],launch:true,launchLabel:'Начать заново',
+  def:'Диффузия — явление, при котором вещества сами собой проникают друг в друга из-за беспорядочного движения молекул. Чем выше температура, тем быстрее движутся молекулы и тем быстрее идёт диффузия. В газах она происходит быстро, в жидкостях медленнее, а в твёрдых телах — очень медленно.',
+  fhead:'Главное',
+  formulas:['чем выше температура, тем быстрее диффузия','в газах диффузия идёт быстрее, чем в жидкостях'],
+  tryit:['Сравните время, за которое вещества перемешаются наполовину, при 0 °C и при 100 °C.','Переключитесь на жидкости — диффузия заметно замедлится. Почему?','Проследите за зелёной молекулой: её путь — ломаная линия из-за столкновений.'],
+  init(S,P){
+    S.t=0;S.parts=[];S.trail=[];S.acc=0;S.mix=0;
+    for(let i=0;i<P.N;i++){const k=i%2;S.parts.push({x:k?330+Math.random()*262:48+Math.random()*262,y:48+Math.random()*304,a:Math.random()*6.2832,k})}
+  },
+  step(S,P,dt){
+    S.t+=dt;const s=Math.sqrt((P.t+273)/293),liq=P.med==='l',v=(liq?40:120)*s,rate=liq?14:3.5,bar=S.t<0.9;
+    for(const p of S.parts){
+      if(Math.random()<rate*dt)p.a=Math.random()*6.2832;
+      p.x+=Math.cos(p.a)*v*dt;p.y+=Math.sin(p.a)*v*dt;
+      const lo=bar&&p.k===1?326:46,hi=bar&&p.k===0?314:594;
+      if(p.x<lo){p.x=lo;p.a=Math.PI-p.a}if(p.x>hi){p.x=hi;p.a=Math.PI-p.a}
+      if(p.y<46){p.y=46;p.a=-p.a}if(p.y>354){p.y=354;p.a=-p.a}
+      if(p.z===undefined){p.z=Math.random();p.b=Math.random()*6.2832}
+      if(Math.random()<rate*dt)p.b=Math.random()*6.2832;
+      p.z+=Math.cos(p.b)*v*dt/320;if(p.z<0){p.z=0;p.b=Math.PI-p.b}if(p.z>1){p.z=1;p.b=Math.PI-p.b}
+    }
+    S.acc+=dt;if(S.acc>0.04&&S.parts.length){S.acc=0;S.trail.push([S.parts[0].x+(S.parts[0].z||0)*40*DX,S.parts[0].y+(S.parts[0].z||0)*40*DY]);if(S.trail.length>140)S.trail.shift()}
+    let c=0;for(const p of S.parts)if((p.k===0&&p.x>320)||(p.k===1&&p.x<320))c++;
+    S.mix=ease(S.mix,Math.min(1,c/(S.parts.length/2)),dt,4);
+  },
+  draw(g,S,P){
+    const liq=P.med==='l';
+    const D3=40,ox=D3*DX,oy=D3*DY;
+    g.fillStyle=liq?rgba('#3F6FB5',0.10):C.soft;g.fillRect(40,40,560,320);
+    tank3(g,40,40,560,320,D3,liq?40:null,'#3F6FB5',{alpha:.22});
+    if(S.t<1){const lift=sm((S.t-0.4)/0.5)*330,yb=40-lift;
+      g.fillStyle=rgba(C.ink,.85);g.beginPath();g.moveTo(317,yb);g.lineTo(317+ox,yb+oy);g.lineTo(317+ox,yb+320+oy);g.lineTo(317,yb+320);g.closePath();g.fill();
+      g.fillStyle=C.ink;g.fillRect(317,yb,6,320)}
+    if(S.trail.length>1){g.strokeStyle=rgba(C.lime,0.9);g.lineWidth=2;g.lineJoin='round';g.beginPath();S.trail.forEach((q,i)=>i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]));g.stroke()}
+    const ord=S.parts.map((p,i)=>i).sort((a,b)=>(S.parts[b].z||0)-(S.parts[a].z||0));
+    for(const i of ord){const p=S.parts[i],z=p.z||0,x=p.x+z*ox,y=p.y+z*oy,k=1-z*.28;
+      g.globalAlpha=1-z*.35;sph(g,x,y,(i===0?7.5:5.5)*k,i===0?C.lime:p.k?C.teal:C.plum);
+      if(i===0){g.globalAlpha=1;g.strokeStyle=C.ink;g.lineWidth=2;g.beginPath();g.arc(x,y,7.5*k,0,7);g.stroke()}}
+    g.globalAlpha=1;tank3front(g,40,40,560,320,D3);
+    // шкала перемешивания
+    g.fillStyle=C.grid;g.beginPath();g.roundRect(200,374,400,10,5);g.fill();
+    g.fillStyle=LABC(this);g.beginPath();g.roundRect(200,374,Math.max(10,400*S.mix),10,5);g.fill();
+    txt(g,'перемешано '+Math.round(S.mix*100)+' %',190,384,{a:'right',s:13,w:600,c:C.muted});
+  },
+  outs(S,P){return[['Перемешано',Math.round(S.mix*100)+' %'],['Время опыта',f1(S.t,1)+' с'],['Температура',P.t+' °C'],['Вещества',P.med==='l'?'жидкости':'газы']]}
+});
+
+/* 3. Равномерное движение */
+LABS.push({
+  id:'motion',title:'Равномерное движение',cat:'Взаимодействие тел',color:'#B54708',
+  short:'Велосипедист и автомобиль едут с постоянной скоростью. Кто быстрее проедет 100 метров?',
+  params:[
+    {id:'v1',label:'Скорость велосипедиста',min:1,max:30,step:1,val:6,unit:'м/с'},
+    {id:'v2',label:'Скорость автомобиля',min:1,max:30,step:1,val:15,unit:'м/с'}
+  ],
+  presets:[['Медленный велосипедист',{v1:3}],['Автомобиль 72 км/ч',{v2:20}],['Одинаковые скорости',{v1:10,v2:10}],['Велосипед быстрее',{v1:12,v2:8}]],
+  restartOn:'all',launch:true,launchLabel:'Старт заново',
+  def:'Движение называют равномерным, если тело за любые равные промежутки времени проходит одинаковые пути. Скорость показывает, какой путь тело проходит за единицу времени. График пути при равномерном движении — прямая линия: чем больше скорость, тем круче идёт график.',
+  formulas:['v = s / t','s = v · t','t = s / v','1 м/с = 3,6 км/ч'],
+  tryit:['Сделайте скорости одинаковыми — графики совпадут.','Как по графику сразу понять, какое тело движется быстрее?','Переведите 15 м/с в километры в час и проверьте ответ в карточке.'],
+  init(S){S.t=0},
+  step(S,P,dt){const T=100/Math.min(P.v1,P.v2);if(S.t<T)S.t=Math.min(T,S.t+dt)},
+  draw(g,S,P){
+    const X0=60,X1=588,kx=(X1-X0)/100,t=S.t,s1=Math.min(100,P.v1*t),s2=Math.min(100,P.v2*t),lab=LABC(this);
+    g.fillStyle=C.soft;g.beginPath();g.roundRect(16,22,W-32,158,18);g.fill();
+    {const rg=g.createLinearGradient(0,34,0,150);rg.addColorStop(0,C.dark?'#2c2536':'#dcdbe3');rg.addColorStop(1,C.dark?'#3a3247':'#ebeaf0');
+     g.fillStyle=rg;g.beginPath();g.moveTo(40,34);g.lineTo(W-40,34);g.lineTo(W-24,146);g.lineTo(24,146);g.closePath();g.fill();
+     g.fillStyle=C.dark?'#1a1520':'#c4c2cf';g.beginPath();g.moveTo(24,146);g.lineTo(W-24,146);g.lineTo(W-24,156);g.lineTo(24,156);g.closePath();g.fill()}
+    g.setLineDash([14,10]);g.strokeStyle=C.grid;g.lineWidth=3;g.beginPath();g.moveTo(30,98);g.lineTo(W-30,98);g.stroke();g.setLineDash([]);
+    for(let m=0;m<=100;m+=20){const x=X0+m*kx;g.strokeStyle=C.grid;g.lineWidth=1.5;g.beginPath();g.moveTo(x,30);g.lineTo(x,154);g.stroke();
+      txt(g,m+' м',x,172,{a:'center',s:12,c:C.muted,w:500})}
+    for(let r=0;r<8;r++)for(let c=0;c<2;c++){g.fillStyle=(r+c)%2?C.ink:C.surf;g.fillRect(X1+c*8,30+r*15.5,8,15.5)}
+    const moving1=s1<100&&t>0,moving2=s2<100&&t>0;
+    // велосипед
+    const bx=X0+s1*kx-14,by=72;
+    if(moving1){g.strokeStyle=rgba(C.plum,0.4);g.lineWidth=3;for(let i=0;i<3;i++){g.beginPath();g.moveTo(bx-34-i*4,by-10+i*9);g.lineTo(bx-50-i*10,by-10+i*9);g.stroke()}}
+    shadow(g,bx,by+19,30,.25);g.strokeStyle=C.ink;g.lineWidth=3;
+    for(const dx of [-13,13]){g.beginPath();g.arc(bx+dx,by+8,9,0,7);g.stroke();
+      const r1=s1/0.35;g.lineWidth=1.2;g.beginPath();for(let k=0;k<3;k++){const a=r1+k*Math.PI/3;g.moveTo(bx+dx-Math.cos(a)*8,by+8-Math.sin(a)*8);g.lineTo(bx+dx+Math.cos(a)*8,by+8+Math.sin(a)*8)}g.stroke();g.lineWidth=3}
+    g.strokeStyle=C.plum;g.lineWidth=3.5;g.lineJoin='round';g.beginPath();g.moveTo(bx-13,by+8);g.lineTo(bx-2,by-6);g.lineTo(bx+13,by+8);g.moveTo(bx-2,by-6);g.lineTo(bx+6,by-20);g.stroke();
+    sph(g,bx+8,by-27,6.5,C.plum);
+    // автомобиль
+    const cx=X0+s2*kx-28,cy=128;
+    if(moving2){g.strokeStyle=rgba(C.teal,0.5);g.lineWidth=3;for(let i=0;i<3;i++){g.beginPath();g.moveTo(cx-34-i*4,cy-12+i*8);g.lineTo(cx-52-i*10,cy-12+i*8);g.stroke()}}
+    shadow(g,cx+4,cy+13,46,.3);
+    box3(g,cx-15,cy-24,30,12,C.teal,12,{shadow:false});g.fillStyle=rgba('#BFE3F2',.85);g.fillRect(cx-11,cy-22,10,8);g.fillRect(cx+1,cy-22,10,8);
+    box3(g,cx-28,cy-12,56,17,C.teal,12,{shadow:false});
+    g.fillStyle='#FFE08A';g.beginPath();g.arc(cx+26,cy-6,2.5,0,7);g.fill();
+    for(const dx of [-16,16]){g.fillStyle=C.ink;g.beginPath();g.arc(cx+dx,cy+6,7.5,0,7);g.fill();
+      g.fillStyle='#9AA0AE';g.beginPath();g.arc(cx+dx,cy+6,3.2,0,7);g.fill();const a=s2/0.27;g.strokeStyle='#9AA0AE';g.lineWidth=1.5;g.beginPath();g.moveTo(cx+dx,cy+6);g.lineTo(cx+dx+Math.cos(a)*6,cy+6+Math.sin(a)*6);g.stroke()}
+    // график s(t)
+    const gx0=72,gx1=608,gy0=376,gy1=214,T=100/Math.min(P.v1,P.v2);
+    const X=tt=>gx0+tt/T*(gx1-gx0),Y=ss=>gy0-ss/100*(gy0-gy1);
+    g.fillStyle=C.soft;g.beginPath();g.roundRect(16,194,W-32,198,18);g.fill();
+    const steps=[0.5,1,2,5,10,20,50];const st=steps.find(s=>T/s<=10)||50;
+    g.strokeStyle=C.grid;g.lineWidth=1;
+    for(let tt=0;tt<=T+1e-9;tt+=st){g.beginPath();g.moveTo(X(tt),gy0);g.lineTo(X(tt),gy1);g.stroke();txt(g,f1(tt,st<1?1:0),X(tt),gy0+14,{a:'center',s:11,c:C.muted,w:500})}
+    for(const ss of [0,50,100]){g.beginPath();g.moveTo(gx0,Y(ss));g.lineTo(gx1,Y(ss));g.stroke();txt(g,String(ss),gx0-8,Y(ss)+4,{a:'right',s:11,c:C.muted,w:500})}
+    txt(g,'s, м',gx0-8,gy1-6,{a:'right',s:12,c:C.muted,w:600});txt(g,'t, с',gx1,gy1-6,{a:'right',s:12,c:C.muted,w:600});
+    const line=(v,col,cur)=>{const Tf=100/v;
+      g.setLineDash([5,6]);g.strokeStyle=rgba(col,0.35);g.lineWidth=2;g.beginPath();g.moveTo(X(0),Y(0));g.lineTo(X(Tf),Y(100));g.lineTo(X(T),Y(100));g.stroke();g.setLineDash([]);
+      g.strokeStyle=col;g.lineWidth=4;g.lineCap='round';g.beginPath();g.moveTo(X(0),Y(0));
+      if(t<=Tf)g.lineTo(X(t),Y(v*t));else{g.lineTo(X(Tf),Y(100));g.lineTo(X(t),Y(100))}g.stroke();
+      g.fillStyle=col;g.beginPath();g.arc(X(t),Y(cur),6,0,7);g.fill()};
+    line(P.v1,'#9B2D67',s1);line(P.v2,'#50ADA8',s2);
+    txt(g,'t = '+f1(t,1)+' с',W/2,210,{a:'center',s:15,w:700});
+  },
+  outs(S,P){return[['Велосипедист',P.v1+' м/с = '+f1(P.v1*3.6,1)+' км/ч'],['Автомобиль',P.v2+' м/с = '+f1(P.v2*3.6,1)+' км/ч'],
+    ['Время на 100 м',f1(100/P.v1,1)+' с и '+f1(100/P.v2,1)+' с'],['Прошло времени',f1(S.t,1)+' с']]}
+});
+
+/* 4. Плотность */
+const MATS=[['cork','Пробка',240,'#C9A26B'],['pine','Сосна',400,'#C08A4E'],['ice','Лёд',900,'#8EC9DE'],['al','Алюминий',2700,'#A9B0BC'],['steel','Сталь',7800,'#6B7280'],['pb','Свинец',11300,'#4E5464']];
+const matOf=id=>MATS.find(m=>m[0]===id)||MATS[0];
+LABS.push({
+  id:'density',title:'Плотность вещества',cat:'Взаимодействие тел',color:'#5E7A1E',
+  short:'Кубики одного объёма из разных веществ весят по-разному. Взвесьте и сравните.',
+  params:[
+    {id:'mat',label:'Вещество',type:'seg',val:'al',options:MATS.map(m=>[m[0],m[1]])},
+    {id:'V',label:'Объём тела',min:10,max:1000,step:10,val:200,unit:'см³'}
+  ],
+  presets:[['Пробка, 1000 см³',{mat:'cork',V:1000}],['Свинец, 20 см³',{mat:'pb',V:20}],['Лёд, 100 см³',{mat:'ice',V:100}]],
+  restartOn:['mat'],
+  def:'Плотность показывает, чему равна масса вещества в единице объёма. Тела одинакового объёма, сделанные из разных веществ, имеют разную массу: свинцовый кубик намного тяжелее пробкового того же размера. Плотность — свойство вещества, она не зависит от размеров тела.',
+  formulas:['ρ = m / V','m = ρ · V','V = m / ρ','1 г/см³ = 1000 кг/м³'],
+  tryit:['Найдите объём пробки, которая весит столько же, сколько 20 см³ свинца.','Во сколько раз сталь плотнее льда?','Какие вещества из списка плавали бы в воде? Сравните их с отметкой «вода».'],
+  side(P){return 30+Math.cbrt(P.V)*9},
+  init(S){S.y=-170;S.v=0;S.landed=false;S.m=0},
+  step(S,P,dt){
+    const s=this.side(P),ty=296-s,mass=matOf(P.mat)[2]/1000*P.V;
+    if(!S.landed){S.v+=2600*dt;S.y+=S.v*dt;if(S.y>=ty){S.y=ty;if(S.v>260)S.v=-S.v*0.28;else{S.v=0;S.landed=true}}}
+    else S.y=ty;
+    S.m=S.landed?ease(S.m,mass,dt,7):0;if(S.landed&&Math.abs(S.m-mass)<0.05)S.m=mass;
+  },
+  draw(g,S,P){
+    const M=matOf(P.mat),s=this.side(P),cx=190;
+    // весы
+    shadow(g,200,356,150,.25);box3(g,78,304,224,50,C.dark?'#3a3247':'#E9E7F0',50,{shadow:false,stroke:C.ink,lw:2});
+    box3(g,62,296,256,9,C.dark?'#8d88a3':'#3a3e5c',60,{shadow:false});
+    g.fillStyle='#1F2340';g.beginPath();g.roundRect(126,316,128,28,8);g.fill();
+    txt(g,f1(S.m,S.m<100?1:0)+' г',246,336,{a:'right',s:17,c:'#99CC42',w:700});
+    // кубик
+    g.save();
+    const cd=s*.6,csh=(60-cd)/2,cxo=csh*DX,cyo=csh*DY;
+    {const dh=296-(S.y+s);shadow(g,cx+cxo+cd*DX/2,296+cyo+cd*DY/2,s*.7*clamp(1-dh/250,.3,1),.25*clamp(1-dh/250,.2,1));
+     box3(g,cx-s/2+cxo,S.y+cyo,s,s,M[3],cd,{shadow:false})}
+    g.restore();
+    g.font='700 '+14*TS+'px '+FONT;const lblW=g.measureText(M[1]).width;
+    if(lblW<s-10)txt(g,M[1],cx+cxo,S.y+cyo+s/2+5,{a:'center',s:14,c:'#fff',w:700});
+    else txt(g,M[1],cx+cxo+cd*DX/2,S.y+cyo+cd*DY-10,{a:'center',s:14,w:700});
+    // плотности
+    const bx=462,bw=118,mx=11300,wx0=bx+1000/mx*bw;
+    txt(g,'Плотность, кг/м³',352,46,{s:14,w:700});
+    MATS.forEach((m,i)=>{const y=70+i*46,cur=m[0]===P.mat,w=Math.max(4,m[2]/mx*bw);
+      txt(g,m[1],bx-10,y+15,{a:'right',s:13,w:cur?700:500,c:cur?C.ink:C.muted});
+      g.globalAlpha=cur?1:.5;box3(g,bx,y,w,20,m[3],10,{shadow:false,stroke:cur?C.ink:null,lw:1.5});g.globalAlpha=1;
+      txt(g,String(m[2]),Math.max(bx+w+8,bx+w<wx0?wx0+6:0),y+15,{s:12,w:cur?700:500,c:cur?C.ink:C.muted});
+    });
+    const wx=bx+1000/mx*bw;g.setLineDash([4,4]);g.strokeStyle=C.plum;g.lineWidth=2;g.beginPath();g.moveTo(wx,62);g.lineTo(wx,346);g.stroke();g.setLineDash([]);
+    txt(g,'вода, 1000',wx+4,364,{s:12,c:C.plum,w:600,a:'center'});
+  },
+  outs(S,P){const M=matOf(P.mat),m=M[2]/1000*P.V;
+    return[['Масса m = ρ · V',m>=1000?f1(m/1000,2)+' кг':f1(m,m<100?1:0)+' г'],['Плотность',f1(M[2]/1000,2)+' г/см³'],['То же в СИ',f1(M[2],0)+' кг/м³'],['Объём',f1(P.V,0)+' см³']]}
+});
+
+/* 5. Закон Гука */
+LABS.push({
+  id:'hooke',title:'Сила упругости. Закон Гука',cat:'Взаимодействие тел',color:'#367A55',
+  short:'Подвесьте груз к пружине и измерьте удлинение. Как оно зависит от массы и жёсткости?',
+  params:[
+    {id:'m',label:'Масса груза',min:0.1,max:1,step:0.05,val:0.3,unit:'кг',d:2},
+    {id:'k',label:'Жёсткость пружины',min:20,max:200,step:5,val:50,unit:'Н/м'},
+    {id:'g',label:'Ускорение свободного падения g',min:1,max:25,step:0.1,val:9.8,unit:'Н/кг',d:1}
+  ],
+  presets:[['Земля',{g:9.8}],['Луна',{g:1.6}],['Юпитер',{g:24.8}],['Мягкая пружина',{k:20}],['Жёсткая пружина',{k:200}]],
+  restartOn:[],launch:true,launchLabel:'Подвесить заново',
+  def:'Сила упругости возникает при деформации тела и стремится вернуть ему прежнюю форму. Закон Гука: при упругой деформации сила упругости прямо пропорциональна удлинению. Когда груз висит неподвижно, сила упругости уравновешивает силу тяжести, а вес груза равен m·g. Если растянуть пружину слишком сильно, закон Гука перестаёт выполняться.',
+  formulas:['Fупр = k · Δl','Fтяж = m · g','в покое: Fупр = Fтяж, вес P = m · g'],
+  tryit:['Удвойте массу груза — во сколько раз увеличилось удлинение?','Перенесите опыт на Луну: как изменились удлинение и вес?','Найдите груз, который растягивает пружину 50 Н/м ровно на 10 см.'],
+  init(S){S.x=0;S.v=0},
+  step(S,P,dt){const n=20,h=dt/n,c=0.36*Math.sqrt(P.k/P.m);
+    for(let i=0;i<n;i++){const a=P.g-(P.k/P.m)*S.x-c*S.v;S.v+=a*h;S.x+=S.v*h;
+      if(S.x>0.6){S.x=0.6;if(S.v>0)S.v=0}if(S.x<-0.05){S.x=-0.05;if(S.v<0)S.v=0}}},
+  draw(g,S,P){
+    const lab=LABC(this),X=320,y0=42,L0=60,px=400,len=L0+S.x*px,over=P.m*P.g/P.k>0.6;
+    const stc=C.dark?'#8d88a3':'#3a3e5c';
+    box3(g,96-20*DX,370-20*DY,150,12,stc,40);cyl(g,160,34,372,5,stc,{ry:1.8});box3(g,156-5*DX,30-5*DY,190,9,stc,10,{shadow:false});
+    // пружина (винтовая линия)
+    {const turns=8,top=y0+8,bot=y0+len-8,r=14,col=over?C.plum:C.ink,N=turns*24;
+     g.strokeStyle=col;g.lineWidth=2.5;g.lineCap='round';g.beginPath();g.moveTo(X,y0);g.lineTo(X,top);g.stroke();
+     for(const pass of [0,1]){g.strokeStyle=pass?col:rgba(col,.4);g.lineWidth=pass?3:2;g.beginPath();
+       for(let i=0;i<N;i++){const a1=i/24*2*Math.PI,a2=(i+1)/24*2*Math.PI,front=Math.sin((a1+a2)/2)>0;if(front!==!!pass)continue;
+         const y1=top+(bot-top)*i/N,y2=top+(bot-top)*(i+1)/N;
+         g.moveTo(X+r*Math.cos(a1),y1+r*.32*Math.sin(a1));g.lineTo(X+r*Math.cos(a2),y2+r*.32*Math.sin(a2))}g.stroke()}
+     g.strokeStyle=col;g.lineWidth=2.5;g.beginPath();g.moveTo(X+r,bot);g.lineTo(X,bot);g.lineTo(X,y0+len);g.stroke()}
+    // груз
+    const hw=20+P.m*22,wy=y0+len+8;
+    shadow(g,X,388,40*clamp(1-(388-wy-hw)/300,.4,1),.15);
+    g.strokeStyle=C.ink;g.lineWidth=2.2;g.beginPath();g.moveTo(X,y0+len);g.lineTo(X,y0+len+2);g.stroke();
+    g.beginPath();g.arc(X,y0+len+5,3.5,-Math.PI/2,Math.PI*1.3);g.stroke();
+    cyl(g,X,wy+1,wy+9,3,'#6B6F85',{ry:1.2});
+    cyl(g,X,wy+8,wy+hw-6,28,'#5E6476');
+    txt(g,f1(P.m,2)+' кг',X,wy+hw/2+5,{a:'center',s:10.5,c:'#fff',w:700});
+    // линейка
+    const rx=410,r0=y0+L0;box3(g,rx,r0-14,52,256,C.dark?'#3a3247':'#F1E7C8',8,{shadow:false});
+    for(let cm=0;cm<=60;cm++){const y=r0+cm*4;g.strokeStyle=cm%10?C.muted:C.ink;g.lineWidth=cm%10?1:2;g.beginPath();g.moveTo(rx,y);g.lineTo(rx+(cm%10?8:cm%5?10:16),y);g.stroke();
+      if(cm%10===0)txt(g,String(cm),rx+22,y+4,{s:11,w:600})}
+    txt(g,'см',rx+44,r0-2,{s:11,c:C.muted,w:500});
+    const ey=y0+len;g.setLineDash([4,4]);g.strokeStyle=lab;g.lineWidth=2;g.beginPath();g.moveTo(X+18,ey);g.lineTo(rx,ey);g.stroke();g.setLineDash([]);
+    g.fillStyle=lab;g.beginPath();g.moveTo(rx-2,ey);g.lineTo(rx-12,ey-6);g.lineTo(rx-12,ey+6);g.closePath();g.fill();
+    // силы
+    const Fu=P.k*S.x,Ft=P.m*P.g,sc=Math.min(8,90/Math.max(Ft,Fu,0.01));
+    if(Fu>0.05){arrow(g,X-44,wy+hw/2,X-44,wy+hw/2-Fu*sc-4,C.teal,4);txt(g,'Fупр',X-52,wy+hw/2-Fu*sc/2,{a:'right',s:13,c:C.teal,w:700})}
+    arrow(g,X+44,wy+hw/2,X+44,wy+hw/2+Ft*sc+4,C.plum,4);txt(g,'Fтяж',X+52,wy+hw/2+Ft*sc/2+8,{s:13,c:C.plum,w:700});
+    if(over)badge(g,'Предел упругости превышен',W-16,16,C.plum,'right');
+    txt(g,'Δl = '+f1(S.x*100,1)+' см',W-20,over?80:40,{a:'right',s:17,w:800});
+  },
+  outs(S,P){return[['Удлинение Δl',f1(S.x*100,1)+' см'],['Сила упругости k·Δl',f1(P.k*S.x,2)+' Н'],['Сила тяжести m·g',f1(P.m*P.g,2)+' Н'],['Вес груза в покое',f1(P.m*P.g,2)+' Н']]}
+});
+
+/* 6. Сила трения */
+const SURF={ice:[0.03,0.05,'Лёд'],wood:[0.3,0.4,'Дерево'],asph:[0.6,0.75,'Асфальт'],wheel:[0.02,0.03,'Колёсики']};
+LABS.push({
+  id:'friction',title:'Сила трения',cat:'Взаимодействие тел',color:'#8A5A2B',
+  short:'Тяните брусок динамометром. Когда он сдвинется с места и от чего зависит трение?',
+  params:[
+    {id:'F',label:'Сила тяги (показания динамометра)',min:0,max:40,step:0.5,val:5,unit:'Н',d:1},
+    {id:'m',label:'Масса бруска',min:0.5,max:5,step:0.1,val:2,unit:'кг',d:1},
+    {id:'surf',label:'Поверхность',type:'seg',val:'wood',options:[['ice','Лёд'],['wood','Дерево'],['asph','Асфальт'],['wheel','На колёсиках']]}
+  ],
+  presets:[['Ледяная дорожка',{surf:'ice',F:2}],['Тяжёлый ящик',{m:5,surf:'wood',F:15}],['На колёсиках',{surf:'wheel',F:2}]],
+  restartOn:['surf'],launch:true,launchLabel:'Вернуть брусок',
+  def:'Сила трения возникает при соприкосновении тел и препятствует их движению. Пока брусок покоится, сила трения покоя равна силе тяги. Брусок сдвигается, когда сила тяги превышает наибольшую силу трения покоя. Сила трения скольжения тем больше, чем сильнее тело прижато к опоре и чем шероховатее поверхности. Трение качения намного меньше трения скольжения.',
+  formulas:['Fтр = μ · N','N = m · g (на горизонтальной опоре)','тело сдвинется, если F > Fтр.покоя max'],
+  tryit:['Медленно увеличивайте силу тяги и найдите момент, когда брусок сдвинется.','Поставьте брусок на колёсики — во сколько раз уменьшилось трение?','Увеличьте массу вдвое: как изменилась сила трения скольжения?'],
+  init(S){S.x=0;S.v=0;S.mv=false;S.w=0},
+  step(S,P,dt){
+    const s=SURF[P.surf],N=P.m*G,Fs=s[1]*N,Fk=s[0]*N;
+    if(!S.mv&&P.F>Fs+1e-9)S.mv=true;
+    if(S.mv){S.v+=(P.F-Fk)/P.m*dt;if(S.v<=0){S.v=0;if(P.F<=Fs)S.mv=false}S.x+=S.v*dt;S.w+=S.v*dt;
+      if(S.x>8){S.x=0;S.v=0;S.mv=false}}
+  },
+  draw(g,S,P){
+    const s=SURF[P.surf],N=P.m*G,Fs=s[1]*N,Fk=s[0]*N,Ftr=S.mv?Fk:Math.min(P.F,Fs),gy=262,wheel=P.surf==='wheel';
+    // поверхность
+    const col=P.surf==='ice'?rgba('#8EC9DE',0.55):P.surf==='asph'?rgba('#4E5464',C.dark?0.9:0.8):rgba('#C08A4E',0.55);
+    g.fillStyle=col;g.fillRect(0,gy,W,H-gy);
+    g.strokeStyle=P.surf==='asph'?'rgba(255,255,255,.25)':rgba('#8A5A2B',0.35);g.lineWidth=1.5;
+    if(P.surf==='asph'){g.fillStyle='rgba(255,255,255,.22)';for(let i=0;i<90;i++){const x=(i*73)%W,y=gy+12+(i*37)%120;g.fillRect(x,y,2,2)}}
+    else if(P.surf==='ice'){g.strokeStyle='rgba(255,255,255,.7)';for(let i=0;i<10;i++){const x=(i*97)%W;g.beginPath();g.moveTo(x,gy+20+i*9%60);g.lineTo(x+40,gy+14+i*9%60);g.stroke()}}
+    else{for(let y=gy+24;y<H;y+=24){g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke()}}
+    {const base=P.surf==='ice'?'#BFE3EE':P.surf==='asph'?'#5E6476':'#D6A774',d=56;
+     g.fillStyle=C.dark?darken(base,.35):base;g.beginPath();g.moveTo(0,gy);g.lineTo(d*DX,gy+d*DY);g.lineTo(W,gy+d*DY);g.lineTo(W,gy);g.closePath();g.fill();
+     const tg=g.createLinearGradient(0,gy+d*DY,0,gy);tg.addColorStop(0,'rgba(255,255,255,.25)');tg.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=tg;g.fill();
+     if(P.surf==='wood'){g.strokeStyle=rgba('#8A5A2B',.3);g.lineWidth=1;for(let i=1;i<4;i++){const y=gy+d*DY*i/4;g.beginPath();g.moveTo(d*DX*i/4,y);g.lineTo(W,y);g.stroke()}}}
+    g.fillStyle=C.ink;g.fillRect(0,gy-2,W,3);
+    // брусок
+    const bw=60+P.m*8,bh=34+P.m*6,bx=60+S.x*40,by=gy-(wheel?16:0)-bh;
+    shadow(g,bx+bw/2+8,gy-4,bw*.7,.25);
+    if(wheel){g.fillStyle=rgba(C.ink,.55);for(const dx of [14,bw-14]){g.beginPath();g.arc(bx+dx+18*DX,gy-8+18*DY,7,0,7);g.fill()}}
+    box3(g,bx,by,bw,bh,'#8A5A2B',22,{shadow:false});
+    if(wheel){g.fillStyle=C.ink;for(const dx of [14,bw-14]){g.beginPath();g.arc(bx+dx,gy-8,8,0,7);g.fill()}
+      g.strokeStyle=C.surf;g.lineWidth=2;for(const dx of [14,bw-14]){const a=S.w/0.08;g.beginPath();g.moveTo(bx+dx,gy-8);g.lineTo(bx+dx+6*Math.cos(a),gy-8+6*Math.sin(a));g.stroke()}}
+    g.strokeStyle='rgba(255,255,255,.18)';g.lineWidth=2;for(let i=1;i<3;i++){g.beginPath();g.moveTo(bx+6,by+bh*i/3);g.lineTo(bx+bw-6,by+bh*i/3);g.stroke()}
+    txt(g,f1(P.m,1)+' кг',bx+bw/2,by+bh/2+5,{a:'center',s:13,c:'#fff',w:700});
+    if(S.mv){g.strokeStyle=rgba(C.ink,0.3);g.lineWidth=3;for(let i=0;i<3;i++){g.beginPath();g.moveTo(bx-10-i*3,by+8+i*10);g.lineTo(bx-26-i*8,by+8+i*10);g.stroke()}}
+    // динамометр и рука
+    const hy=by+bh/2+11*DY,hx0=bx+bw+11*DX;
+    g.fillStyle=C.dark?'#C9C5D8':'#3a3e5c';g.beginPath();g.arc(hx0,hy,3,0,7);g.fill();
+    dyn(g,hx0,hy,0,P.F,40,100);
+    sph(g,hx0+148,hy,13,'#99CC42');
+    txt(g,'F = '+f1(P.F,1)+' Н',hx0+62,hy-20,{a:'center',s:14,w:700});
+    // сила трения
+    if(Ftr>0.05){const L=Math.min(150,Ftr*3.5+6);arrow(g,bx+bw/2,gy+14,bx+bw/2-L,gy+14,C.plum,4);txt(g,'Fтр = '+f1(Ftr,1)+' Н',bx+bw/2-L,gy+38,{s:14,c:C.ink,w:700})}
+    badge(g,!S.mv?'Покой':wheel?'Качение':'Скольжение',16,16,!S.mv?C.green:LABC(this));
+    txt(g,'путь '+f1(S.x,1)+' м',W-16,38,{a:'right',s:13,c:C.muted,w:600});
+  },
+  outs(S,P){const s=SURF[P.surf],N=P.m*G,Fs=s[1]*N,Fk=s[0]*N,Ftr=S.mv?Fk:Math.min(P.F,Fs);
+    return[['Сила трения',f1(Ftr,1)+' Н'],['Вид трения',!S.mv?'трение покоя':P.surf==='wheel'?'трение качения':'трение скольжения'],['Наибольшая сила трения покоя',f1(Fs,1)+' Н'],['Скорость',f1(S.v,1)+' м/с']]}
+});
+
+/* 7. Равнодействующая */
+LABS.push({
+  id:'resultant',title:'Сложение сил',cat:'Взаимодействие тел',color:'#5B3C9E',
+  short:'Двое тянут ящик за верёвки. Куда он поедет и с какой силой его тянут на самом деле?',
+  params:[
+    {id:'F1',label:'Сила F₁',min:0,max:500,step:10,val:300,unit:'Н'},
+    {id:'F2',label:'Сила F₂',min:0,max:500,step:10,val:200,unit:'Н'},
+    {id:'mode',label:'Направление сил',type:'seg',val:'opp',options:[['opp','Противоположно'],['same','В одну сторону']]}
+  ],
+  presets:[['Ничья',{F1:300,F2:300,mode:'opp'}],['Перетягивание',{F1:400,F2:250,mode:'opp'}],['Тянут вместе',{F1:200,F2:150,mode:'same'}]],
+  restartOn:['mode'],
+  def:'Равнодействующая — это сила, которая действует на тело так же, как несколько сил вместе. Силы, направленные в одну сторону, складываются. Если силы направлены противоположно, равнодействующая равна их разности и направлена в сторону большей силы. Если противоположные силы равны, равнодействующая равна нулю — силы уравновешивают друг друга.',
+  formulas:['в одну сторону: R = F₁ + F₂','в противоположные: R = F₁ − F₂ (если F₁ > F₂)','R направлена в сторону большей силы'],
+  tryit:['Сделайте силы равными в режиме «Противоположно» — ящик остановится.','Сравните равнодействующую сил 200 Н и 300 Н в обоих режимах.','Какую силу F₂ нужно приложить, чтобы уравновесить F₁ = 350 Н?'],
+  R(P){return P.mode==='same'?P.F1+P.F2:P.F2-P.F1},
+  init(S){S.x=0;S.v=0;S.t=0},
+  step(S,P,dt){const R=this.R(P);S.t+=dt;S.v+=(R/150-0.6*S.v)*dt;S.x+=S.v*dt},
+  draw(g,S,P){
+    const gy=300,same=P.mode==='same',R=this.R(P),k=0.25;
+    const off=((S.x*40)%40+40)%40,fd=70;
+    {const tg=g.createLinearGradient(0,gy+fd*DY,0,gy);tg.addColorStop(0,C.dark?'#2a2333':'#ECEAF2');tg.addColorStop(1,C.dark?'#342c40':'#DCD9E6');
+     g.fillStyle=tg;g.beginPath();g.moveTo(0,gy);g.lineTo(0,gy+fd*DY);g.lineTo(W,gy+fd*DY);g.lineTo(W,gy);g.closePath();g.fill();
+     g.strokeStyle=rgba(C.muted,.25);g.lineWidth=1.5;for(let x=-off-80;x<W+80;x+=40){g.beginPath();g.moveTo(x,gy);g.lineTo(x+fd*DX,gy+fd*DY);g.stroke()}}
+    g.fillStyle=C.soft;g.fillRect(0,gy,W,H-gy);g.fillStyle=C.ink;g.fillRect(0,gy-1,W,3);
+    g.strokeStyle=C.grid;g.lineWidth=3;
+    for(let x=-off;x<W+40;x+=40){g.beginPath();g.moveTo(x,gy+14);g.lineTo(x-12,gy+30);g.stroke()}
+    const bx=320;
+    const ZP=17,ox=ZP*DX,oy=ZP*DY,ropeC='#A57B4B';
+    const person=(x,dir,col,pull)=>{const lean=6+pull/500*14,dk=darken(col,.28);x+=ox;const fy=gy+oy;
+      shadow(g,x+dir*6,fy,26,.24);g.lineCap='round';g.lineJoin='round';
+      const hip=[x+dir*lean*.6,252+oy],sh=[x+dir*lean*1.6,220+oy],hand=[x-dir*16,250+oy];
+      g.strokeStyle=dk;g.lineWidth=7;g.beginPath();g.moveTo(hip[0],hip[1]);g.lineTo(x+dir*-2+10,fy-14);g.lineTo(x+10+dir*-4,fy);g.stroke();
+      g.strokeStyle=dk;g.lineWidth=5.5;g.beginPath();g.moveTo(sh[0]+dir*2,sh[1]+3);g.lineTo(hand[0]+dir*4,hand[1]-3);g.stroke();
+      g.strokeStyle=col;g.lineWidth=11;g.beginPath();g.moveTo(hip[0],hip[1]);g.lineTo(sh[0],sh[1]);g.stroke();
+      g.lineWidth=7;g.beginPath();g.moveTo(hip[0],hip[1]);g.lineTo(x-6,fy-14);g.lineTo(x-8,fy);g.stroke();
+      g.fillStyle=C.ink;for(const fx of [x-8,x+10+dir*-4]){g.beginPath();g.ellipse(fx+dir*-3,fy,7,3.2,0,0,7);g.fill()}
+      sph(g,sh[0]+dir*5,sh[1]-17,11,col);
+      return hand};
+    const armOver=(x,dir,col,pull)=>{const lean=6+pull/500*14;x+=ox;const sh=[x+dir*lean*1.6,220+oy],hand=[x-dir*16,250+oy];
+      g.strokeStyle=col;g.lineWidth=6;g.lineCap='round';g.beginPath();g.moveTo(sh[0],sh[1]+4);g.lineTo(hand[0],hand[1]);g.stroke();
+      sph(g,hand[0],hand[1],4.5,lighten(col,.2))};
+    const LF=[bx-36+ox,262+oy],RF=[bx+36+ox,262+oy];
+    let h1,h2;
+    if(!same){h1=person(150,-1,C.plum,P.F1);h2=person(490,1,C.teal,P.F2);
+      g.strokeStyle=ropeC;g.lineWidth=4;g.beginPath();g.moveTo(h1[0],h1[1]);g.lineTo(LF[0],LF[1]);g.stroke();armOver(150,-1,C.plum,P.F1)}
+    else{h1=person(470,1,C.plum,P.F1);h2=person(560,1,C.teal,P.F2)}
+    box3(g,bx-36,236,72,64,'#8A5A2B',34);
+    g.strokeStyle=ropeC;g.lineWidth=4;g.lineCap='round';
+    if(!same){g.beginPath();g.moveTo(RF[0],RF[1]);g.lineTo(h2[0],h2[1]);g.stroke();armOver(490,1,C.teal,P.F2)}
+    else{g.beginPath();g.moveTo(RF[0],RF[1]);g.lineTo(h1[0],h1[1]);g.lineTo(h2[0],h2[1]);g.stroke();armOver(470,1,C.plum,P.F1);armOver(560,1,C.teal,P.F2)}
+    g.fillStyle=C.dark?'#C9C5D8':'#3a3e5c';g.beginPath();g.arc(RF[0],RF[1],3.5,0,7);g.fill();
+    g.strokeStyle='rgba(255,255,255,.25)';g.lineWidth=3;g.beginPath();g.moveTo(bx-28,244);g.lineTo(bx+28,292);g.moveTo(bx+28,244);g.lineTo(bx-28,292);g.stroke();
+    // стрелки сил
+    const ay=120;
+    if(!same){if(P.F1>0){arrow(g,bx,ay,bx-P.F1*k-4,ay,C.plum,5);txt(g,'F₁ = '+P.F1+' Н',bx-P.F1*k-6,ay-14,{s:14,w:700,c:C.plum})}
+      if(P.F2>0){arrow(g,bx,ay+40,bx+P.F2*k+4,ay+40,C.teal,5);txt(g,'F₂ = '+P.F2+' Н',bx+P.F2*k+6,ay+26,{a:'right',s:14,w:700,c:C.teal})}}
+    else{if(P.F1>0){arrow(g,bx,ay,bx+P.F1*k+4,ay,C.plum,5);txt(g,'F₁ = '+P.F1+' Н',bx+P.F1*k+6,ay-14,{a:'right',s:14,w:700,c:C.plum})}
+      if(P.F2>0){arrow(g,bx+P.F1*k,ay+40,bx+(P.F1+P.F2)*k+4,ay+40,C.teal,5);g.setLineDash([4,4]);g.strokeStyle=C.muted;g.lineWidth=1.5;g.beginPath();g.moveTo(bx+P.F1*k,ay+6);g.lineTo(bx+P.F1*k,ay+40);g.stroke();g.setLineDash([]);
+        txt(g,'F₂ = '+P.F2+' Н',bx+(P.F1+P.F2)*k+6,ay+26,{a:'right',s:14,w:700,c:C.teal})}}
+    g.strokeStyle=C.grid;g.lineWidth=2;g.setLineDash([3,5]);g.beginPath();g.moveTo(bx,ay-24);g.lineTo(bx,232);g.stroke();g.setLineDash([]);
+    if(Math.abs(R)>0){const xe=bx+clamp(R*k,-300,300);arrow(g,bx,ay+82,xe+Math.sign(R)*4,ay+82,C.ink,6);
+      txt(g,'R = '+Math.abs(R)+' Н',xe,ay+70,{a:R>0?'right':'left',s:15,w:800})}
+    else badge(g,'R = 0: силы уравновешены',bx,ay+66,C.green,'center');
+  },
+  outs(S,P){const R=this.R(P),same=P.mode==='same';
+    return[['Равнодействующая R',Math.abs(R)+' Н'],['Направление R',R>0?'вправо':R<0?'влево':'нет — равновесие'],['Как сложили',same?'F₁ + F₂':'большая − меньшая'],['Скорость ящика',f1(Math.abs(S.v),1)+' м/с']]}
+});
+
+/* 8. Давление твёрдых тел */
+LABS.push({
+  id:'solidp',title:'Давление твёрдых тел',cat:'Давление',color:'#C4526B',
+  short:'Почему в ботинках проваливаешься в снег, а на лыжах — нет? Меняйте площадь опоры.',
+  params:[
+    {id:'m',label:'Масса тела',min:5,max:100,step:1,val:60,unit:'кг'},
+    {id:'S',label:'Площадь опоры',min:0.01,max:0.5,step:0.01,val:0.05,unit:'м²',d:2}
+  ],
+  presets:[['В ботинках',{m:60,S:0.05}],['На лыжах',{m:60,S:0.35}],['На одной ноге',{m:60,S:0.02}],['Ребёнок на лыжах',{m:30,S:0.25}]],
+  restartOn:[],
+  def:'Давление — величина, равная отношению силы, действующей перпендикулярно поверхности, к площади этой поверхности. При одной и той же силе давление тем меньше, чем больше площадь опоры. Поэтому лыжник не проваливается в снег, а у ножа и иглы делают острые края, чтобы получить большое давление.',
+  formulas:['p = F / S','F = m · g','1 Па = 1 Н/м², 1 кПа = 1000 Па'],
+  tryit:['Сравните давление человека в ботинках и на лыжах.','Во сколько раз уменьшится давление, если площадь опоры увеличить в 10 раз?','Подберите площадь, при которой человек массой 60 кг давит на снег с давлением около 3 кПа.'],
+  p(P){return P.m*G/P.S},
+  frac(P){return clamp((Math.log10(this.p(P))-2.3)/2.6,0,1)},
+  init(S){S.dep=0;S.snow=[];for(let i=0;i<80;i++)S.snow.push([Math.random()*W,262+Math.random()*130,Math.random()*1.6+0.8])},
+  step(S,P,dt){S.dep=ease(S.dep,4+this.frac(P)*92,dt,3.5)},
+  draw(g,S,P){
+    const gy=258,cx=W/2,w=24+400*Math.sqrt(P.S/0.5),d=S.dep,rim=d*0.16,fr=this.frac(P);
+    const snow=C.dark?mixc(C.surf,'#BFD4EE',0.35):'#EAF1FA';
+    {const fd=60,ox=fd*DX,oy=fd*DY,pd=40;
+     const tg=g.createLinearGradient(0,gy+oy,0,gy);tg.addColorStop(0,C.dark?mixc(C.surf,'#BFD4EE',0.2):'#F6F9FD');tg.addColorStop(1,snow);
+     g.fillStyle=tg;g.beginPath();g.moveTo(0,gy);g.lineTo(ox,gy+oy);g.lineTo(W,gy+oy);g.lineTo(W,gy);g.closePath();g.fill();
+     g.fillStyle=rgba('#7FA3C8',.35);g.beginPath();g.moveTo(cx-w/2,gy);g.lineTo(cx-w/2+pd*DX,gy+pd*DY);g.lineTo(cx+w/2+pd*DX,gy+pd*DY);g.lineTo(cx+w/2,gy);g.closePath();g.fill();
+     g.fillStyle=rgba('#7FA3C8',.25);g.beginPath();g.moveTo(cx+w/2,gy);g.lineTo(cx+w/2+pd*DX,gy+pd*DY);g.lineTo(cx+w/2+pd*DX,gy+pd*DY+d);g.lineTo(cx+w/2,gy+d);g.closePath();g.fill()}
+    g.fillStyle=snow;g.beginPath();g.moveTo(0,gy);g.lineTo(cx-w/2-22,gy);g.quadraticCurveTo(cx-w/2-8,gy-rim*2,cx-w/2,gy+2);
+    g.lineTo(cx-w/2,gy+d);g.lineTo(cx+w/2,gy+d);g.lineTo(cx+w/2,gy+2);g.quadraticCurveTo(cx+w/2+8,gy-rim*2,cx+w/2+22,gy);g.lineTo(W,gy);g.lineTo(W,H);g.lineTo(0,H);g.closePath();g.fill();
+    g.strokeStyle=C.ink;g.lineWidth=2;g.stroke();
+    g.fillStyle=rgba('#8EC9DE',0.8);for(const s of S.snow)if(Math.abs(s[0]-cx)>w/2+4||s[1]>gy+d+6){g.beginPath();g.arc(s[0],s[1],s[2],0,7);g.fill()}
+    // тело на опоре
+    const fy=gy+d,bw=120,bh=86,sh=24,by=fy-sh-bh;
+    box3(g,cx-w/2,fy-8,w,8,C.dark?'#8d88a3':'#3a3e5c',40,{shadow:false});
+    g.fillStyle=C.muted;g.beginPath();g.moveTo(cx-Math.min(w,bw)/2+6,fy-8);g.lineTo(cx-bw/2+18,by+bh);g.lineTo(cx+bw/2-18,by+bh);g.lineTo(cx+Math.min(w,bw)/2-6,fy-8);g.closePath();g.fill();
+    box3(g,cx-bw/2,by,bw,bh,LABC(this),44,{shadow:false});
+    txt(g,P.m+' кг',cx,by+bh/2+6,{a:'center',s:18,c:'#fff',w:800});
+    const fax=cx+bw/2+44*DX+16;arrow(g,fax,by+10,fax,by+10+30+P.m*0.6,C.plum,4);txt(g,'F = '+f1(P.m*G,0)+' Н',fax+10,by+40,{s:14,w:700,c:C.plum});
+    // стрелки давления
+    const n=Math.max(2,Math.min(9,Math.round(w/45))),L=8+fr*30;
+    for(let i=0;i<n;i++){const x=cx-w/2+10+(w-20)*i/(n-1);arrow(g,x,fy+3,x,fy+3+L,rgba(C.plum,0.85),2.5)}
+    txt(g,'p = '+fPa(this.p(P)),20,40,{s:20,w:800});
+    txt(g,'S = '+f1(P.S,2)+' м²',20,64,{s:14,c:C.muted,w:600});
+  },
+  outs(S,P){const p=this.p(P),fr=this.frac(P);
+    return[['Давление p',fPa(p)],['Сила давления F',f1(P.m*G,0)+' Н'],['Площадь опоры S',f1(P.S,2)+' м²'],['Снег',fr<0.3?'почти не проваливается':fr<0.62?'проваливается':'проваливается глубоко']]}
+});
+
+/* 9. Давление газа */
+LABS.push({
+  id:'gas',title:'Давление газа',cat:'Давление',color:'#B23B7A',
+  short:'Газ давит на стенки, потому что молекулы непрерывно о них ударяются. Нагревайте и сжимайте газ.',
+  params:[
+    {id:'t',label:'Температура газа',min:-100,max:400,step:10,val:20,unit:'°C'},
+    {id:'N',label:'Число молекул',min:10,max:150,step:5,val:60,unit:''},
+    {id:'V',label:'Объём сосуда',min:30,max:100,step:1,val:100,unit:'%'}
+  ],
+  presets:[['Холод, −100 °C',{t:-100}],['Комната, 20 °C',{t:20}],['Нагрев, 300 °C',{t:300}],['Сжать вдвое',{V:50}]],
+  restartOn:[],
+  def:'Молекулы газа беспорядочно движутся и ударяются о стенки сосуда. Давление газа — результат этих ударов. Если газ сжать, молекул в каждом участке объёма станет больше, удары станут чаще и давление вырастет. При нагревании молекулы движутся быстрее и ударяют сильнее — давление тоже растёт.',
+  fhead:'Главное',
+  formulas:['объём меньше → давление больше','температура выше → давление больше','молекул больше → давление больше'],
+  tryit:['Сожмите газ вдвое при постоянной температуре — как изменилось давление?','Нагрейте газ: что происходит со скоростью молекул и с давлением?','Почему накачанный мяч на морозе становится мягче?'],
+  init(S,P){S.parts=[];S.xr=30+460*P.V/100;const b=6*Math.sqrt(P.t+273),b0=6*Math.sqrt(293);S.p=P.N*b*b/(S.xr-38);S.pr=S.p/(60*b0*b0/(490-38))*100},
+  step(S,P,dt){
+    const TK=P.t+273,base=6*Math.sqrt(TK),r=4,x0=34,y0=34,y1=366;
+    S.xr=ease(S.xr,30+460*P.V/100,dt,6);const xr=S.xr;
+    while(S.parts.length<P.N)S.parts.push({x:x0+Math.random()*(xr-x0-8),y:y0+Math.random()*(y1-y0),gx:gauss(),gy:gauss()});
+    while(S.parts.length>P.N)S.parts.pop();
+    let imp=0;
+    for(const p of S.parts){
+      p.x+=p.gx*base*dt;p.y+=p.gy*base*dt;
+      if(p.z===undefined){p.z=Math.random();p.gz=gauss()}p.z+=p.gz*base*dt/300;if(p.z<0){p.z=0;p.gz=Math.abs(p.gz)}if(p.z>1){p.z=1;p.gz=-Math.abs(p.gz)}
+      if(p.x<x0){p.x=x0;p.gx=Math.abs(p.gx)}
+      if(p.x>xr-r){p.x=xr-r;if(p.gx>0)imp+=2*p.gx*base;p.gx=-Math.abs(p.gx)}
+      if(p.y<y0){p.y=y0;p.gy=Math.abs(p.gy)}
+      if(p.y>y1){p.y=y1;p.gy=-Math.abs(p.gy)}
+    }
+    if(dt>0){S.p+=((imp/dt)-S.p)*Math.min(1,dt*1.5);
+      const b0=6*Math.sqrt(293),ref=60*b0*b0/(490-r-x0);S.pr=S.p/ref*100}
+  },
+  draw(g,S,P){
+    const xr=S.xr,base=6*Math.sqrt(P.t+273);
+    const D3=36,ox=D3*DX,oy=D3*DY;
+    g.fillStyle=C.soft;g.fillRect(30,30,xr-30,340);tank3(g,30,30,xr-30,340,D3,null);
+    const ord=S.parts.slice().sort((a,b)=>(b.z||0)-(a.z||0));
+    for(const p of ord){const sp=Math.hypot(p.gx,p.gy)*base/(6*Math.sqrt(293)*1.4);const t=Math.round(clamp(sp*0.7,0,1)*10)/10,z=p.z||0;
+      g.globalAlpha=1-z*.35;sph(g,p.x+z*ox,p.y+z*oy,5.5*(1-z*.25),mixc('#50ADA8','#C4245F',t))}
+    g.globalAlpha=1;
+    g.strokeStyle=C.ink;g.lineWidth=4;g.lineJoin='round';g.beginPath();g.moveTo(xr,30);g.lineTo(30,30);g.lineTo(30,370);g.lineTo(xr,370);g.stroke();
+    g.lineWidth=2;g.beginPath();g.moveTo(30,30);g.lineTo(30+ox,30+oy);g.lineTo(xr+ox,30+oy);g.moveTo(30+ox,30+oy);g.stroke();
+    // поршень — объёмная пластина
+    g.fillStyle=darken('#99CC42',.25);g.beginPath();g.moveTo(xr+8,26);g.lineTo(xr+8+ox,26+oy);g.lineTo(xr+8+ox,374+oy);g.lineTo(xr+8,374);g.closePath();g.fill();
+    g.fillStyle=lighten('#99CC42',.3);g.beginPath();g.moveTo(xr-2,26);g.lineTo(xr-2+ox,26+oy);g.lineTo(xr+8+ox,26+oy);g.lineTo(xr+8,26);g.closePath();g.fill();
+    g.fillStyle=C.lime;g.fillRect(xr-2,26,10,348);
+    {const rg=g.createLinearGradient(0,193+oy/2,0,207+oy/2);rg.addColorStop(0,'#9A9EB5');rg.addColorStop(1,'#3a3e5c');g.fillStyle=rg;g.fillRect(xr+8,193+oy/2,W-xr,12)}
+    txt(g,'поршень',Math.min(W-60,xr+ox+16),226,{s:12,c:C.muted,w:500});
+    // манометр
+    const gx=575,gy=96,R=44,pv=clamp(S.pr,0,400)/400,ang=Math.PI*0.8+pv*Math.PI*1.4;
+    shadow(g,gx+6,gy+R+4,R,.18);sph(g,gx+3,gy+3,R+4,C.dark?'#6b6680':'#B8B6C6');g.fillStyle=C.surf;g.strokeStyle=C.ink;g.lineWidth=3;g.beginPath();g.arc(gx,gy,R,0,7);g.fill();g.stroke();
+    g.strokeStyle=C.muted;g.lineWidth=1.5;for(let i=0;i<=8;i++){const a=Math.PI*0.8+i/8*Math.PI*1.4;g.beginPath();g.moveTo(gx+Math.cos(a)*(R-10),gy+Math.sin(a)*(R-10));g.lineTo(gx+Math.cos(a)*(R-4),gy+Math.sin(a)*(R-4));g.stroke()}
+    g.strokeStyle=C.plum;g.lineWidth=3;g.lineCap='round';g.beginPath();g.moveTo(gx,gy);g.lineTo(gx+Math.cos(ang)*(R-12),gy+Math.sin(ang)*(R-12));g.stroke();
+    g.fillStyle=C.ink;g.beginPath();g.arc(gx,gy,4,0,7);g.fill();
+    cyl(g,gx,gy+R,193+oy/2,3,C.dark?'#8d88a3':'#3a3e5c',{top:false});
+    for(let i=0;i<=4;i++){const a=Math.PI*0.8+i/4*Math.PI*1.4;txt(g,String(i*100),gx+Math.cos(a)*(R-19),gy+Math.sin(a)*(R-19)+3,{a:'center',s:8,c:C.muted,w:600})}
+    txt(g,'манометр',gx,gy-R-10,{a:'center',s:12,c:C.muted,w:500});
+  },
+  outs(S,P){return[['Давление (усл. ед.)',String(Math.round(S.pr))],['Средняя скорость молекул азота',Math.round(470*Math.sqrt((P.t+273)/293))+' м/с'],['Температура',P.t+' °C'],['Объём',P.V+' %']]}
+});
+
+/* 10. Давление жидкости, закон Паскаля */
+const LIQ={'1000':['Вода','#3F6FB5'],'800':['Керосин','#C9A43A'],'13600':['Ртуть','#8E96A3']};
+LABS.push({
+  id:'liquid',title:'Давление в жидкости',cat:'Давление',color:'#3457D5',
+  short:'Чем глубже, тем сильнее давит жидкость. Опустите датчик и посмотрите на струи.',
+  params:[
+    {id:'liq',label:'Жидкость',type:'seg',val:'1000',options:[['1000','Вода'],['800','Керосин'],['13600','Ртуть']]},
+    {id:'h',label:'Высота столба жидкости',min:0.2,max:1,step:0.05,val:0.8,unit:'м',d:2},
+    {id:'d',label:'Глубина погружения датчика',min:0,max:1,step:0.05,val:0.4,unit:'м',d:2}
+  ],
+  presets:[['Полный сосуд',{h:1}],['Мало жидкости',{h:0.3}],['Датчик на дне',{d:1}]],
+  restartOn:[],
+  def:'Жидкость давит на дно и стенки сосуда и на любое тело внутри неё. Давление растёт с глубиной и зависит от плотности жидкости, но не зависит от формы сосуда. Закон Паскаля: давление, производимое на жидкость или газ, передаётся без изменения в каждую точку по всем направлениям. Поэтому на одной глубине давление одинаково во все стороны.',
+  formulas:['p = ρ · g · h','на одной глубине давление одинаково по всем направлениям'],
+  tryit:['Опустите датчик вдвое глубже — во сколько раз выросло давление?','Почему нижняя струя бьёт дальше всех?','Замените воду ртутью: давление на той же глубине вырастет в 13,6 раза.'],
+  init(S,P){S.h=P.h;S.o=0},
+  step(S,P,dt){S.h=ease(S.h,P.h,dt,5);S.o+=dt*60},
+  draw(g,S,P){
+    const rho=+P.liq,L=LIQ[P.liq],k=300,bot=370,xl=90,xr=290,yl=bot-S.h*k,dd=Math.min(P.d,S.h),yp=yl+dd*k;
+    // линейка
+    for(let i=0;i<=10;i++){const y=bot-i*0.1*k;g.strokeStyle=i%5?C.grid:C.muted;g.lineWidth=i%5?1.5:2;g.beginPath();g.moveTo(52,y);g.lineTo(i%5?64:70,y);g.stroke();
+      if(i%5===0)txt(g,f1(i/10,1),46,y+4,{a:'right',s:11,c:C.muted,w:500})}
+    txt(g,'м',46,48,{a:'right',s:11,c:C.muted,w:500});
+    // жидкость
+    const cxv=(xl+xr)/2,rxv=(xr-xl)/2,ryv=20;
+    shadow(g,cxv+8,bot+6,rxv*1.15,.2);
+    g.fillStyle=C.dark?'rgba(255,255,255,.04)':'rgba(31,35,64,.04)';g.fillRect(xl,40,xr-xl,bot-40);
+    g.strokeStyle=rgba(C.ink,.3);g.lineWidth=1.5;g.beginPath();g.ellipse(cxv,bot,rxv,ryv,0,Math.PI,0);g.stroke();
+    {const gr=g.createLinearGradient(xl,0,xr,0);gr.addColorStop(0,rgba(L[1],.45));gr.addColorStop(.35,rgba(lighten(L[1],.3),.3));gr.addColorStop(1,rgba(darken(L[1],.3),.55));
+     g.fillStyle=gr;g.beginPath();g.moveTo(xl,yl);g.lineTo(xl,bot);g.ellipse(cxv,bot,rxv,ryv,0,Math.PI,0,true);g.lineTo(xr,yl);g.ellipse(cxv,yl,rxv,ryv,0,0,Math.PI,false);g.closePath();g.fill();
+     g.fillStyle=rgba(lighten(L[1],.4),.55);g.beginPath();g.ellipse(cxv,yl,rxv,ryv+Math.sin(S.o*0.08)*1.2,0,0,7);g.fill();
+     g.strokeStyle=rgba(lighten(L[1],.6),.8);g.lineWidth=1.5;g.stroke()}
+    // струи
+    for(const hh of [0.1,0.35,0.6]){const yh=bot-hh*k,D=S.h-hh;
+      g.fillStyle=C.ink;g.beginPath();g.ellipse(xr,yh,3,5,0,0,7);g.fill();
+      if(D>0.005){const v=Math.sqrt(2*G*D);g.save();g.strokeStyle=rgba(L[1],0.8);g.lineWidth=4;g.lineCap='round';g.setLineDash([10,7]);g.lineDashOffset=-S.o*1.5;g.beginPath();g.moveTo(xr+2,yh);
+        for(let t=0.01;t<2;t+=0.01){const x=xr+2+v*t*k,y=yh+4.9*t*t*k;g.lineTo(x,y);if(y>H||x>W)break}g.stroke();g.restore()}}
+    // сосуд
+    g.strokeStyle=C.ink;g.lineWidth=4;g.lineJoin='round';g.beginPath();g.moveTo(xl,40);g.lineTo(xl,bot);g.ellipse(cxv,bot,rxv,ryv,0,Math.PI,0,true);g.lineTo(xr,40);g.stroke();
+    g.lineWidth=2.5;g.beginPath();g.ellipse(cxv,40,rxv,ryv,0,0,7);g.stroke();
+    g.fillStyle='rgba(255,255,255,.22)';g.fillRect(xl+14,52,6,bot-70);
+    // датчик
+    const p=rho*G*dd,al=10+46*Math.sqrt(p/(13600*G));
+    g.strokeStyle=C.muted;g.lineWidth=3;g.beginPath();g.moveTo(190,22);g.lineTo(190,yp-10);g.stroke();
+    for(const a of [0,Math.PI/2,Math.PI,-Math.PI/2])arrow(g,190+Math.cos(a)*12,yp+Math.sin(a)*12,190+Math.cos(a)*(12+al),yp+Math.sin(a)*(12+al),C.plum,3);
+    sph(g,190,yp,10,'#99CC42');
+    txt(g,'p = '+fPa(p),W-20,40,{a:'right',s:20,w:800});
+    txt(g,L[0]+', глубина датчика '+f1(dd,2)+' м',W-20,64,{a:'right',s:13,c:C.muted,w:600});
+  },
+  outs(S,P){const rho=+P.liq,dd=Math.min(P.d,P.h);
+    return[['Давление на датчик',fPa(rho*G*dd)],['Давление на дно',fPa(rho*G*P.h)],['Глубина датчика',f1(dd,2)+' м'],['Плотность жидкости',f1(rho,0)+' кг/м³']]}
+});
+
+/* 11. Сообщающиеся сосуды */
+const PAIRS={ww:['Вода','Вода',1000,1000,'#3F6FB5','#3F6FB5'],wo:['Вода','Масло',1000,900,'#3F6FB5','#D9A441'],wk:['Вода','Керосин',1000,800,'#3F6FB5','#C9B458'],hw:['Ртуть','Вода',13600,1000,'#8E96A3','#3F6FB5']};
+LABS.push({
+  id:'vessels',title:'Сообщающиеся сосуды',cat:'Давление',color:'#2B7F9E',
+  short:'В соединённых трубках жидкость стоит на одном уровне. Что будет, если долить другую жидкость?',
+  params:[
+    {id:'pair',label:'Жидкости',type:'seg',val:'wo',options:[['ww','Вода + вода'],['wo','Вода + масло'],['wk','Вода + керосин'],['hw','Ртуть + вода']]},
+    {id:'hB',label:'Высота долитого столба h₂',min:0,max:20,step:0.5,val:12,unit:'см',d:1}
+  ],
+  presets:[['Ничего не доливать',{hB:0}],['Долить 20 см',{hB:20}]],
+  restartOn:['pair'],
+  def:'Сообщающиеся сосуды — сосуды, соединённые между собой снизу. Однородная жидкость в них устанавливается на одном уровне, какой бы формы ни были сосуды. Если в сосудах жидкости разной плотности, то на уровне их границы давления равны, и столб более лёгкой жидкости оказывается выше: высоты столбов обратно пропорциональны плотностям.',
+  formulas:['однородная жидкость: уровни одинаковы','ρ₁ · h₁ = ρ₂ · h₂','h₁ / h₂ = ρ₂ / ρ₁'],
+  tryit:['Долейте воду к воде — уровни остаются равными.','Сравните, насколько поднимается граница, когда доливают масло к воде и воду к ртути.','Проверьте по карточкам, что ρ₁ · h₁ = ρ₂ · h₂.'],
+  init(S){S.hb=0},
+  step(S,P,dt){S.hb=ease(S.hb,P.hB,dt,2.2);if(Math.abs(S.hb-P.hB)<0.01)S.hb=P.hB},
+  draw(g,S,P){
+    const pr=PAIRS[P.pair],k=8,base=212,x=pr[3]*S.hb/(2*pr[2]);
+    const yL=base-x*k,yI=base+x*k,yB=yI-S.hb*k;
+    const la=184,ra=400,aw=60,bot=344;
+    g.save();g.beginPath();g.rect(la,40,aw,290);g.rect(ra,40,aw,290);g.roundRect(la,296,ra+aw-la,48,[0,0,28,28]);g.clip();
+    const shadeH=(x0,col,al)=>{const gr=g.createLinearGradient(x0,0,x0+aw,0);gr.addColorStop(0,rgba(darken(col,.1),al));gr.addColorStop(.3,rgba(lighten(col,.35),al*.8));gr.addColorStop(1,rgba(darken(col,.35),al*1.2));return gr};
+    {const gv=g.createLinearGradient(0,296,0,344);gv.addColorStop(0,rgba(lighten(pr[4],.3),.4));gv.addColorStop(1,rgba(darken(pr[4],.3),.6));g.fillStyle=gv;g.fillRect(la,296,ra+aw-la,48)}
+    g.fillStyle=shadeH(la,pr[4],.5);g.fillRect(la,yL,aw,bot-yL);g.fillStyle=shadeH(ra,pr[4],.5);g.fillRect(ra,yI,aw,bot-yI);
+    if(S.hb>0.01){g.fillStyle=shadeH(ra,pr[5],.6);g.fillRect(ra,yB,aw,yI-yB)}
+    g.restore();
+    const surf=(cx,y,col)=>{g.fillStyle=rgba(lighten(col,.45),.75);g.beginPath();g.ellipse(cx,y,aw/2,8,0,0,7);g.fill();g.strokeStyle=rgba(darken(col,.2),.6);g.lineWidth=1.2;g.stroke()};
+    surf(la+aw/2,yL,pr[4]);if(S.hb>0.01){surf(ra+aw/2,yI,pr[4]);surf(ra+aw/2,yB,pr[5])}else surf(ra+aw/2,yI,pr[4]);
+    g.strokeStyle=C.ink;g.lineWidth=2;for(const x0 of [la,ra]){g.beginPath();g.ellipse(x0+aw/2,36,aw/2,8,0,0,7);g.stroke()}
+    g.fillStyle='rgba(255,255,255,.25)';for(const x0 of [la,ra])g.fillRect(x0+8,48,4,240);
+    g.strokeStyle=C.ink;g.lineWidth=4;g.lineJoin='round';g.beginPath();
+    g.moveTo(la,36);g.lineTo(la,bot-28);g.quadraticCurveTo(la,bot,la+28,bot);g.lineTo(ra+aw-28,bot);g.quadraticCurveTo(ra+aw,bot,ra+aw,bot-28);g.lineTo(ra+aw,36);
+    g.moveTo(la+aw,36);g.lineTo(la+aw,296);g.lineTo(ra,296);g.lineTo(ra,36);g.stroke();
+    // струя
+    if(P.hB-S.hb>0.08){g.strokeStyle=rgba(pr[5],0.75);g.lineWidth=5;g.lineCap='round';g.beginPath();g.moveTo(ra+aw/2,10);g.lineTo(ra+aw/2,yB);g.stroke()}
+    // разметка
+    if(S.hb>0.3){
+      g.setLineDash([5,5]);g.strokeStyle=C.muted;g.lineWidth=1.5;g.beginPath();g.moveTo(la-30,yI);g.lineTo(ra+aw+30,yI);g.stroke();g.setLineDash([]);
+      const br=(x0,y0,y1,label,right)=>{g.strokeStyle=C.ink;g.lineWidth=2;g.beginPath();g.moveTo(x0,y0);g.lineTo(x0+(right?8:-8),y0);g.moveTo(x0,y0);g.lineTo(x0,y1);g.lineTo(x0+(right?8:-8),y1);g.stroke();
+        txt(g,label,x0+(right?14:-14),(y0+y1)/2+5,{a:right?'left':'right',s:14,w:700})};
+      br(ra+aw+14,yB,yI,'h₂ = '+f1(S.hb,1)+' см',true);
+      br(la-14,yL,yI,'h₁ = '+f1(2*x,1)+' см',false);
+    }
+    txt(g,pr[0],la+aw/2,bot+24,{a:'center',s:13,w:700});
+    txt(g,S.hb>0.01?pr[1]:pr[0],ra+aw/2,bot+24,{a:'center',s:13,w:700});
+  },
+  outs(S,P){const pr=PAIRS[P.pair],x=pr[3]*P.hB/(2*pr[2]);
+    return[['h₁ ('+pr[0].toLowerCase()+')',f1(2*x,1)+' см'],['h₂ ('+pr[1].toLowerCase()+')',f1(P.hB,1)+' см'],['Разница уровней',f1(Math.abs(P.hB-2*x),1)+' см'],['Давление на уровне границы',f1(pr[3]*G*P.hB/100,0)+' Па']]}
+});
+
+/* 12. Атмосферное давление */
+LABS.push({
+  id:'atm',title:'Атмосферное давление',cat:'Давление',color:'#4E5FA8',
+  short:'Воздух давит на всё вокруг. Поднимайтесь в горы и следите за ртутным столбом в трубке Торричелли.',
+  params:[{id:'alt',label:'Высота над уровнем моря',min:0,max:10000,step:50,val:0,unit:'м'}],
+  presets:[['Уровень моря',{alt:0}],['Эльбрус',{alt:5650}],['Эверест',{alt:8850}],['Самолёт',{alt:10000}]],
+  restartOn:[],
+  def:'Землю окружает воздушная оболочка — атмосфера. Воздух имеет вес и давит на все тела. Атмосферное давление впервые измерил Торричелли: столб ртути в запаянной сверху трубке высотой около 760 мм уравновешивает давление атмосферы. С высотой воздух становится всё более разреженным и давление уменьшается.',
+  formulas:['p₀ ≈ 760 мм рт. ст. ≈ 101 300 Па','1 мм рт. ст. ≈ 133,3 Па','у поверхности Земли: подъём на 12 м — давление меньше ≈ на 1 мм рт. ст.'],
+  tryit:['Поднимитесь на 120 м — на сколько миллиметров опустилась ртуть?','Какое давление на вершине Эвереста? Во сколько раз оно меньше, чем у моря?','Почему высоко в горах тяжело дышать?'],
+  mm(h){return 760*Math.pow(1-2.2558e-5*h,5.2559)},
+  init(S,P){S.mm=this.mm(P.alt);S.dots=[];for(let i=0;i<340;i++){const a=-8000*Math.log(1-Math.random()*0.999);if(a<10000)S.dots.push([Math.random()*360,a])}},
+  step(S,P,dt){S.mm=ease(S.mm,this.mm(P.alt),dt,3)},
+  draw(g,S,P){
+    const Y=a=>370-a/10000*320,lab=LABC(this);
+    g.fillStyle=rgba('#3F6FB5',C.dark?0.12:0.07);g.beginPath();g.roundRect(0,0,370,H,[0,18,18,0]);g.fill();
+    g.fillStyle=rgba(C.teal,0.55);for(const d of S.dots){g.beginPath();g.arc(d[0],Y(d[1]),1.6,0,7);g.fill()}
+    g.fillStyle=C.dark?'#2C3240':'#DDE1E8';g.beginPath();g.moveTo(0,372);g.lineTo(60,250);g.lineTo(110,280);g.lineTo(190,160);g.lineTo(260,240);g.lineTo(330,200);g.lineTo(370,250);g.lineTo(370,372);g.closePath();g.fill();
+        g.fillStyle=C.dark?'#3A4150':'#C7CCD6';g.beginPath();g.moveTo(0,372);g.lineTo(40,300);g.lineTo(80,320);g.lineTo(150,190);g.lineTo(180,220);g.lineTo(230,Y(8850));g.lineTo(275,170);g.lineTo(300,210);g.lineTo(360,372);g.closePath();g.fill();
+    g.fillStyle=C.dark?'rgba(0,0,0,.28)':'rgba(31,35,64,.12)';g.beginPath();g.moveTo(230,Y(8850));g.lineTo(275,170);g.lineTo(300,210);g.lineTo(360,372);g.lineTo(240,372);g.lineTo(250,260);g.closePath();g.fill();
+    g.beginPath();g.moveTo(150,190);g.lineTo(180,220);g.lineTo(165,300);g.lineTo(120,372);g.lineTo(150,372);g.closePath();g.fill();
+    g.fillStyle=C.surf;g.beginPath();g.moveTo(230,Y(8850));g.lineTo(213,Y(7600));g.lineTo(224,Y(7800));g.lineTo(235,Y(7500));g.lineTo(247,Y(7700));g.closePath();g.fill();
+    g.fillStyle=C.green;g.fillRect(0,370,370,30);
+    for(let km=0;km<=10;km+=2){txt(g,km+' км',8,Y(km*1000)-4,{s:11,c:C.muted,w:500})}
+    const y=Y(P.alt);g.setLineDash([5,5]);g.strokeStyle=lab;g.lineWidth=2;g.beginPath();g.moveTo(0,y);g.lineTo(370,y);g.stroke();g.setLineDash([]);
+    sph(g,320,y,10,'#99CC42');
+    txt(g,f1(P.alt,0)+' м',306,y-14,{a:'right',s:14,w:700});
+    // трубка Торричелли
+    const tx=500,dish=346,kk=0.38,top=dish-S.mm*kk;
+    shadow(g,504,dish+34,95,.2);
+    {const gr=g.createLinearGradient(0,dish-6,0,dish+24);gr.addColorStop(0,'#C3C8D1');gr.addColorStop(1,'#6E7583');g.fillStyle=gr;g.beginPath();g.roundRect(426,dish-6,150,30,[0,0,12,12]);g.fill();
+     g.fillStyle='#D5D9E0';g.beginPath();g.ellipse(501,dish-6,75,7,0,0,7);g.fill()}
+    g.strokeStyle=C.ink;g.lineWidth=3;g.beginPath();g.moveTo(420,dish-16);g.lineTo(420,dish+18);g.quadraticCurveTo(420,dish+30,432,dish+30);g.lineTo(570,dish+30);g.quadraticCurveTo(582,dish+30,582,dish+18);g.lineTo(582,dish-16);g.stroke();
+    cyl(g,tx,top,dish+12,11,'#8E96A3',{ry:3.5,top:true});
+    g.strokeStyle=C.ink;g.lineWidth=3;g.beginPath();g.moveTo(tx-13,dish+14);g.lineTo(tx-13,36);g.arc(tx,36,13,Math.PI,0);g.lineTo(tx+13,dish+14);g.stroke();
+    if(top-36>40)txt(g,'пустота',tx-18,(top+36)/2+4,{a:'right',s:11,c:C.muted,w:500});
+    for(let v=0;v<=700;v+=100){const yy=dish-v*kk;g.strokeStyle=C.muted;g.lineWidth=1;g.beginPath();g.moveTo(tx+18,yy);g.lineTo(tx+26,yy);g.stroke();txt(g,String(v),tx+30,yy+4,{s:11,c:C.muted,w:500})}
+    const y760=dish-760*kk;g.setLineDash([3,4]);g.strokeStyle=C.plum;g.lineWidth=1.5;g.beginPath();g.moveTo(tx-30,y760);g.lineTo(tx+60,y760);g.stroke();g.setLineDash([]);
+    txt(g,'760',tx+62,y760+4,{s:11,c:C.plum,w:700});
+    txt(g,f1(S.mm,0)+' мм рт. ст.',tx-22,top+4,{a:'right',s:13.5,w:800});
+  },
+  outs(S,P){const mm=this.mm(P.alt);return[['Давление',f1(mm,0)+' мм рт. ст.'],['В килопаскалях',f1(mm*0.13332,1)+' кПа'],['Высота',f1(P.alt,0)+' м'],['Меньше, чем у моря, на',f1(760-mm,0)+' мм рт. ст.']]}
+});
+
+/* 13. Гидравлический пресс */
+LABS.push({
+  id:'press',title:'Гидравлический пресс',cat:'Давление',color:'#D0752B',
+  short:'Небольшой силой на маленьком поршне можно поднять тяжёлый груз. Как это работает?',
+  params:[
+    {id:'F1',label:'Сила на малом поршне F₁',min:10,max:300,step:10,val:100,unit:'Н'},
+    {id:'S1',label:'Площадь малого поршня S₁',min:1,max:20,step:1,val:5,unit:'см²'},
+    {id:'S2',label:'Площадь большого поршня S₂',min:20,max:500,step:10,val:200,unit:'см²'}
+  ],
+  presets:[['Автомобильный домкрат',{F1:150,S1:2,S2:400}],['Равные поршни',{S1:20,S2:20}],['Слабый выигрыш',{S1:20,S2:60}]],
+  restartOn:[],launch:true,launchLabel:'Нажать снова',
+  def:'Гидравлический пресс — два сообщающихся цилиндра разной площади с жидкостью, закрытые поршнями. По закону Паскаля давление, созданное малым поршнем, передаётся жидкостью без изменения к большому. Поэтому сила на большом поршне во столько раз больше силы на малом, во сколько раз площадь большого поршня больше площади малого. Зато большой поршень поднимается во столько же раз меньше.',
+  formulas:['p = F₁ / S₁ = F₂ / S₂','F₂ / F₁ = S₂ / S₁','h₁ · S₁ = h₂ · S₂'],
+  tryit:['Сделайте большой поршень в 100 раз больше малого — какой груз можно поднять силой 100 Н?','Почему большой поршень поднимается намного меньше, чем опускается малый?','Подберите площади так, чтобы выигрыш в силе был в 50 раз.'],
+  init(S){S.t=0},
+  step(S,P,dt){S.t=Math.min(S.t+dt,3)},
+  draw(g,S,P){
+    const pr=sm(S.t/2.2),d1=120*pr,d2=d1*P.S1/P.S2,lab=LABC(this);
+    const c1=140,c2=430,w1=18+Math.sqrt(P.S1)*6,w2=Math.max(w1,40+Math.sqrt(P.S2)*9.5),top=56,bot=360,ch=36;
+    const y1=130+d1,y2=226-d2,liq=rgba('#3F6FB5',0.35);
+    shadow(g,(c1+c2)/2+20,bot+6,(c2-c1)/2+w2/2+20,.18);
+    const shH=(x0,w)=>{const gr=g.createLinearGradient(x0,0,x0+w,0);gr.addColorStop(0,rgba('#3F6FB5',.38));gr.addColorStop(.3,rgba('#8FB2E8',.3));gr.addColorStop(1,rgba('#24477F',.5));return gr};
+    {const gv=g.createLinearGradient(0,bot-ch,0,bot);gv.addColorStop(0,rgba('#8FB2E8',.32));gv.addColorStop(1,rgba('#24477F',.5));g.fillStyle=gv;g.fillRect(c1-w1/2,bot-ch,c2-c1+w2/2+w1/2,ch)}
+    g.fillStyle=shH(c1-w1/2,w1);g.fillRect(c1-w1/2,y1,w1,bot-ch-y1);g.fillStyle=shH(c2-w2/2,w2);g.fillRect(c2-w2/2,y2,w2,bot-ch-y2);
+    g.strokeStyle=C.ink;g.lineWidth=4;g.lineJoin='round';g.beginPath();
+    g.moveTo(c1-w1/2,top);g.lineTo(c1-w1/2,bot);g.lineTo(c2+w2/2,bot);g.lineTo(c2+w2/2,top+40);
+    g.moveTo(c1+w1/2,top);g.lineTo(c1+w1/2,bot-ch);g.lineTo(c2-w2/2,bot-ch);g.lineTo(c2-w2/2,top+40);g.stroke();
+    // малый поршень
+    cyl(g,c1,y1-42,y1-12,3,C.dark?'#8d88a3':'#6B6F85',{top:false});cyl(g,c1,y1-12,y1,w1/2-2,C.dark?'#8d88a3':'#6B6F85',{ry:Math.max(3,w1*.14)});box3(g,c1-22-7*DX,y1-50-7*DY,44,9,C.dark?'#8d88a3':'#3a3e5c',14,{shadow:false});
+    const L1=20+44*P.F1/300;arrow(g,c1,y1-56-L1,c1,y1-54,C.plum,5);txt(g,'F₁ = '+P.F1+' Н',c1+16,y1-58-L1/2,{s:14,w:700,c:C.plum});
+    // большой поршень и груз
+    cyl(g,c2,y2-14,y2,w2/2-2,C.dark?'#8d88a3':'#6B6F85',{ry:Math.max(3,w2*.12)});
+    const F2=P.F1*P.S2/P.S1,lw=Math.min(w2-8,140),lh=34+Math.min(60,Math.sqrt(F2)*0.9);
+    const wd=Math.min(lw*.5,w2*.5),wfx=c2-lw/2-wd/2*DX,wfy=y2-14-lh-wd/2*DY;box3(g,wfx,wfy,lw,lh,lab,wd,{shadow:false});
+    txt(g,'груз',wfx+lw/2,wfy+lh/2+5,{a:'center',s:13,c:'#fff',w:700});
+    const L2=Math.min(150,L1*Math.sqrt(P.S2/P.S1)),ax=Math.min(W-20,c2+w2/2+22);
+    arrow(g,ax,y2,ax,y2-L2,C.teal,5);{const lbl='F₂ = '+f1(F2,0)+' Н';g.font='700 '+14*TS+'px '+FONT;const tw=g.measureText(lbl).width;if(ax+10+tw<W-6)txt(g,lbl,ax+10,y2-L2+14,{s:14,w:700,c:C.teal});else txt(g,lbl,ax+6,y2-L2-10,{a:'right',s:14,w:700,c:C.teal})}
+    // давление
+    txt(g,'p = '+f1(P.F1/(P.S1*1e-4)/1000,0)+' кПа',(c1+c2)/2,bot-ch/2+5,{a:'center',s:13,w:700});
+    txt(g,'S₁ = '+P.S1+' см²',c1,bot+24,{a:'center',s:12,c:C.muted,w:600});txt(g,'S₂ = '+P.S2+' см²',c2,bot+24,{a:'center',s:12,c:C.muted,w:600});
+  },
+  outs(S,P){const F2=P.F1*P.S2/P.S1,pr=sm(S.t/2.2);
+    return[['Сила на большом поршне F₂',f1(F2,0)+' Н'],['Выигрыш в силе',P.S2===P.S1?'нет':'в '+f1(P.S2/P.S1,1)+' раза'],['Давление в жидкости',f1(P.F1/(P.S1*1e-4)/1000,0)+' кПа'],['Подъём груза при ходе 30 см',f1(30*P.S1/P.S2*pr,2)+' см']]}
+});
+
+/* 14. Закон Архимеда */
+LABS.push({
+  id:'archimedes',title:'Закон Архимеда',cat:'Давление',color:'#3F6FB5',
+  short:'Почему одни тела плавают, а другие тонут? Сравните плотность тела и жидкости.',
+  params:[
+    {id:'rho',label:'Плотность тела',min:200,max:8000,step:50,val:600,unit:'кг/м³'},
+    {id:'rl',label:'Плотность жидкости',min:700,max:14000,step:50,val:1000,unit:'кг/м³'},
+    {id:'V',label:'Объём тела',min:1,max:8,step:0.5,val:3,unit:'дм³',d:1}
+  ],
+  presets:[['Дерево в воде',{rho:600,rl:1000}],['Лёд в воде',{rho:900,rl:1000}],['Камень в воде',{rho:2500,rl:1000}],['Сталь в ртути',{rho:7800,rl:13600}],['Лёд в керосине',{rho:900,rl:800}]],
+  restartOn:'all',launch:true,launchLabel:'Опустить снова',
+  def:'На тело, погружённое в жидкость, действует выталкивающая сила, равная весу жидкости в объёме погружённой части тела. Её называют архимедовой силой. Тело тонет, если сила тяжести больше архимедовой силы, и всплывает, если меньше. Плавающее тело погружается настолько, чтобы архимедова сила уравновесила силу тяжести.',
+  formulas:['Fₐ = ρж · g · Vпогр','тонет, если ρт > ρж','плавает, если ρт < ρж'],
+  tryit:['Подберите плотность тела так, чтобы оно висело в толще воды.','Опустите сталь в ртуть и сравните глубину погружения с деревом в воде.','Почему стальной корабль плавает, хотя сталь плотнее воды?'],
+  init(S,P){const s=40*Math.cbrt(P.V);S.s=s;S.y=110-s;S.v=0;S.t=0;S.f=0;S.rise=0},
+  step(S,P,dt){
+    const s=S.s,bot=360,n=4,h=dt/n;S.t+=dt;
+    for(let i=0;i<n;i++){
+      const surf=170-S.rise,f=clamp((S.y+s-surf)/s,0,1);
+      const a=420*(1-P.rl*f/P.rho)-5*S.v;S.v+=a*h;S.y+=S.v*h;
+      if(S.y>bot-s){S.y=bot-s;S.v=Math.min(0,S.v)}
+      S.f=f;S.rise=s*s*f/360;
+    }
+  },
+  draw(g,S,P){
+    const surf=170-S.rise,bot=360,tl=140,tr=500,s=S.s,bx=(tl+tr)/2-s/2,al=0.18+0.35*Math.min(1,P.rl/14000);
+    const D3=60,cd=Math.min(s*.55,D3-6),sh=(D3-cd)/2,qx=bx+sh*DX,qy=S.y+sh*DY;
+    shadow(g,(tl+tr)/2+D3*DX/2,bot+4,(tr-tl)/2+30,.18);
+    tank3(g,tl,90,tr-tl,bot-90,D3,surf,'#3F6FB5',{alpha:al*1.6,mid:()=>{
+      const wv=S.t*2;g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=1.2;
+      for(let i=1;i<4;i++){const f=i/4,y=surf+D3*DY*f,x0=tl+D3*DX*f;g.beginPath();for(let x=0;x<=tr-tl;x+=10)g.lineTo(x0+x,y+Math.sin(x*.05+wv+i)*1.2*(Math.abs(S.v)>5?2:1));g.stroke()}
+      box3(g,qx,qy,s,s,C.plum,cd,{shadow:false});
+      if(s>=70)txt(g,f1(P.rho,0),qx+s/2,qy+s/2+5,{a:'center',s:13,c:'#fff',w:700});
+    }});
+    g.setLineDash([3,4]);g.strokeStyle=C.muted;g.lineWidth=1;g.beginPath();g.moveTo(tr+4,170);g.lineTo(tr+20,170);g.stroke();g.setLineDash([]);
+    tank3front(g,tl,90,tr-tl,bot-90,D3);
+    const Ft=P.rho*G*P.V/1000,Fa=P.rl*G*P.V*S.f/1000,sc=v=>26+84*Math.min(1,v/250),cx=qx+s/2,cy=qy+s/2;
+    const tag=(s1,x,y,col,al)=>{g.font='700 '+13*TS+'px '+FONT;const w=g.measureText(s1).width+12,bx2=al==='right'?x-w:x;
+      g.fillStyle=rgba(C.surf,.88);g.beginPath();g.roundRect(bx2,y-14,w,20,7);g.fill();txt(g,s1,bx2+6,y+1,{s:13,c:col,w:700})};
+    const dn=sc(Ft),up=Fa>0.3?sc(Fa):0;
+    arrow(g,cx+6,cy,cx+6,cy+dn,C.plum,4);
+    if(up)arrow(g,cx-6,cy,cx-6,cy-up,C.teal,4);
+    sph(g,cx,cy,3.5,C.ink);
+    tag('Fт = '+f1(Ft,1)+' Н',cx+14,cy+dn-2,C.plum,'left');
+    if(up)tag('Fₐ = '+f1(Fa,1)+' Н',cx-14,cy-up+12,C.teal,'right');
+    if(S.y>=bot-s-0.5&&Ft-Fa>0.3){const Nn=Ft-Fa,nx2=qx+s+cd*DX+12;arrow(g,nx2,qy+s,nx2,qy+s-sc(Nn),C.ink,3);tag('N',nx2+6,qy+s-sc(Nn)/2,C.ink,'left')}
+    txt(g,'ρ тела',22,124,{s:12,c:C.muted,w:500});txt(g,f1(P.rho,0)+' кг/м³',22,144,{s:15,w:700});
+    txt(g,'ρ жидкости',22,184,{s:12,c:C.muted,w:500});txt(g,f1(P.rl,0)+' кг/м³',22,204,{s:15,w:700});
+    const v=P.rho<P.rl?'Плавает':P.rho>P.rl?'Тонет':'Плавает внутри';badge(g,v,W-16,16,P.rho<P.rl?C.green:P.rho>P.rl?C.plum:C.muted,'right');
+  },
+  outs(S,P){const Ft=P.rho*G*P.V/1000,Fa=P.rl*G*P.V*(S.f||0)/1000;const v=P.rho<P.rl?'плавает':P.rho>P.rl?'тонет':'плавает внутри';
+    return[['Сила тяжести',f1(Ft,1)+' Н'],['Архимедова сила',f1(Fa,1)+' Н'],['Погружено',Math.round((S.f||0)*100)+' % объёма'],['Итог',v]]}
+});
+
+/* 15. Работа и мощность */
+LABS.push({
+  id:'work',title:'Механическая работа и мощность',cat:'Работа и энергия',color:'#7A3E9D',
+  short:'Кран поднимает груз. Сколько работы он совершает и какая у него мощность?',
+  params:[
+    {id:'m',label:'Масса груза',min:10,max:200,step:5,val:50,unit:'кг'},
+    {id:'h',label:'Высота подъёма',min:1,max:20,step:1,val:10,unit:'м'},
+    {id:'t',label:'Время подъёма',min:2,max:20,step:1,val:5,unit:'с'}
+  ],
+  presets:[['Быстрый подъём',{t:2}],['Медленный подъём',{t:20}],['Тяжёлый груз',{m:200}]],
+  restartOn:['h','t'],launch:true,launchLabel:'Поднять снова',
+  def:'Механическая работа совершается, когда на тело действует сила и тело перемещается. Работа равна произведению силы на пройденный путь. Мощность показывает, как быстро совершается работа: она равна отношению работы ко времени, за которое работа совершена. При равномерном подъёме груза сила тяги равна силе тяжести.',
+  formulas:['A = F · s','N = A / t','при подъёме груза: A = m · g · h'],
+  tryit:['Уменьшите время подъёма вдвое — как изменились работа и мощность?','Поднимите груз вдвое выше: во сколько раз выросла работа?','Какую мощность развивает кран, поднимая 100 кг на 10 м за 5 с?'],
+  init(S){S.t=0},
+  step(S,P,dt){S.t=Math.min(S.t+dt,P.t)},
+  draw(g,S,P){
+    const lab=LABC(this),gy=372,k=238/P.h,fr=S.t/P.t,y=P.h*fr,A=P.m*G*P.h,lw=54,lh=34;
+    floor3(g,gy,0,W,C.dark?darken('#367A55',.3):'#7FB38F',50);g.fillStyle=C.green;g.fillRect(0,gy,W,H-gy);
+    // кран: все тросы и груз в одной плоскости z = 12
+    const ZR=12,zx=z=>z*DX,zy=z=>z*DY,met=C.dark?'#8d88a3':'#3a3e5c',rope=C.dark?'#C9C5D8':'#2a2e48';
+    box3(g,128,gy-16,66,16,met,40);
+    box3(g,150+zx(1),46+zy(1),22,gy-16-46-zy(1),C.dark?'#7f9a3a':'#C5E08A',22,{shadow:false});
+    {const x0=150+zx(1),y0=46+zy(1),h0=gy-16-y0;g.strokeStyle=C.dark?'#3d4a1c':'#5E7A1E';g.lineWidth=2.2;g.strokeRect(x0,y0,22,h0);g.beginPath();
+     for(let yy=y0;yy<y0+h0-21;yy+=22){g.moveTo(x0,yy);g.lineTo(x0+22,yy+22);g.moveTo(x0+22,yy);g.lineTo(x0,yy+22)}g.stroke()}
+    box3(g,112+zx(4),46+zy(4),30,26,met,16,{shadow:false});
+    box3(g,112+zx(4),38+zy(4),308,8,met,16,{shadow:false});
+    box3(g,138+zx(2),14+zy(2),46,24,lab,20,{shadow:false});g.fillStyle=rgba('#BFE3F2',.85);g.fillRect(162+zx(2),19+zy(2),16,10);
+    const hx=390,by=gy-lh-y*k,RX=hx+zx(ZR),tY=46+zy(ZR);
+    box3(g,hx-13+zx(6),46+zy(6),26,9,C.dark?'#B8B6C6':'#6B6F85',12,{shadow:false});
+    const topY=by+zy(ZR),hookY=topY-18;
+    g.strokeStyle=rope;g.lineWidth=2;g.beginPath();g.moveTo(RX-2,tY+9);g.lineTo(RX-2,hookY-6);g.moveTo(RX+2,tY+9);g.lineTo(RX+2,hookY-6);g.stroke();
+    const fl=gy+zy(ZR);shadow(g,RX,fl,lw*.7*clamp(1-y*k/300,.3,1),.25*clamp(1-y*k/300,.2,1));
+    box3(g,hx-lw/2,by,lw,lh,'#8A5A2B',24,{shadow:false});
+    g.strokeStyle='rgba(255,255,255,.2)';g.lineWidth=2;g.beginPath();g.moveTo(hx-lw/2+4,by+lh/2);g.lineTo(hx+lw/2-4,by+lh/2);g.stroke();
+    g.strokeStyle=rope;g.lineWidth=1.8;g.beginPath();g.moveTo(RX,hookY);g.lineTo(hx-lw/2+7+zx(ZR),topY);g.moveTo(RX,hookY);g.lineTo(hx+lw/2-7+zx(ZR),topY);g.stroke();
+    cyl(g,RX,hookY-8,hookY-1,6,C.dark?'#B8B6C6':'#6B6F85',{ry:2});
+    txt(g,P.m+' кг',hx,by+lh/2+5,{a:'center',s:13,c:'#fff',w:700});
+    if(fr<1&&fr>0)arrow(g,hx+lw/2+12,by+lh,hx+lw/2+12,by-22,C.teal,3);
+    // линейка высоты
+    const steps=[1,2,5];const st=steps.find(s=>P.h/s<=10)||5,rx=470;
+    g.strokeStyle=C.muted;g.lineWidth=2;g.beginPath();g.moveTo(rx,gy);g.lineTo(rx,gy-P.h*k);g.stroke();
+    for(let v=0;v<=P.h+1e-9;v+=st){const yy=gy-v*k;g.beginPath();g.moveTo(rx,yy);g.lineTo(rx+8,yy);g.stroke();txt(g,v+' м',rx+12,v?yy+4:yy-4,{s:11,c:C.muted,w:500})}
+    g.setLineDash([4,5]);g.strokeStyle=lab;g.lineWidth=1.5;g.beginPath();g.moveTo(hx+lw/2+24*DX,gy-P.h*k);g.lineTo(rx,gy-P.h*k);g.stroke();g.setLineDash([]);
+    // шкала работы
+    const bx=560,bt=70,bb=330;cyl(g,bx+22,bt,bb,22,C.dark?'#3a3247':'#E4E2EC',{shadow:true});
+    const fh=(bb-bt)*fr;if(fh>1)cyl(g,bx+22,bb-fh,bb,22,lab);
+    txt(g,'A',bx+22,bt-12,{a:'center',s:16,w:800});txt(g,fJ(A*fr),bx+22,bb+22,{a:'center',s:13,w:700});
+    txt(g,'t = '+f1(S.t,1)+' с',22,30,{s:16,w:800});txt(g,'h = '+f1(y,1)+' м',22,52,{s:13,c:C.muted,w:600});
+  },
+  outs(S,P){const A=P.m*G*P.h;return[['Работа A = m·g·h',fJ(A)],['Мощность N = A / t',fWt(A/P.t)],['Сила тяги F',f1(P.m*G,0)+' Н'],['Скорость подъёма',f1(P.h/P.t,2)+' м/с']]}
+});
+
+/* 16. Рычаг */
+LABS.push({
+  id:'lever',title:'Рычаг. Правило моментов',cat:'Работа и энергия',color:'#2E7D6B',
+  short:'Два груза на рычаге уравновешивают друг друга, если равны моменты сил.',
+  params:[
+    {id:'m1',label:'Груз слева m₁',min:0.5,max:10,step:0.5,val:4,unit:'кг',d:1},
+    {id:'d1',label:'Плечо слева l₁',min:0.2,max:2.4,step:0.1,val:1.2,unit:'м',d:1},
+    {id:'m2',label:'Груз справа m₂',min:0.5,max:10,step:0.5,val:4,unit:'кг',d:1},
+    {id:'d2',label:'Плечо справа l₂',min:0.2,max:2.4,step:0.1,val:1.2,unit:'м',d:1}
+  ],
+  presets:[['Равновесие',{m1:4,d1:1.2,m2:4,d2:1.2}],['Разные плечи',{m1:6,d1:0.6,m2:2,d2:1.8}],['Тяжёлый близко к оси',{m1:8,d1:0.4,m2:1,d2:2}]],
+  restartOn:[],
+  def:'Рычаг — твёрдое тело, которое может вращаться вокруг неподвижной опоры. Он находится в равновесии, когда силы, действующие на него, обратно пропорциональны плечам. Плечо силы — кратчайшее расстояние от оси вращения до линии действия силы. Момент силы равен произведению силы на плечо; рычаг в равновесии, если моменты, вращающие его в разные стороны, равны.',
+  formulas:['F₁ / F₂ = l₂ / l₁','M = F · l','равновесие: F₁ · l₁ = F₂ · l₂'],
+  tryit:['Подберите l₂ так, чтобы рычаг уравновесился при m₁ = 6 кг, l₁ = 0,6 м и m₂ = 2 кг.','Увеличьте груз слева, не меняя плечи — куда наклонится рычаг?','Проверьте: груз вдвое легче уравновешивает тяжёлый на вдвое большем плече.'],
+  K:96,PY:175,ZH:15,
+  wg(m){const rr=10+m*1.6,hh=12+m*3.2;return{rr,hh,ry:rr*.32,L:26,kn:7}},
+  init(S){S.a=0;S.w=0},
+  step(S,P,dt){
+    const M1=G*P.m1*P.d1,M2=G*P.m2*P.d2,n=4,h=dt/n;
+    const room=(m,d)=>{const q=this.wg(m);return Math.asin(clamp((321-(this.PY+5)-q.L-q.kn-q.hh-q.ry)/(d*this.K),0,1))};
+    const limR=Math.min(rad(20),room(P.m2,P.d2)),limL=Math.min(rad(20),room(P.m1,P.d1));
+    for(let i=0;i<n;i++){const tq=(M2-M1)*Math.cos(S.a)*0.35-4*Math.sin(S.a);S.w+=(tq/6-S.w*3.2)*h;S.a+=S.w*h;
+      if(S.a>limR){S.a=limR;S.w=Math.min(0,S.w)*-0.25}if(S.a<-limL){S.a=-limL;S.w=Math.max(0,S.w)*-0.25}}
+  },
+  draw(g,S,P){
+    const px=W/2,py=this.PY,K=this.K,ZH=this.ZH,M1=G*P.m1*P.d1,M2=G*P.m2*P.d2,eq=Math.abs(M1-M2)<0.15;
+    const Z=(p,z)=>[p[0]+z*DX,p[1]+z*DY],ca=Math.cos(S.a),sa=Math.sin(S.a);
+    const rot=(x,y)=>{const dx=x-px,dy=y-py;return[px+dx*ca-dy*sa,py+dx*sa+dy*ca]};
+    const metal=C.dark?'#8d88a3':'#4A4E6C';
+    // пол
+    floor3(g,330,0,W,C.dark?'#2c2536':'#E7E5EE',60);g.fillStyle=C.soft;g.fillRect(0,330,W,70);g.fillStyle=C.ink;g.fillRect(0,329,W,3);
+    // опора: треугольная призма под серединой бруса
+    // штатив за брусом: основание, стойка, ось проходит сквозь брус
+    {const sc=C.dark?'#7a7590':'#8E92AA',zb=8,bw2=120,bh2=12,zP=30;
+     const fx=px-bw2/2+zb*DX,fy=330+zb*DY-bh2;shadow(g,px+30,330+20*DY,90,.25);
+     box3(g,fx,fy,bw2,bh2,sc,40,{shadow:false});
+     const P0=[px-9+zP*DX,py-4+zP*DY];box3(g,P0[0],P0[1],18,fy+bh2-P0[1]+(zP-zb)*DY-bh2+2,sc,10,{shadow:false})}
+    // точки подвеса (в средней плоскости бруса) и грузы
+    const hook=d=>Z(rot(px+d*K,py+5),ZH);
+    const H1=hook(-P.d1),H2=hook(P.d2);
+    const hang=(Hq,m,col,lab,side)=>{const q=this.wg(m),x=Hq[0],top=Hq[1]+q.L+q.kn,bot=top+q.hh;
+      const fl=330+ZH*DY,gap=fl-bot;shadow(g,x+4,fl,q.rr*1.3,.22*clamp(1-gap/140,.2,1));
+      g.strokeStyle=C.dark?'#C9C5D8':'#3a3e5c';g.lineWidth=1.8;g.beginPath();g.moveTo(x,Hq[1]);g.lineTo(x,Hq[1]+q.L-4);g.stroke();
+      g.lineWidth=2.2;g.beginPath();g.arc(x,Hq[1]+q.L,4,-Math.PI*.5,Math.PI*1.3);g.stroke();
+      cyl(g,x,Hq[1]+q.L+3,top,3.2,metal,{ry:1.2});
+      cyl(g,x,top,bot,q.rr,col,{ry:q.ry});
+      g.fillStyle='rgba(255,255,255,.18)';g.fillRect(x-q.rr,top+q.hh*.62,q.rr*2,2);
+      if(q.rr>=23)txt(g,f1(m,1)+' кг',x,top+q.hh/2+5,{a:'center',s:12,c:'#fff',w:700});
+      else txt(g,f1(m,1)+' кг',x,bot+q.ry+15,{a:'center',s:12,w:700});
+      const ax=x+side*(q.rr+12),Lf=18+m*4.2;arrow(g,ax,Hq[1]+2,ax,Hq[1]+2+Lf,C.plum,3);
+      txt(g,lab,ax+side*6,Hq[1]+Lf*.55+6,{a:side<0?'right':'left',s:13,c:C.plum,w:800})};
+    hang(H1,P.m1,'#2E7D6B','F₁',-1);hang(H2,P.m2,'#8A5A2B','F₂',1);
+    // брус: вытянутая призма (толщина 10, глубина 22)
+    const hl=252,bt=5,bz=4,BDp=22;
+    const bp=[[px-hl,py-bt],[px+hl,py-bt],[px+hl,py+bt],[px-hl,py+bt]].map(p=>Z(rot(p[0],p[1]),bz));
+        prism3(g,bp,BDp,C.dark?'#B79CF2':'#5B3C9E',{front:C.dark?'#9a82d0':'#4A2F86'});
+    // деления через 0,1 м и крупные через 0,5 м
+    for(let i=-26;i<=26;i++){if(!i)continue;const big=i%5===0,a=Z(rot(px+i*K/10,py-bt),bz),b=Z(rot(px+i*K/10,py-bt+(big?7:3.5)),bz);
+      g.strokeStyle=big?'rgba(255,255,255,.95)':'rgba(255,255,255,.55)';g.lineWidth=big?1.6:1;g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.stroke()}
+    // кольца подвеса на брусе
+    for(const Hq of [H1,H2]){g.strokeStyle=C.dark?'#C9C5D8':'#3a3e5c';g.lineWidth=2;g.beginPath();g.arc(Hq[0],Hq[1]+2,3.5,0,7);g.stroke()}
+    // ось
+    {const c=Z([px,py],bz);sph(g,c[0],c[1],6.5,C.dark?'#E7E3F2':'#C9CCD8');g.fillStyle=C.ink;g.beginPath();g.arc(c[0],c[1],2,0,7);g.fill()}
+    // плечи
+    g.strokeStyle=C.muted;g.lineWidth=1.5;
+    const brk=(d,label,side)=>{const a=Z(rot(px,py-24),bz),b=Z(rot(px+side*d*K,py-24),bz),a2=Z(rot(px,py-30),bz),b2=Z(rot(px+side*d*K,py-30),bz),a3=Z(rot(px,py-18),bz),b3=Z(rot(px+side*d*K,py-18),bz);
+      g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(b[0],b[1]);g.moveTo(a2[0],a2[1]);g.lineTo(a3[0],a3[1]);g.moveTo(b2[0],b2[1]);g.lineTo(b3[0],b3[1]);g.stroke();
+      const mx=(a[0]+b[0])/2,tx=side<0?Math.min(mx,px-48):Math.max(mx,px+48);txt(g,label,tx,(a[1]+b[1])/2-10,{a:'center',s:13,w:700})};
+    brk(P.d1,'l₁ = '+f1(P.d1,1)+' м',-1);brk(P.d2,'l₂ = '+f1(P.d2,1)+' м',1);
+    txt(g,'M₁ = '+f1(M1,1)+' Н·м',20,34,{s:15,w:700});txt(g,'M₂ = '+f1(M2,1)+' Н·м',W-20,34,{a:'right',s:15,w:700});
+    if(eq)badge(g,'Равновесие',px,50,C.green,'center');else badge(g,M1>M2?'Перевешивает левая сторона':'Перевешивает правая сторона',px,50,C.dark?'#5d5770':'#6B6F85','center');
+  },
+  outs(S,P){const M1=G*P.m1*P.d1,M2=G*P.m2*P.d2,eq=Math.abs(M1-M2)<0.15;
+    return[['Момент слева F₁·l₁',f1(M1,1)+' Н·м'],['Момент справа F₂·l₂',f1(M2,1)+' Н·м'],['Разница моментов',f1(Math.abs(M1-M2),1)+' Н·м'],['Рычаг',eq?'в равновесии':(M1>M2?'перевешивает левая сторона':'перевешивает правая сторона')]]}
+});
+
+/* 17. Блоки */
+LABS.push({
+  id:'pulleys',title:'Неподвижный и подвижный блоки',cat:'Работа и энергия',color:'#A23E48',
+  short:'Какой блок помогает поднять груз меньшей силой и чем за это приходится платить?',
+  params:[
+    {id:'mode',label:'Блок',type:'seg',val:'fix',options:[['fix','Неподвижный'],['mov','Подвижный']]},
+    {id:'m',label:'Масса груза',min:1,max:40,step:1,val:10,unit:'кг'}
+  ],
+  presets:[['Лёгкий груз',{m:4}],['Тяжёлый груз',{m:40}]],
+  restartOn:['mode'],launch:true,launchLabel:'Поднять снова',
+  def:'Блок — колесо с жёлобом, через который перекинута верёвка. Неподвижный блок не даёт выигрыша в силе, но меняет её направление: тянуть вниз удобнее. Подвижный блок поднимается вместе с грузом и даёт выигрыш в силе в 2 раза, но руке приходится вытянуть вдвое больше верёвки. Работа в обоих случаях одинакова — это «золотое правило» механики. Массу блока и трение мы не учитываем.',
+  formulas:['неподвижный блок: F = P','подвижный блок: F = P / 2','золотое правило: во сколько раз выигрываем в силе, во столько раз проигрываем в расстоянии'],
+  tryit:['Сравните показания динамометра для двух блоков при одном грузе.','Какой путь проходит рука, когда груз поднимается на 1 м?','Проверьте, что работа руки F · s одинакова для обоих блоков.'],
+  init(S){S.t=0},
+  step(S,P,dt){S.t=Math.min(S.t+dt,3.2)},
+  draw(g,S,P){
+    const pr=sm(S.t/3),fix=P.mode==='fix',Pw=P.m*G,F=fix?Pw:Pw/2,k=70,lab=LABC(this),R=28;
+    const hatch=(x0,x1)=>{box3(g,x0-12*DX,20-12*DY,x1-x0,10,C.dark?'#8d88a3':'#3a3e5c',24,{shadow:false})};
+    const load=(cx,top)=>{const fx=cx-28-12*DX,fy=top-12*DY;box3(g,fx,fy,56,38,lab,24,{shadow:false});txt(g,P.m+' кг',fx+28,fy+24,{a:'center',s:13,c:'#fff',w:700});
+      cyl(g,cx,top-7,top+1,4,C.dark?'#B8B6C6':'#6B6F85',{ry:1.6})};
+    const wheel=(cx,cy)=>{const t=9;g.fillStyle=darken(C.dark?'#8d88a3':'#9A9EB5',.25);g.beginPath();g.arc(cx+t*DX,cy+t*DY,R,0,7);g.fill();
+      g.beginPath();g.moveTo(cx+R*Math.cos(-2.2),cy+R*Math.sin(-2.2));g.lineTo(cx+t*DX+R*Math.cos(-2.2),cy+t*DY+R*Math.sin(-2.2));g.lineTo(cx+t*DX+R*Math.cos(.95),cy+t*DY+R*Math.sin(.95));g.lineTo(cx+R*Math.cos(.95),cy+R*Math.sin(.95));g.closePath();g.fill();
+      {const gr=g.createRadialGradient(cx-R*.35,cy-R*.4,2,cx,cy,R);gr.addColorStop(0,C.surf);gr.addColorStop(1,C.dark?'#3a3247':'#DAD8E4');g.fillStyle=gr}
+      g.strokeStyle=C.ink;g.lineWidth=4;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();g.stroke();
+      g.save();g.translate(cx,cy);g.rotate((fix?1:-1)*pr*k/R);g.strokeStyle=C.muted;g.lineWidth=2;for(let i=0;i<3;i++){g.rotate(Math.PI*2/3);g.beginPath();g.moveTo(0,0);g.lineTo(R-6,0);g.stroke()}g.restore();
+      g.fillStyle=C.ink;g.beginPath();g.arc(cx,cy,5,0,7);g.fill()};
+    const rope='#A57B4B';let handLen;
+    if(fix){
+      hatch(240,400);const cx=320,cy=78;
+      g.strokeStyle=C.ink;g.lineWidth=4;g.beginPath();g.moveTo(cx,30);g.lineTo(cx,cy);g.stroke();
+      const lt=290-pr*k,hy=150+pr*k;load(cx-R,lt);
+      g.strokeStyle=rope;g.lineWidth=3;g.beginPath();g.moveTo(cx-R,lt-6);g.lineTo(cx-R,cy);g.arc(cx,cy,R,Math.PI,0);g.lineTo(cx+R,hy);g.stroke();
+      wheel(cx,cy);
+      dyn(g,cx+R,hy,Math.PI/2,F,400,70);
+      sph(g,cx+R,hy+106,12.5,'#99CC42');
+      arrow(g,cx+R+30,hy+80,cx+R+30,hy+124,C.plum,4);
+      txt(g,'F = '+f1(F,0)+' Н',cx+R+44,hy+70,{s:15,w:800});
+      handLen=pr*1;
+    }else{
+      hatch(214,300);const cx=300,cy=300-pr*k,ry=266-pr*2*k;
+      load(cx,cy+46);
+      g.strokeStyle=C.ink;g.lineWidth=3;g.beginPath();g.moveTo(cx-6,cy);g.lineTo(cx-6,cy+R+4);g.lineTo(cx,cy+40);g.lineTo(cx+6,cy+R+4);g.lineTo(cx+6,cy);g.stroke();
+      g.strokeStyle=rope;g.lineWidth=3;g.beginPath();g.moveTo(cx-R,30);g.lineTo(cx-R,cy);g.arc(cx,cy,R,Math.PI,0,true);g.lineTo(cx+R,ry);g.stroke();
+      wheel(cx,cy);
+      dyn(g,cx+R,ry,-Math.PI/2,F,400,70);
+      sph(g,cx+R,ry-106,12.5,'#99CC42');
+      arrow(g,cx+R+30,ry-80,cx+R+30,ry-124,C.plum,4);
+      txt(g,'F = '+f1(F,0)+' Н',cx+R+44,ry-88,{s:15,w:800});
+      handLen=pr*2;
+    }
+    // путь груза и руки
+    const bx=520,base=330;
+    const bar=(x,v,label,col)=>{cyl(g,x+13,base-150,base,13,C.dark?'#3a3247':'#E4E2EC',{shadow:true});
+      if(v>0.005)cyl(g,x+13,base-v*70,base,13,col);
+      txt(g,label,x+13,base+20,{a:'center',s:12,w:600,c:C.muted});txt(g,f1(v,1)+' м',x+13,base-156,{a:'center',s:13,w:700})};
+    bar(bx,pr,'груз',lab);bar(bx+50,handLen,'рука',C.plum);
+    txt(g,'P = '+f1(Pw,0)+' Н',22,H-20,{s:15,w:700});
+  },
+  outs(S,P){const fix=P.mode==='fix',Pw=P.m*G,F=fix?Pw:Pw/2,pr=sm(S.t/3),s=fix?pr:2*pr;
+    return[['Показание динамометра F',f1(F,0)+' Н'],['Вес груза P',f1(Pw,0)+' Н'],['Выигрыш в силе',fix?'нет':'в 2 раза'],['Путь руки',f1(s,2)+' м'],['Груз поднят на',f1(pr,2)+' м'],['Работа руки F · s',fJ(F*s)]]}
+});
+
+/* 18. Наклонная плоскость и КПД */
+LABS.push({
+  id:'incline',title:'Наклонная плоскость. КПД',cat:'Работа и энергия',color:'#9C6B1E',
+  short:'Втащите брусок по наклонной плоскости и узнайте, какая часть работы пошла на пользу.',
+  params:[
+    {id:'ang',label:'Угол наклона',min:10,max:60,step:1,val:30,unit:'°'},
+    {id:'mu',label:'Коэффициент трения',min:0,max:0.6,step:0.02,val:0.2,unit:'',d:2},
+    {id:'m',label:'Масса бруска',min:0.5,max:5,step:0.1,val:2,unit:'кг',d:1}
+  ],
+  presets:[['Без трения',{mu:0}],['Пологая',{ang:15}],['Крутая',{ang:55}],['Шероховатая',{mu:0.5}]],
+  restartOn:'all',launch:true,launchLabel:'Тянуть снова',
+  def:'Наклонная плоскость — простой механизм, который позволяет поднять груз силой меньше его веса. Полезная работа — работа по подъёму груза на высоту h. Затраченная работа — работа силы тяги на длине плоскости l. Из-за трения затраченная работа всегда больше полезной. Отношение полезной работы к затраченной называют коэффициентом полезного действия (КПД). Длина плоскости в опыте — 1 м.',
+  formulas:['η = Aп / Aз · 100 %','Aп = P · h','Aз = F · l'],
+  tryit:['Уберите трение (μ = 0) — КПД станет 100 %.','Как меняется КПД при увеличении угла наклона?','Во сколько раз сила тяги меньше веса бруска при угле 20°?'],
+  calc(P){const a=rad(P.ang),Pw=P.m*G,h=Math.sin(a),F=Pw*(Math.sin(a)+P.mu*Math.cos(a)),Ap=Pw*h,Az=F*1;return{a,Pw,h,F,Ap,Az,eta:Ap/Az}},
+  init(S){S.t=0},
+  step(S,P,dt){S.t=Math.min(S.t+dt,3.2)},
+  draw(g,S,P){
+    const c=this.calc(P),a=c.a,bx=60,by=350,Lp=Math.min(470,255/Math.sin(a)),tx=bx+Lp*Math.cos(a),ty=by-Lp*Math.sin(a),pr=clamp(S.t/3,0,1);
+    floor3(g,by,0,W,C.dark?'#2c2536':'#E7E5EE',70);shadow(g,(bx+tx)/2+30,by+2,(tx-bx)/2+20,.15);prism3(g,[[bx,by],[tx,ty],[tx,by]],70,C.dark?'#3a3247':'#DCD8E8');
+    g.strokeStyle=C.ink;g.lineWidth=4;g.lineJoin='round';g.beginPath();g.moveTo(bx,by);g.lineTo(tx,ty);g.stroke();
+    g.fillStyle=C.ink;g.fillRect(0,by,W,3);
+    g.setLineDash([5,5]);g.strokeStyle=C.muted;g.lineWidth=2;g.beginPath();g.moveTo(tx,ty);g.lineTo(tx,by);g.stroke();g.setLineDash([]);
+    txt(g,'h = '+f1(c.h,2)+' м',tx+10,(ty+by)/2,{s:14,w:700});
+    g.strokeStyle=C.muted;g.lineWidth=1.5;g.beginPath();g.arc(bx,by,42,-a,0);g.stroke();txt(g,P.ang+'°',bx+50,by-10,{s:13,c:C.muted,w:600});
+    const ux=Math.cos(a),uy=-Math.sin(a),nx=-Math.sin(a),ny=-Math.cos(a);
+    txt(g,'l = 1 м',bx+Lp*0.5*ux+nx*-22,by+Lp*0.5*uy+ny*-22,{a:'center',s:13,c:C.muted,w:600});
+    const w=38+P.m*4,hh=24+P.m*3,sa=Math.sin(a),caa=Math.cos(a),smax=Math.max(20,Math.min(Lp-40-w,(by+20*DY-hh/2*caa-22)/sa-w-112,(W-18-bx-20*DX+sa*hh/2)/caa-w-112)),s=20+pr*(smax-20),cx=bx+s*ux,cy=by+s*uy;
+    {const sh=20,o2=[sh*DX,sh*DY],P0=[cx+o2[0],cy+o2[1]],pt=(u,v)=>[P0[0]+u*ux+v*nx,P0[1]+u*uy+v*ny];prism3(g,[pt(0,0),pt(w,0),pt(w,hh),pt(0,hh)],26,'#8A5A2B')}
+    const hx=cx+20*DX+w*ux+nx*hh/2,hy=cy+20*DY+w*uy+ny*hh/2;
+    dyn(g,hx,hy,-a,c.F,Math.max(10,c.Pw),70);
+    const ex=hx+106*ux,ey=hy+106*uy;sph(g,ex,ey,11.5,'#99CC42');
+    const mx=cx+20*DX+w/2*ux+nx*hh/2,my=cy+20*DY+w/2*uy+ny*hh/2;arrow(g,mx,my,mx,my+30+c.Pw*1.6,C.plum,3);txt(g,'P',mx+8,my+28+c.Pw*1.6,{s:13,c:C.plum,w:700});
+    txt(g,'F = '+f1(c.F,1)+' Н',20,34,{s:18,w:800});
+    txt(g,'КПД = '+f1(c.eta*100,0)+' %',20,58,{s:15,w:700,c:C.muted});
+  },
+  outs(S,P){const c=this.calc(P);return[['Сила тяги F',f1(c.F,1)+' Н'],['КПД η',f1(c.eta*100,0)+' %'],['Полезная работа Aп',f1(c.Ap,2)+' Дж'],['Затраченная работа Aз',f1(c.Az,2)+' Дж'],['Вес бруска P',f1(c.Pw,1)+' Н'],['Выигрыш в силе P / F','в '+f1(c.Pw/c.F,1)+' раза']]}
+});
+
+/* 19. Энергия */
+LABS.push({
+  id:'energy',title:'Потенциальная и кинетическая энергия',cat:'Работа и энергия',color:'#C2410C',
+  short:'Мяч падает и подпрыгивает. Проследите, как одна энергия превращается в другую.',
+  params:[
+    {id:'h',label:'Начальная высота',min:1,max:10,step:0.5,val:5,unit:'м',d:1},
+    {id:'m',label:'Масса мяча',min:0.1,max:5,step:0.1,val:1,unit:'кг',d:1},
+    {id:'loss',label:'Потери энергии при ударе',min:0,max:80,step:5,val:20,unit:'%'}
+  ],
+  presets:[['Без потерь',{loss:0}],['Резиновый мяч',{loss:20}],['Пластилин',{loss:80}]],
+  restartOn:['h','m'],launch:true,launchLabel:'Бросить снова',
+  def:'Энергия показывает, какую работу может совершить тело. Поднятое тело обладает потенциальной энергией, движущееся — кинетической. При падении потенциальная энергия превращается в кинетическую, при подъёме — наоборот. Если нет трения и потерь, полная механическая энергия сохраняется. При ударе часть механической энергии переходит во внутреннюю — мяч и пол немного нагреваются.',
+  formulas:['Eп = m · g · h','Eк = m · v² / 2','без потерь: Eп + Eк = const'],
+  tryit:['Поставьте потери 0 % — мяч каждый раз подлетает на ту же высоту.','В какой момент кинетическая энергия наибольшая?','Сравните энергию мячей массой 1 кг и 2 кг, брошенных с одной высоты.'],
+  init(S,P){S.y=P.h;S.v=0;S.Q=0;S.trail=[];S.acc=0;S.rest=false},
+  step(S,P,dt){
+    if(S.rest)return;const n=8,h=dt/n,E0=P.m*G*P.h;
+    for(let i=0;i<n;i++){S.v-=G*h;S.y+=S.v*h;
+      if(S.y<=0&&S.v<0){S.y=0;const Em=Math.max(0,E0-S.Q),lost=Em*P.loss/100;S.Q+=lost;const v=Math.sqrt(2*(Em-lost)/P.m);
+        if(v<0.35){S.Q=E0;S.v=0;S.rest=true;break}S.v=v}}
+    S.acc+=dt;if(S.acc>0.05){S.acc=0;S.trail.push(S.y);if(S.trail.length>8)S.trail.shift()}
+  },
+  en(S,P){const E0=P.m*G*P.h,Ep=P.m*G*Math.max(0,S.y),Ek=Math.max(0,E0-S.Q-Ep);return{E0,Ep,Ek,Q:E0-Ep-Ek,v:Math.sqrt(2*Ek/P.m)}},
+  draw(g,S,P){
+    const e=this.en(S,P),gy=366,k=300/P.h,r=10+P.m*2.4,bx=230,lab=LABC(this);
+    floor3(g,gy,0,W,C.dark?darken('#367A55',.3):'#7FB38F',50);g.fillStyle=C.green;g.fillRect(0,gy,W,H-gy);
+    const steps=[0.5,1,2];const st=steps.find(s=>P.h/s<=10)||2;
+    g.strokeStyle=C.muted;g.lineWidth=2;g.beginPath();g.moveTo(120,gy);g.lineTo(120,gy-P.h*k);g.stroke();
+    for(let v=0;v<=P.h+1e-9;v+=st){const y=gy-v*k;g.beginPath();g.moveTo(120,y);g.lineTo(128,y);g.stroke();txt(g,f1(v,st<1?1:0)+' м',112,v?y+4:y-4,{a:'right',s:11,c:C.muted,w:500})}
+    g.setLineDash([4,5]);g.strokeStyle=C.grid;g.beginPath();g.moveTo(130,gy-P.h*k);g.lineTo(330,gy-P.h*k);g.stroke();g.setLineDash([]);
+    {const hpx=S.y*k;shadow(g,bx+10,gy+2,r*1.6*clamp(1-hpx/400,.35,1),.3*clamp(1-hpx/400,.15,1))}
+    S.trail.forEach((y,i)=>{g.globalAlpha=0.06+i*0.03;sph(g,bx,gy-r-y*k,r,lab)});g.globalAlpha=1;
+    {const hpx=S.y*k,sq=hpx<r*.6&&Math.abs(S.v)>0.3?clamp(1-hpx/(r*.6),0,1)*.22:0;
+     g.save();g.translate(bx,gy-hpx);g.scale(1+sq,1-sq);sph(g,0,-r,r,lab);g.restore()}
+    if(e.v>0.2)arrow(g,bx+r+12,gy-r-S.y*k,bx+r+12,gy-r-S.y*k-Math.sign(S.v)*(10+e.v*4),C.teal,3);
+    // столбики энергии
+    const top=58,base=308,Hh=base-top,bars=[['Eп',e.Ep,'#3E8E8A'],['Eк',e.Ek,lab],['внутр.',e.Q,C.muted]];
+    g.setLineDash([4,4]);g.strokeStyle=C.ink;g.lineWidth=1.5;g.beginPath();g.moveTo(392,top);g.lineTo(620,top);g.stroke();g.setLineDash([]);
+    txt(g,'полная энергия '+fJ(e.E0),620,top-10,{a:'right',s:12,w:600,c:C.muted});
+    bars.forEach((b,i)=>{const x=400+i*76,hgt=Hh*b[1]/e.E0;cyl(g,x+26,top,base,26,C.dark?'#3a3247':'#E4E2EC',{shadow:true});
+      if(hgt>0.5)cyl(g,x+26,base-hgt,base,26,b[2]);
+      txt(g,b[0],x+26,base+22,{a:'center',s:14,w:700});txt(g,f1(b[1],b[1]<10?1:0),x+26,base+40,{a:'center',s:12,c:C.muted,w:600})});
+  },
+  outs(S,P){const e=this.en(S,P);return[['Потенциальная Eп',fJ(e.Ep)],['Кинетическая Eк',fJ(e.Ek)],['Механическая Eп + Eк',fJ(e.Ep+e.Ek)],['Скорость мяча',f1(e.v,1)+' м/с']]}
+});
+
+function LABC(lab){return lab.color}
+
+/* ===================== APP ===================== */
+const app=$('#app');
+let visited=new Set();
+try{visited=new Set(JSON.parse(localStorage.getItem('lab-sirius-visited')||'[]').filter(id=>LABS.some(l=>l.id===id)))}catch(e){}
+function saveVisited(){try{localStorage.setItem('lab-sirius-visited',JSON.stringify([...visited]))}catch(e){}}
+
+const CATS=['Все',...Array.from(new Set(LABS.map(l=>l.cat)))];
+let filter='Все',cur=null,P={},S={},paused=false,raf=0,last=0,outT=0,cv=null,g=null,homeScroll=0,fromHome=false,outEls=[];
+try{const f=sessionStorage.getItem('lab-sirius-filter');if(f&&CATS.includes(f))filter=f}catch(e){}
+
+const ICON={
+  play:'<svg viewBox="0 0 18 18" fill="currentColor" aria-hidden="true"><path d="M5 3.5v11a1 1 0 0 0 1.5.86l9-5.5a1 1 0 0 0 0-1.72l-9-5.5A1 1 0 0 0 5 3.5z"/></svg>',
+  pause:'<svg viewBox="0 0 18 18" fill="currentColor" aria-hidden="true"><rect x="4" y="3" width="3.5" height="12" rx="1.2"/><rect x="10.5" y="3" width="3.5" height="12" rx="1.2"/></svg>',
+  again:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.47"/><path d="M3 3v4h4"/></svg>',
+  reset:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h12M3 9h12M3 13h12"/><circle cx="6" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="9" r="1.6" fill="currentColor"/><circle cx="8" cy="13" r="1.6" fill="currentColor"/></svg>',
+  next:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l6 6-6 6"/></svg>'
+};
+const logoSVG='<svg viewBox="0 0 50 36" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" style="color:var(--brand)" aria-hidden="true"><path d="M3 4h16c3 0 6 2 6 5v23c0-3-3-5-6-5H3z"/><path d="M47 4H31c-3 0-6 2-6 5v23c0-3 3-5 6-5h16z"/></svg>';
+function header(){return `<header class="top"><button class="logo" data-act="home" aria-label="На главную">${logoSVG}<div><b>Лаборатория</b><span> Сириус</span></div></button></header>`}
+
+function cardsHTML(){
+  return LABS.filter(l=>filter==='Все'||l.cat===filter).map(l=>`
+    <a class="card ${visited.has(l.id)?'seen':''}" style="--c:${l.color}" href="#lab/${l.id}">
+      <div class="pb"><i></i></div>
+      <span class="tag">${l.cat}</span>
+      <h2>${l.title}</h2><p>${l.short}</p>
+      <div class="foot"><span class="meta">Параметров: ${l.params.length}</span><span class="go">Открыть</span></div>
+    </a>`).join('');
+}
+function home(){
+  stop();cur=null;document.title='Лаборатория Сириус — физика 7 класса';
+  const done=LABS.filter(l=>visited.has(l.id)).length;
+  const count=c=>c==='Все'?LABS.length:LABS.filter(l=>l.cat===c).length;
+  app.innerHTML=`<div class="view">`+header()+`
+  <section class="hero"><h1>Физика 7 класса</h1><p>Запускайте опыты, меняйте параметры и смотрите, как работают законы из курса 7 класса.</p></section>
+  <div class="progress"><span>Изучено ${done} из ${LABS.length}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${LABS.length}" aria-valuenow="${done}"><i data-w="${done/LABS.length*100}"></i></div></div>
+  <div class="chips" role="group" aria-label="Разделы">${CATS.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${c===filter}">${c}<span class="n">${count(c)}</span></button>`).join('')}</div>
+  <div class="cards" id="cards">${cardsHTML()}</div></div>`;
+  window.scrollTo(0,homeScroll);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
+}
+function setFilter(c){
+  filter=c;try{sessionStorage.setItem('lab-sirius-filter',c)}catch(e){}
+  document.querySelectorAll('.chips .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cat===c));
+  const el=$('#cards');if(el){el.innerHTML=cardsHTML();el.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}
+}
+
+function fmtVal(p,v){const d=p.d!==undefined?p.d:(p.step<1?1:0);return f1(v,d)+(p.unit?' '+p.unit:'')}
+
+function openLab(id){
+  if(!cur)homeScroll=window.scrollY;
+  stop();cur=LABS.find(l=>l.id===id);visited.add(id);saveVisited();paused=false;
+  P={};cur.params.forEach(p=>P[p.id]=p.val);S={};cur.init(S,P);
+  const l=cur,idx=LABS.indexOf(l),nx=LABS[(idx+1)%LABS.length];
+  document.title=l.title+' — Лаборатория Сириус';
+  app.innerHTML=`<div class="view">`+header()+`
+  <section class="labhead" style="--lab:${l.color}">
+    <button class="back" data-act="back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg>Все явления</button>
+    <h1>${l.title}</h1><p>${l.short}</p><span class="tag">${l.cat}</span>
+  </section>
+  <main class="sheet" style="--lab:${l.color}">
+    <div class="stage"><canvas id="cv" role="img" aria-label="Интерактивная модель: ${l.title}"></canvas><span class="paused">Пауза</span></div>
+    <div class="tools">
+      ${l.launch?`<button class="btn main" data-act="restart">${ICON.again}${l.launchLabel||'Запустить снова'}</button>`:''}
+      <button class="btn ${l.launch?'':'main'}" data-act="pause" aria-pressed="false">${ICON.pause}<span>Пауза</span></button>
+      <button class="btn" data-act="reset">${ICON.reset}Сбросить параметры</button>
+    </div>
+    <div class="outs" id="outs" aria-live="off"></div>
+    <h2>Настрой опыт</h2>
+    ${l.presets?`<div class="presets" role="group" aria-label="Готовые опыты">${l.presets.map((p,i)=>`<button class="chip" data-preset="${i}" aria-pressed="false">${p[0]}</button>`).join('')}</div>`:''}
+    <div id="ctls">${l.params.map(controlHTML).join('')}</div>
+    <div class="note"><b>Явление.</b> ${l.def}</div>
+    <div class="note f"><b>${l.fhead||'Формулы'}</b>${l.formulas.map(f=>`<div class="fm${l.fhead?' t':''}">${f}</div>`).join('')}</div>
+    <div class="note f"><b>Попробуйте сами</b><ol>${l.tryit.map(t=>`<li>${t}</li>`).join('')}</ol></div>
+    <a class="nextlab" href="#lab/${nx.id}" style="--c:${nx.color}"><span><small>Следующее явление</small><b>${nx.title}</b></span>${ICON.next}</a>
+  </main></div>`;
+  cv=$('#cv');g=cv.getContext('2d');LIGHT=null;readColors();sizeCanvas();
+  document.querySelectorAll('#ctls input[type=range]').forEach(setFill);
+  window.scrollTo(0,0);buildOuts();
+  last=performance.now();raf=requestAnimationFrame(loop);
+}
+function controlHTML(p){
+  if(p.type==='seg')return `<div class="ctl"><div class="r"><span>${p.label}</span></div><div class="seg" role="group" aria-label="${p.label}" data-seg="${p.id}">${p.options.map(o=>`<button data-v="${o[0]}" aria-pressed="${o[0]===P[p.id]}">${o[1]}</button>`).join('')}</div></div>`;
+  return `<div class="ctl"><label class="r" for="p_${p.id}"><span>${p.label}</span><span class="val" id="v_${p.id}">${fmtVal(p,P[p.id])}</span></label><input type="range" id="p_${p.id}" data-p="${p.id}" min="${p.min}" max="${p.max}" step="${p.step}" value="${P[p.id]}"></div>`;
+}
+function setFill(el){const mn=+el.min,mx=+el.max;el.style.setProperty('--fill',((+el.value-mn)/(mx-mn)*100)+'%')}
+function bump(el){if(!el)return;el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}
+function syncControls(){
+  cur.params.forEach(p=>{
+    if(p.type==='seg'){document.querySelectorAll(`[data-seg="${p.id}"] button`).forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===P[p.id]))}
+    else{const el=$('#p_'+p.id);if(el){el.value=P[p.id];setFill(el);const v=$('#v_'+p.id),t=fmtVal(p,P[p.id]);if(v.textContent!==t){v.textContent=t;bump(v)}}}
+  });
+}
+function clearPresets(){document.querySelectorAll('[data-preset]').forEach(b=>b.setAttribute('aria-pressed','false'))}
+function changed(id){
+  const r=cur.restartOn;
+  if(r==='all'||(Array.isArray(r)&&r.includes(id)))cur.init(S,P);
+}
+function sizeCanvas(){
+  if(!cv||!g)return;const dpr=Math.min(window.devicePixelRatio||1,2.5),w=cv.clientWidth||W;
+  const pw=Math.round(w*dpr),ph=Math.round(w*dpr*H/W);
+  if(cv.width!==pw||cv.height!==ph){cv.width=pw;cv.height=ph}
+  TS=w<420?1.2:w<560?1.1:1;
+  g.setTransform(cv.width/W,0,0,cv.width/W,0,0);
+}
+function buildOuts(){
+  const o=$('#outs');if(!o||!cur)return;const d=cur.outs(S,P);
+  o.innerHTML=d.map(x=>`<div class="out"><small>${x[0]}</small><b></b></div>`).join('');
+  outEls=[...o.querySelectorAll('.out')];updateOuts();
+}
+function updateOuts(){
+  if(!cur)return;const d=cur.outs(S,P);
+  if(d.length!==outEls.length){buildOuts();return}
+  d.forEach((x,i)=>{const sm=outEls[i].firstChild,b=outEls[i].lastChild,v=String(x[1]);if(sm.textContent!==x[0])sm.textContent=x[0];if(b.textContent!==v){b.textContent=v;b.classList.toggle('long',v.length>9)}});
+}
+let LIGHT=null;
+function frame(){
+  g.setTransform(cv.width/W,0,0,cv.width/W,0,0);
+  g.clearRect(0,0,W,H);g.fillStyle=C.surf;g.fillRect(0,0,W,H);
+  if(!LIGHT||LIGHT.dark!==C.dark||LIGHT.surf!==C.surf){const lg=g.createLinearGradient(0,0,0,H);lg.addColorStop(0,C.dark?'rgba(255,255,255,.035)':'rgba(255,255,255,0)');lg.addColorStop(1,C.dark?'rgba(0,0,0,.14)':'rgba(31,35,64,.04)');LIGHT={g:lg,dark:C.dark,surf:C.surf}}
+  g.fillStyle=LIGHT.g;g.fillRect(0,0,W,H);
+  g.save();cur.draw(g,S,P);g.restore();
+}
+function loop(ts){
+  if(!cur)return;
+  const dt=clamp((ts-last)/1000,0,.033);last=ts;
+  if(!paused&&dt>0)cur.step(S,P,dt);
+  frame();
+  outT+=dt;if(outT>.15){outT=0;updateOuts()}
+  raf=requestAnimationFrame(loop);
+}
+function stop(){cancelAnimationFrame(raf);raf=0}
+function setPaused(v){
+  paused=v;const b=$('[data-act="pause"]');if(!b)return;
+  b.setAttribute('aria-pressed',v);b.innerHTML=(v?ICON.play:ICON.pause)+`<span>${v?'Продолжить':'Пауза'}</span>`;
+  const st=$('.stage');if(st)st.classList.toggle('is-paused',v);
+}
+function goHome(){if(fromHome){fromHome=false;history.back()}else{location.hash=''}}
+
+app.addEventListener('click',e=>{
+  const a=e.target.closest('a.card,a.nextlab');if(a){if(!cur)fromHome=true;return}
+  const t=e.target.closest('button');if(!t)return;
+  if(t.dataset.act==='home'){if(cur)goHome();else window.scrollTo({top:0,behavior:'smooth'});return}
+  if(t.dataset.act==='back'){goHome();return}
+  if(t.dataset.cat){setFilter(t.dataset.cat);return}
+  if(!cur)return;
+  if(t.dataset.act==='pause'){setPaused(!paused);return}
+  if(t.dataset.act==='restart'){cur.init(S,P);setPaused(false);updateOuts();return}
+  if(t.dataset.act==='reset'){cur.params.forEach(p=>P[p.id]=p.val);cur.init(S,P);syncControls();clearPresets();updateOuts();return}
+  if(t.dataset.preset!==undefined){Object.assign(P,cur.presets[+t.dataset.preset][1]);cur.init(S,P);syncControls();clearPresets();t.setAttribute('aria-pressed','true');setPaused(false);updateOuts();return}
+  const seg=t.closest('[data-seg]');
+  if(seg){if(P[seg.dataset.seg]===t.dataset.v)return;P[seg.dataset.seg]=t.dataset.v;syncControls();clearPresets();changed(seg.dataset.seg);updateOuts()}
+});
+app.addEventListener('input',e=>{
+  const el=e.target;if(!el.dataset.p||!cur)return;
+  const p=cur.params.find(x=>x.id===el.dataset.p);P[p.id]=parseFloat(el.value);setFill(el);
+  const v=$('#v_'+p.id);v.textContent=fmtVal(p,P[p.id]);bump(v);clearPresets();changed(p.id);updateOuts();
+});
+document.addEventListener('keydown',e=>{
+  if(!cur||e.altKey||e.ctrlKey||e.metaKey)return;const tag=(e.target.tagName||'').toLowerCase();
+  if(e.key==='Escape'){goHome();return}
+  if(e.key===' '&&tag!=='input'&&tag!=='button'&&tag!=='a'){e.preventDefault();setPaused(!paused)}
+});
+function route(){
+  const m=location.hash.match(/^#lab\/([\w-]+)$/);
+  if(m&&LABS.some(l=>l.id===m[1]))openLab(m[1]);else{fromHome=false;home()}
+}
+const tiltOK=()=>window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
+app.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse'||!tiltOK())return;
+  const c=e.target.closest('.card');
+  if(c){const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    c.style.setProperty('--ry',((x-.5)*7).toFixed(2)+'deg');c.style.setProperty('--rx',((.5-y)*7).toFixed(2)+'deg');
+    c.style.setProperty('--mx',(x*100).toFixed(1)+'%');c.style.setProperty('--my',(y*100).toFixed(1)+'%');return}
+  const st=e.target.closest('.stage');
+  if(st&&cv){const r=st.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    cv.style.setProperty('--ry',((x-.5)*4).toFixed(2)+'deg');cv.style.setProperty('--rx',((.5-y)*3).toFixed(2)+'deg')}
+});
+app.addEventListener('pointerout',e=>{
+  const c=e.target.closest('.card');if(c&&!c.contains(e.relatedTarget)){c.style.setProperty('--rx','0deg');c.style.setProperty('--ry','0deg')}
+  const st=e.target.closest('.stage');if(st&&cv&&!st.contains(e.relatedTarget)){cv.style.setProperty('--rx','0deg');cv.style.setProperty('--ry','0deg')}
+});
+window.addEventListener('hashchange',route);
+window.addEventListener('resize',sizeCanvas);
+if(window.ResizeObserver)new ResizeObserver(()=>sizeCanvas()).observe(app);
+const themeUpdate=()=>{readColors();if(cur&&g&&paused)frame()};
+if(window.matchMedia){const mq=matchMedia('(prefers-color-scheme: dark)');mq.addEventListener?mq.addEventListener('change',themeUpdate):mq.addListener&&mq.addListener(themeUpdate)}
+new MutationObserver(themeUpdate).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class','style']});
+document.addEventListener('visibilitychange',()=>{last=performance.now()});
+
+readColors();route();
+})();
+</script>
+</body>
+</html>
