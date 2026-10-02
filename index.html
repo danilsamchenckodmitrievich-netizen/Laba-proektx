@@ -37,15 +37,20 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 @keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
 /* header */
-.top{display:flex;align-items:center;gap:10px;padding:16px 20px}
+.top{display:flex;align-items:center;gap:6px;padding:16px 20px}
+.chev,.burger{background:none;border:0;padding:6px;border-radius:10px;color:var(--muted);display:inline-flex}
+.chev svg{width:22px;height:22px}.burger{margin-left:auto}.burger svg{width:30px;height:30px}
+@media(hover:hover){.chev:hover,.burger:hover{background:var(--soft)}}
 .logo{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;text-align:left;border-radius:10px}
 .logo svg{width:38px;height:auto;flex:none}
 .logo b{font-size:22px;font-weight:800;color:var(--brand);letter-spacing:-.2px}
 .logo span{font-size:22px;font-weight:500;color:var(--muted);margin-left:-4px}
+.logo div{white-space:nowrap}
+@media(max-width:400px){.logo svg{width:32px}.logo b,.logo span{font-size:19px}.top{padding:14px 14px 14px 18px}}
 
 /* home */
-.hero{padding:18px 20px 6px}
-.hero h1{margin:0;font-size:clamp(34px,9vw,52px);line-height:1.05;font-weight:800;letter-spacing:-1px}
+.hero{padding:34px 20px 10px}
+.hero h1{margin:0;font-size:clamp(32px,8vw,44px);line-height:1.1;font-weight:700;letter-spacing:-.6px}
 .hero p{margin:12px 0 0;color:var(--muted);font-size:18px;max-width:36ch}
 .progress{margin:20px 20px 4px;display:flex;align-items:center;gap:14px;font-weight:600;color:var(--muted);font-size:15px}
 .bar{flex:1;height:10px;border-radius:6px;background:var(--grid);overflow:hidden}
@@ -59,22 +64,25 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 .chip .n{opacity:.55;font-weight:500;margin-left:6px}
 .cards{display:grid;gap:16px;padding:6px 20px 40px}
 @media(min-width:640px){.cards{grid-template-columns:1fr 1fr}}
-.card{position:relative;border-radius:30px;padding:24px;min-height:300px;display:flex;flex-direction:column;
+.card{position:relative;border-radius:24px;padding:26px 24px 24px;min-height:340px;display:flex;flex-direction:column;
   background:var(--c);color:#fff;text-align:left;border:0;width:100%;text-decoration:none;
   transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s}
 @media(hover:hover){.card:hover{transform:translateY(-3px);box-shadow:0 18px 32px -20px var(--c)}
   .card:hover .go{transform:translateX(3px)}}
 .card:active{transform:scale(.985)}
 .card:focus-visible{outline-offset:4px}
-.card .pb{height:8px;width:56%;border-radius:5px;background:rgba(255,255,255,.28);margin:0 0 22px 8px;overflow:hidden}
+.card .pb{height:8px;width:42%;border-radius:5px;background:rgba(255,255,255,.28);margin:0 0 30px 22px;overflow:hidden}
 .card .pb i{display:block;height:100%;width:0;background:var(--lime);border-radius:5px;transition:width .7s cubic-bezier(.2,.8,.2,1) .2s}
 .card.seen.ready .pb i{width:100%}
 .tag{align-self:flex-start;background:rgba(255,255,255,.2);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
-.card h2{margin:14px 0 8px;font-size:28px;line-height:1.12;font-weight:800;letter-spacing:-.4px}
-.card p{margin:0;opacity:.88;font-size:16px}
+.card h2{margin:14px 0 10px;font-size:28px;line-height:1.2;font-weight:700;letter-spacing:-.2px}
+.card p{margin:0;opacity:.8;font-size:16px}
 .card .foot{margin-top:auto;padding-top:22px;display:flex;align-items:flex-end;gap:12px;justify-content:space-between}
-.card .meta{font-size:15px;opacity:.8;display:flex;align-items:center;gap:8px}
-.go{background:var(--lime);color:#1B2A0A;font-weight:700;font-size:18px;border-radius:16px;padding:14px 28px;border:0;flex:1;text-align:center;max-width:220px;transition:transform .2s}
+.card .meta{display:flex;flex-direction:column;gap:12px;color:rgba(255,255,255,.62);font-size:15px;min-width:0}
+.card .meta .mrow{display:flex;align-items:center;gap:10px;font-size:16px}
+.card .meta svg{width:30px;height:30px;flex:none}
+.go{background:var(--lime);color:#fff;font-weight:700;font-size:19px;border-radius:14px;padding:15px 20px;border:0;flex:1;text-align:center;max-width:260px;transition:transform .2s,filter .2s}
+@media(hover:hover){.card:hover .go{filter:brightness(1.05)}}
 
 /* lab */
 .labhead{background:var(--lab);color:#fff;padding:14px 20px 78px}
@@ -146,12 +154,20 @@ input[type=range]:focus-visible::-webkit-slider-thumb{outline:3px solid var(--br
 @media(hover:hover) and (pointer:fine){.card:hover{transform:translateY(-4px) rotateX(var(--rx)) rotateY(var(--ry))}.card:hover::after{opacity:1}}
 .stage{perspective:1400px}
 .stage canvas{--rx:0deg;--ry:0deg;transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .5s cubic-bezier(.2,.8,.2,1)}
-/* вкладки */
-.tabs{display:flex;gap:4px;margin:0 20px 4px;padding:5px;background:var(--soft);border-radius:999px;width:max-content;max-width:calc(100% - 40px)}
-.tabs a{flex:1 1 auto;text-align:center;text-decoration:none;color:var(--ink);font-weight:700;font-size:15px;padding:10px 18px;border-radius:999px;white-space:nowrap;transition:background-color .18s,color .18s}
-.tabs a[aria-current="page"]{background:var(--ink);color:var(--bg)}
-@media(hover:hover){.tabs a:not([aria-current]):hover{background:var(--grid)}}
-@media(max-width:400px){.tabs a{padding:9px 12px;font-size:14px}}
+/* меню разделов */
+.menu{position:fixed;inset:0;z-index:50;background:rgba(10,10,14,.62);animation:fadeIn .2s ease-out}
+.menu-sheet{background:var(--surf);border-radius:0 0 28px 28px;padding:20px 20px 24px;max-width:760px;margin:0 auto;max-height:100%;overflow-y:auto;
+  padding-top:calc(20px + env(safe-area-inset-top,0px));animation:sheetIn .28s cubic-bezier(.2,.8,.2,1)}
+.menu-x{display:flex;margin:0 0 6px auto;background:none;border:0;padding:8px;border-radius:10px;color:var(--muted)}
+.menu-x svg{width:26px;height:26px}
+.menu nav a{display:flex;gap:18px;align-items:flex-start;padding:14px 20px;border-radius:16px;color:var(--ink);text-decoration:none;font-size:19px;font-weight:600;line-height:1.45}
+.menu nav a svg{flex:none;width:28px;height:28px;margin-top:1px}
+.menu nav a small{display:block;font-size:14px;font-weight:500;color:var(--muted)}
+.menu nav a[aria-current="page"]{background:#9C9CA3;color:#fff}
+.menu nav a[aria-current="page"] small{color:rgba(255,255,255,.8)}
+@media(hover:hover){.menu nav a:not([aria-current]):hover{background:var(--soft)}}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes sheetIn{from{transform:translateY(-24px);opacity:0}}
 /* лабораторные работы */
 .stage.work canvas{touch-action:none;transform:none!important;-webkit-user-select:none;user-select:none}
 .hint{display:flex;gap:10px;align-items:flex-start;margin:14px 8px 0;color:var(--muted);font-size:14px;line-height:1.4}
@@ -191,7 +207,7 @@ table.res tr.flash td{animation:flash 1.4s ease-out}
   .card:hover,.stage canvas{transform:none!important}
   .view,.val.pop{animation:none}
   .bar i,.card,.card .pb i,.go,.nextlab,.nextlab svg{transition:none}
-  .toast.show,table.res tr.flash td{animation:none}
+  .toast.show,table.res tr.flash td,.menu,.menu-sheet{animation:none}
 }
 [hidden]{display:none!important}
 </style>
@@ -2028,26 +2044,54 @@ const ICON={
   next:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l6 6-6 6"/></svg>',
   rec:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="13" height="13" rx="2.5"/><path d="M2.5 7h13M7 7v8.5"/></svg>',
   check:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.5l3.5 3.5 7.5-8"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>',
+  burger:'<svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M5 9h20M5 15h20M5 21h20"/></svg>',
+  close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  lines:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square" aria-hidden="true"><path d="M3 6h22M3 11h22M3 16h22M3 21h12"/></svg>',
+  flask:'<svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="15" r="13"/><path d="M12 8h6M13 8v5l-4.5 7.5a1.5 1.5 0 0 0 1.3 2.3h10.4a1.5 1.5 0 0 0 1.3-2.3L17 13V8"/><path d="M10.6 18h8.8"/></svg>',
   hand:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10V4.5a1.5 1.5 0 0 1 3 0V9m0-1.5a1.5 1.5 0 0 1 3 0V9m0-.5a1.5 1.5 0 0 1 3 0V12a6 6 0 0 1-6 6h-.6a5 5 0 0 1-4-2L3 12.6a1.5 1.5 0 0 1 2.3-1.9L7 12.5"/></svg>'
 };
 const logoSVG='<svg viewBox="0 0 50 36" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" style="color:var(--brand)" aria-hidden="true"><path d="M3 4h16c3 0 6 2 6 5v23c0-3-3-5-6-5H3z"/><path d="M47 4H31c-3 0-6 2-6 5v23c0-3 3-5 6-5h16z"/></svg>';
-function header(){return `<header class="top"><button class="logo" data-act="home" aria-label="На главную">${logoSVG}<div><b>Лаборатория</b><span> Сириус</span></div></button></header>`}
-function tabsHTML(a){return `<nav class="tabs" aria-label="Разделы сайта"><a href="#"${a==='labs'?' aria-current="page"':''}>Явления</a><a href="#works"${a==='works'?' aria-current="page"':''}>Лабораторные работы</a></nav>`}
+function header(){return `<header class="top"><button class="logo" data-act="home" aria-label="На главную">${logoSVG}<div><b>Лаборатория</b><span> Сириус</span></div></button><button class="chev" data-act="menu" aria-label="Разделы" aria-haspopup="dialog">${ICON.chev}</button><button class="burger" data-act="menu" aria-label="Меню" aria-haspopup="dialog">${ICON.burger}</button></header>`}
+/* меню разделов в стиле «Сириус.Школы» */
+const menuEl=document.createElement('div');menuEl.className='menu';menuEl.id='menu';menuEl.hidden=true;document.body.appendChild(menuEl);
+let menuFocus=null;
+function openMenu(){
+  const h=location.hash,inWorks=h.startsWith('#work'),cnt=c=>LABS.filter(l=>l.cat===c).length;
+  const items=[['#','Все явления',LABS.length+' '+plural(LABS.length,'модель','модели','моделей'),'Все',!inWorks&&filter==='Все']]
+    .concat(CATS.slice(1).map((c,i)=>['#','Глава '+(i+1)+'. '+c,cnt(c)+' '+plural(cnt(c),'модель','модели','моделей'),c,!inWorks&&filter===c]))
+    .concat([['#works','Лабораторные работы',WORKS.length+' работ · выполнено '+WORKS.filter(w=>doneW.has(w.id)).length,'',inWorks]]);
+  menuEl.innerHTML=`<div class="menu-sheet" role="dialog" aria-modal="true" aria-label="Разделы"><button class="menu-x" data-m="close" aria-label="Закрыть меню">${ICON.close}</button><nav>${items.map(it=>`<a href="${it[0]}" data-cat="${it[3]}"${it[4]?' aria-current="page"':''}>${ICON.lines}<span>${it[1]}<small>${it[2]}</small></span></a>`).join('')}</nav></div>`;
+  menuFocus=document.activeElement;menuEl.hidden=false;document.body.style.overflow='hidden';const a=menuEl.querySelector('[aria-current]')||menuEl.querySelector('a');if(a)a.focus();
+}
+function closeMenu(){if(menuEl.hidden)return;menuEl.hidden=true;document.body.style.overflow='';if(menuFocus&&menuFocus.focus)menuFocus.focus()}
+menuEl.addEventListener('click',e=>{
+  if(e.target===menuEl||e.target.closest('[data-m="close"]')){closeMenu();return}
+  const a=e.target.closest('a');if(!a)return;e.preventDefault();closeMenu();fromHome=false;
+  if(a.getAttribute('href')==='#works'){location.hash='works';return}
+  filter=a.dataset.cat;try{sessionStorage.setItem('lab-sirius-filter',filter)}catch(_){}
+  homeScroll=0;if(location.hash&&location.hash!=='#')location.hash='';else{setFilter(filter);window.scrollTo({top:0,behavior:'smooth'})}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menuEl.hidden){e.stopImmediatePropagation();closeMenu()}},true);
 
+function worksCard(){const d=WORKS.filter(w=>doneW.has(w.id)).length;
+  return `<a class="card ${d===WORKS.length?'seen':''}" style="--c:#9B2D67" href="#works"><div class="pb"><i style="width:${d/WORKS.length*100}%"></i></div>
+    <span class="tag">Практикум</span><h2>Лабораторные работы</h2><p>Настоящие работы 7 класса: весы, мензурка, динамометр, рычаг. Измеряйте, считайте, делайте вывод.</p>
+    <div class="foot"><span class="meta"><span class="mrow">${ICON.flask}<span>${WORKS.length} работ</span></span><span>Выполнено ${d} из ${WORKS.length}</span></span><span class="go">${d?'Продолжить':'Начать'}</span></div></a>`}
 function cardsHTML(){
-  return LABS.filter(l=>filter==='Все'||l.cat===filter).map(l=>`
+  return (filter==='Все'?worksCard():'')+LABS.filter(l=>filter==='Все'||l.cat===filter).map(l=>`
     <a class="card ${visited.has(l.id)?'seen':''}" style="--c:${l.color}" href="#lab/${l.id}">
       <div class="pb"><i></i></div>
       <span class="tag">${l.cat}</span>
       <h2>${l.title}</h2><p>${l.short}</p>
-      <div class="foot"><span class="meta">Параметров: ${l.params.length}</span><span class="go">Открыть</span></div>
+      <div class="foot"><span class="meta"><span class="mrow">${ICON.flask}<span>${l.params.length} ${plural(l.params.length,'параметр','параметра','параметров')}</span></span><span>${visited.has(l.id)?'Изучено':'Ещё не открыто'}</span></span><span class="go">${visited.has(l.id)?'Продолжить':'Открыть'}</span></div>
     </a>`).join('');
 }
 function home(){
   const back=cur&&cur.kind!=='work';stop();cur=null;document.title='Лаборатория Сириус — физика 7 класса';
   const done=LABS.filter(l=>visited.has(l.id)).length;
   const count=c=>c==='Все'?LABS.length:LABS.filter(l=>l.cat===c).length;
-  app.innerHTML=`<div class="view">`+header()+tabsHTML('labs')+`
+  app.innerHTML=`<div class="view">`+header()+`
   <section class="hero"><h1>Физика 7 класса</h1><p>Запускайте опыты, меняйте параметры и смотрите, как работают законы из курса 7 класса.</p></section>
   <div class="progress"><span>Изучено ${done} из ${LABS.length}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${LABS.length}" aria-valuenow="${done}"><i data-w="${done/LABS.length*100}"></i></div></div>
   <div class="chips" role="group" aria-label="Разделы">${CATS.map(c=>`<button class="chip" data-cat="${c}" aria-pressed="${c===filter}">${c}<span class="n">${count(c)}</span></button>`).join('')}</div>
@@ -2058,7 +2102,7 @@ function home(){
 function worksHome(){
   const back=cur&&cur.kind==='work';stop();cur=null;document.title='Лабораторные работы — Лаборатория Сириус';
   const done=WORKS.filter(w=>doneW.has(w.id)).length;
-  app.innerHTML=`<div class="view">`+header()+tabsHTML('works')+`
+  app.innerHTML=`<div class="view">`+header()+`
   <section class="hero"><h1>Лабораторные работы</h1><p>Берите приборы руками: взвешивайте, погружайте, подвешивайте грузы. Записывайте измерения в таблицу, считайте и делайте вывод.</p></section>
   <div class="progress"><span>Выполнено ${done} из ${WORKS.length}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${WORKS.length}" aria-valuenow="${done}"><i data-w="${done/WORKS.length*100}"></i></div></div>
   <div class="cards" id="cards">${WORKS.map(w=>`
@@ -2066,7 +2110,7 @@ function worksHome(){
       <div class="pb"><i></i></div>
       <span class="tag">Лабораторная работа № ${w.num}</span>
       <h2>${w.title}</h2><p>${w.goal}</p>
-      <div class="foot"><span class="meta">${doneW.has(w.id)?'✓ Выполнена':'Опытов: '+(w.need||w.rows)}</span><span class="go">${doneW.has(w.id)?'Повторить':'Начать'}</span></div>
+      <div class="foot"><span class="meta"><span class="mrow">${ICON.flask}<span>${w.need||w.rows} ${plural(w.need||w.rows,'опыт','опыта','опытов')}</span></span><span>${doneW.has(w.id)?'✓ Выполнена':'Не выполнена'}</span></span><span class="go">${doneW.has(w.id)?'Повторить':'Начать'}</span></div>
     </a>`).join('')}</div></div>`;
   window.scrollTo(0,back?worksScroll:0);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
@@ -2259,7 +2303,8 @@ function goHome(){if(fromHome){fromHome=false;history.back()}else{location.hash=
 app.addEventListener('click',e=>{
   const a=e.target.closest('a.card,a.nextlab');if(a){if(!cur)fromHome=true;return}
   const t=e.target.closest('button');if(!t)return;
-  if(t.dataset.act==='home'){if(cur)goHome();else window.scrollTo({top:0,behavior:'smooth'});return}
+  if(t.dataset.act==='menu'){openMenu();return}
+  if(t.dataset.act==='home'){if(cur)goHome();else if(location.hash==='#works')location.hash='';else window.scrollTo({top:0,behavior:'smooth'});return}
   if(t.dataset.act==='back'){goHome();return}
   if(t.dataset.cat){setFilter(t.dataset.cat);return}
   if(!cur)return;
