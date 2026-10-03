@@ -193,6 +193,8 @@ input[type=range]:focus-visible::-webkit-slider-thumb{outline:3px solid var(--br
 .wstatus .dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--lab);box-shadow:0 0 0 4px rgba(255,255,255,.5)}
 .wstatus.err{background:var(--pink)}
 .stage .bigx{display:none}
+.stage .loupe{position:absolute;top:14px;right:14px;width:min(42%,190px);aspect-ratio:1;border-radius:50%;border:3px solid var(--ink);background:var(--surf);box-shadow:0 10px 26px -8px rgba(0,0,0,.45);pointer-events:none;z-index:3}
+.stage .loupe.left{right:auto;left:14px}
 .stage:fullscreen,.stage.big{position:fixed;inset:0;z-index:300;margin:0;border-radius:0;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:var(--surf)}
 .stage:-webkit-full-screen{position:fixed;inset:0;margin:0;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;background:var(--surf)}
@@ -211,6 +213,11 @@ details.steps p{margin:10px 0 0}
 .legend i{display:inline-block;width:14px;height:14px;border-radius:5px;vertical-align:-2px;margin-right:6px}
 .legend .lm{background:var(--soft);border:2px solid var(--line)}
 .legend .lc{border:2px solid var(--lab)}
+.legend .lr{background:var(--surf);border:2px dashed var(--ink)}
+table.res input.rd{background:var(--surf);border:2px dashed var(--ink);border-color:color-mix(in srgb,var(--ink) 55%,transparent)}
+table.res select{width:100%;min-width:104px;font:inherit;font-weight:600;color:var(--ink);background:var(--surf);border:2px solid var(--lab);border-radius:10px;padding:7px 6px}
+table.res select.ok{border-color:#367A55;background:rgba(54,122,85,.16)}table.res select.bad{border-color:#C4245F;background:rgba(196,36,95,.12)}
+table.res input.rd::placeholder{color:var(--muted);font-weight:500;font-size:13px}
 .tblwrap{position:relative;overflow-x:auto;margin:10px 6px;border:2px solid var(--line);border-radius:20px;background:var(--surf)}
 table.res{border-collapse:collapse;width:100%;font-size:14px}
 table.res th{background:var(--soft);text-align:left;font-weight:700;font-size:12.5px;line-height:1.25;padding:10px 6px;vertical-align:bottom}
@@ -371,7 +378,7 @@ function badge(g,s,x,y,col,a){
   txt(g,s,bx+w/2,y+22,{a:'center',c:'#fff',s:14,w:700});
 }
 /* динамометр: крючок в (x,y), корпус уходит в направлении ang; ext — насколько шток вытянут из корпуса */
-function dyn(g,x,y,ang,F,Fmax,len,ext){
+function dyn(g,x,y,ang,F,Fmax,len,ext,div){
   len=len||100;ext=ext||0;
   g.save();g.translate(x,y);g.rotate(ang);
   g.strokeStyle=C.dark?'#C9C5D8':'#4A4E6C';g.lineWidth=2.5;g.lineCap='round';
@@ -385,10 +392,18 @@ function dyn(g,x,y,ang,F,Fmax,len,ext){
   g.fillStyle='#F7F4EA';g.beginPath();g.roundRect(18,-8,len-12,16,4);g.fill();
   const z0=len+1,z1=26,px=z0-clamp(F/Fmax,0,1.06)*(z0-z1);
   g.strokeStyle='#3a3e5c';g.lineWidth=1;
-  for(let i=0;i<=20;i++){const xx=z0-(z0-z1)*i/20;g.beginPath();g.moveTo(xx,-8);g.lineTo(xx,i%10===0?0:i%2?-4.5:-2.5);g.stroke()}
+  if(div){/* шкала лабораторного динамометра: деление div, длинные штрихи у целых ньютонов, средние у половин */
+    const n=Math.round(Fmax/div),per=Math.round(1/div);
+    for(let i=0;i<=n;i++){const xx=z0-(z0-z1)*i/n,big=i%per===0,mid=!big&&(2*i)%per===0;g.lineWidth=big?1.3:.8;
+      g.beginPath();g.moveTo(xx,-8);g.lineTo(xx,big?1:mid?-2:-4.6);g.stroke()}
+    g.lineWidth=1}
+  else for(let i=0;i<=20;i++){const xx=z0-(z0-z1)*i/20;g.beginPath();g.moveTo(xx,-8);g.lineTo(xx,i%10===0?0:i%2?-4.5:-2.5);g.stroke()}
   g.strokeStyle='#7A7F95';g.lineWidth=1.2;g.beginPath();g.moveTo(len+6,4);
   for(let i=1;i<=12;i++)g.lineTo(len+6+(px-len-6)*i/12,i%2?7:1.5);g.stroke();
   g.strokeStyle='#9A9EB5';g.lineWidth=1.6;g.beginPath();g.moveTo(px,4);g.lineTo(13,4);g.stroke();
+  if(div){g.font=`800 7.5px ${FONT}`;g.textAlign='center';g.textBaseline='middle';
+    for(let v=0;v<=Fmax+1e-9;v+=1){const xx=z0-(z0-z1)*v/Fmax;g.save();g.translate(xx,4.4);g.rotate(-ang);
+      g.fillStyle='#F7F4EA';g.beginPath();g.roundRect(-4.6,-4.4,9.2,8.8,2);g.fill();g.fillStyle='#1F2340';g.fillText(String(v),0,.4);g.restore()}}
   g.fillStyle='#D2343F';g.fillRect(px-1.6,-8,3.2,16);
   g.fillStyle='rgba(255,255,255,.3)';g.beginPath();g.roundRect(16,-11,len-8,2.6,1.3);g.fill();
   g.strokeStyle=rgba(C.ink,.55);g.lineWidth=1.2;g.beginPath();g.roundRect(12,-12,len,24,9);g.stroke();
@@ -1911,7 +1926,7 @@ mkWork({
   id:'mass',num:1,title:'Измерение массы тела на рычажных весах',color:'#5E7A1E',
   goal:'Научиться взвешивать тела на рычажных весах с помощью набора гирь.',
   equip:'рычажные весы, набор гирь (разновес) от 100 г до 100 мг, три металлических цилиндра',
-  steps:['Перетащите тело на левую чашу весов.','Кладите гири на правую чашу, начиная с самой крупной. Если гиря перевесила — снимите её и возьмите следующую, поменьше.','Когда стрелка весов встанет на середину шкалы, весы уравновешены. Сложите массы всех гирь — это масса тела.','Нажмите «Записать измерение», затем переведите массу в килограммы и впишите в таблицу.','Взвесьте все три тела и нажмите «Проверить работу».'],
+  steps:['Перетащите тело на левую чашу весов.','Кладите гири на правую чашу, начиная с самой крупной. Если гиря перевесила — снимите её и возьмите следующую, поменьше.','Когда стрелка весов встанет на середину шкалы, весы уравновешены. Сложите массы всех гирь — это масса тела.','Нажмите «Записать измерение» и впишите в таблицу массу тела — сумму масс гирь. Затем переведите её в килограммы.','Взвесьте все три тела и нажмите «Проверить работу».'],
   rows:3,tip:'В 1 кг 1000 г, поэтому массу в граммах делят на 1000.',
   cols:[{id:'name',label:'Тело',src:'k'},{id:'m',label:'Масса m, г',src:'m',d:1},{id:'mkg',label:'Масса m, кг',src:'c',d:4,f:v=>v.m/1000,tol:6e-5}],
   quiz:{q:'Весы уравновешены гирями 50 г, 20 г, 2 г и 500 мг. Чему равна масса тела?',opts:['72,5 г','72,05 г','77 г','572 г'],a:0},
@@ -1954,17 +1969,18 @@ mkWork({
   id:'density',num:3,title:'Определение плотности твёрдого тела',color:'#7A3E9D',
   goal:'Определить плотность вещества, из которого сделано тело, измерив его массу и объём.',
   equip:'рычажные весы, разновес, мензурка с водой, три металлических цилиндра на нитях',
-  steps:['Взвесьте тело на весах: тело — на левую чашу, гири — на правую.','Опустите это же тело в мензурку, чтобы измерить его объём.','Нажмите «Записать измерение» — масса и уровни воды попадут в таблицу.','Вычислите объём V = V₂ − V₁ и плотность ρ = m / V в г/см³, затем переведите её в кг/м³.','Повторите для всех тел и по таблице плотностей определите, из чего они сделаны.'],
+  steps:['Взвесьте тело на весах: тело — на левую чашу, гири — на правую.','Опустите это же тело в мензурку, чтобы измерить его объём.','Нажмите «Записать измерение» и впишите в таблицу массу тела и уровни воды V₁ и V₂.','Вычислите объём V = V₂ − V₁ и плотность ρ = m / V в г/см³, затем переведите её в кг/м³.','Повторите для всех тел и по таблице плотностей определите, из чего они сделаны: выберите вещество в последнем столбце.','Таблица плотностей, кг/м³: алюминий — 2700, цинк — 7100, сталь — 7800, латунь — 8500, медь — 8900, свинец — 11 300.'],
   rows:3,tip:'ρ = m / V; чтобы перевести г/см³ в кг/м³, умножьте на 1000.',
   cols:[{id:'name',label:'Тело',src:'k'},{id:'m',label:'Масса m, г',src:'m',d:1},{id:'V1',label:'V₁, мл',src:'m',d:0},{id:'V2',label:'V₂, мл',src:'m',d:0},
-    {id:'V',label:'Объём V, см³',src:'c',d:0,f:v=>v.V2-v.V1,tol:.5},{id:'rg',label:'Плотность ρ, г/см³',src:'c',d:2,f:v=>v.m/(v.V2-v.V1),tol:.03},{id:'rk',label:'Плотность ρ, кг/м³',src:'c',d:0,f:v=>v.m/(v.V2-v.V1)*1000,tol:30}],
+    {id:'V',label:'Объём V, см³',src:'c',d:0,f:v=>v.V2-v.V1,tol:.5},{id:'rg',label:'Плотность ρ, г/см³',src:'c',d:2,f:v=>v.m/(v.V2-v.V1),tol:.03},{id:'rk',label:'Плотность ρ, кг/м³',src:'c',d:0,f:v=>v.m/(v.V2-v.V1)*1000,tol:30},
+    {id:'mat',label:'Вещество',src:'s',opts:[['zn','цинк',7100],['al','алюминий',2700],['pb','свинец',11300],['st','сталь',7800],['br','латунь',8500],['cu','медь',8900]]}],
   quiz:{q:'Как изменится плотность алюминия, если взять алюминиевый цилиндр вдвое большего объёма?',opts:['Не изменится','Увеличится в 2 раза','Уменьшится в 2 раза'],a:0},
   concl:'Плотность находят по формуле ρ = m / V. Сравните ответы с таблицей: алюминий — 2700 кг/м³, сталь — 7800 кг/м³, медь — 8900 кг/м³. Плотность — свойство вещества, она не зависит от размеров тела.',
   actions:[['Долить воды',S=>wWater(S,10)],['Отлить воды',S=>wWater(S,-10)]],
   init(S){balInit(S,{cx:150,py:146,L:76,hd:150,pr:38,base:DESK-2,bw:130});S.case={x:262,y:322,w:150,h:24,d:56};
     vInit();S.M={cx:470,bot:322,r:30,vmax:200,V1:vpick([90,100,110,120])};S.M.lv=S.M.V1;S.mm={};S.vv={};S.last=null;
     const back=[100,50,20,10,5].map(mkGW),front=[2,2,1].map(mkGW).concat([500,200,200,100].map(mkMG));caseSlots(S.case,[back,front]);
-    S.items=varBodies().map((b,i)=>{const it=mkBody(b);it.hx=[552,590,624][i];it.hy=DESK-6;return it}).concat(back,front);initItems(S)},
+    S.items=varBodies().map((b,i)=>{const it=mkBody(Object.assign(b,{name:'Цилиндр '+b.short}));it.hx=[552,590,624][i];it.hy=DESK-6;return it}).concat(back,front);initItems(S)},
   phys(S,dt){balPhys(S,dt);mensSub(S,S.M);const r=balRead(S);if(!r.err){S.mm[r.body.id]=r.m.m;S.last=r.body.id}
     const b=S.items.find(i=>i.loc==='mens');if(b&&!b.fly&&S.M.hs>=b.bh-.01){S.vv[b.id]={V1:S.M.V1,V2:S.M.V1+b.V};S.last=b.id}},
   layout(S){balLayout(S);mensLayout(S,S.M)},zones(S){return balZones(S).concat([mensZone(S,S.M)])},
@@ -1973,7 +1989,7 @@ mkWork({
     const b=S.items.find(i=>i.id===id),m=S.mm[id],v=S.vv[id];
     if(m===undefined)return{err:'Объём тела '+b.short+' измерен. Теперь взвесьте его на весах.'};
     if(!v)return{err:'Масса тела '+b.short+' измерена. Теперь опустите его в мензурку.'};
-    return{key:id,k:{name:b.name},m:{m,V1:v.V1,V2:v.V2}}},
+    return{key:id,k:{name:b.name,mat:id},m:{m,V1:v.V1,V2:v.V2}}},
   hint(S){const onPan=S.items.find(i=>i.loc==='panL'&&i.type==='body'),inM=S.items.find(i=>i.loc==='mens'),b=inM||onPan||S.items.find(i=>i.id===S.last);
     if(!b)return'Взвесьте тело на весах (тело — на левую чашу, гири — на правую), затем измерьте его объём мензуркой.';
     const hasM=S.mm[b.id]!==undefined,hasV=!!S.vv[b.id];
@@ -2048,7 +2064,7 @@ mkWork({
       if(!S.mv&&F>Fs+1e-9)S.mv=true;
       if(S.mv){const v=1400*(F-Fk);if(v<=0){S.v=0;S.mv=false}else{S.v=v;S.bx+=v*h}}else S.v=0;S.F=F}
     S.Fd=ease(S.Fd,S.F,dt,9);S.mvT=S.mv?S.mvT+dt:0;
-    if(S.mvT>.5&&S.cap[k]===undefined){S.cap[k]=r05(Fk);wToast('Брусок едет равномерно, динамометр показывает '+f1(S.cap[k],2)+' Н. Можно записывать измерение.','ok')}},
+    if(S.mvT>.5&&S.cap[k]===undefined){S.cap[k]=r05(Fk);wToast('Брусок едет равномерно. Посмотрите на шкалу динамометра и нажмите «Записать измерение».','ok')}},
   layout(S){S.items.filter(i=>i.loc==='blk').sort((a,c)=>a.order-c.order).forEach((it,i)=>{it.tx=S.bx+15*DX+20+i*28;it.ty=this.BY-44+15*DY-36})},
   zones(S){const c=this.n(S);return[{id:'blk',r:[S.bx-8,150,S.bx+124,this.BY+8],ok:it=>it.type!=='hw'?false:c>=3?'На брусок помещается только три груза.':true}]},
   handles:[{hit:(S,x,y)=>{const[hx,hy]=cur.hook(S),e=S.F*20;return x>hx+e+12&&x<hx+e+158&&Math.abs(y-hy)<20},
@@ -2059,7 +2075,7 @@ mkWork({
     shadow(g,S.bx+48+15*DX,this.BY+15*DY+3,58,.22);box3(g,S.bx,this.BY-44,96,44,WOODC,30,{shadow:false});
     S.items.filter(i=>i.loc==='blk').sort((a,c)=>a.order-c.order).forEach(it=>{shadow(g,it.x+2,it.y+36,12,.2);drawIt(g,it)});
     const[hx,hy]=this.hook(S),e=S.F*20;g.fillStyle=metal();g.beginPath();g.arc(hx,hy,2.6,0,7);g.fill();
-    dyn(g,hx,hy,0,S.F,2,110,e);
+    dyn(g,hx,hy,0,S.F,2,110,e,.1);
     if(S.dragging)sph(g,hx+e+150,hy,12,'#99CC42');
     else if(!S.used){const p=(Math.sin(S.time*4)+1)/2;arrow(g,hx+e+150+p*10,hy,hx+e+186+p*10,hy,rgba(C.plum,.85),4);txt(g,'тяните',hx+e+150,hy-18,{s:12,c:C.plum,w:700})}
     badge(g,S.mv?'Скольжение':S.F>.02?'Трение покоя':'Покой',16,16,S.mv?LABC(this):C.green);
@@ -2069,7 +2085,7 @@ mkWork({
   hint(S){const k=this.n(S);if(S.mv)return'Брусок скользит — тяните равномерно, без рывков.';
     if(S.cap[k]!==undefined)return recd('n'+k)?(k<3?'Опыт записан. Верните брусок и положите на него ещё груз.':'Все опыты сделаны.'):'Сила трения измерена — нажмите «Записать измерение».';
     return S.F>0.02?'Брусок пока покоится: трение покоя равно силе тяги. Тяните сильнее.':'Возьмитесь за кольцо динамометра и тяните его вправо.'},
-  outs(S){const k=this.n(S);return[['Динамометр',f1(r05(S.Fd),2)+' Н'],['Брусок',S.mv?'скользит':'покоится'],['Грузов на бруске',String(k)],['Вес бруска с грузами',f1(.8+k,1)+' Н']]}
+  outs(S){const k=this.n(S);return[['Брусок',S.mv?'скользит':'покоится'],['Грузов на бруске',String(k)],['Вес бруска с грузами',f1(S.P0+k,1)+' Н']]}
 });
 
 /* 6. Архимедова сила */
@@ -2113,7 +2129,7 @@ mkWork({
     thread(g,X,this.HY,b?loopTop(b):this.HY+8);if(b)drawIt(g,b,true);
     glassLiquid(g,X,by,R,by-this.HW-S.rise,L[2]);
     glassFront(g,X,by,R,top);
-    dyn(g,X,this.HY,-Math.PI/2,S.F,2,110);
+    dyn(g,X,this.HY,-Math.PI/2,S.F,2,110,0,.1);
     if(!S.used){const p=(Math.sin(S.time*4)+1)/2;arrow(g,X+R+30,by-40+p*6,X+R+30,by-80+p*6,rgba(C.plum,.85),4);txt(g,'поднимите стакан',X+R+40,by-56,{s:12,c:C.plum,w:700})}
     drawTray(g,S)},
   read(S){const b=S.items.find(i=>i.loc==='hook')||S.items.find(i=>i.id===S.last);if(!b)return{err:'Подвесьте тело к крючку динамометра.'};
@@ -2126,7 +2142,7 @@ mkWork({
     if(p1===undefined)return S.fr>0?'Опустите стакан, чтобы измерить вес тела в воздухе.':'Динамометр показывает вес тела в воздухе — подождите, пока стрелка успокоится.';
     if(p2===undefined)return S.fr<.999?'Тяните стакан вверх, пока тело полностью не погрузится в жидкость.':'Подождите, пока стрелка динамометра успокоится.';
     return recd(b.id+'|'+S.liq)?'Опыт записан. Возьмите другое тело или налейте другую жидкость.':'Вес в воздухе и в жидкости измерен — нажмите «Записать измерение».'},
-  outs(S){return[['Динамометр',f1(r05(S.F),2)+' Н'],['Тело погружено',Math.round(S.fr*100)+' %'],['В стакане',LQ[S.liq][0]]]}
+  outs(S){return[['Тело погружено',Math.round(S.fr*100)+' %'],['В стакане',LQ[S.liq][0]]]}
 });
 function wLiq(S,l){if(S.liq===l){wToast('В стакане уже '+LQ[l][0]+'.','err');return}S.liq=l;wToast('Теперь в стакане '+LQ[l][0]+'.','ok')}
 
@@ -2187,7 +2203,7 @@ mkWork({
   id:'eff',num:8,title:'Определение КПД при подъёме тела по наклонной плоскости',color:'#B54708',
   goal:'Убедиться, что полезная работа меньше затраченной, и определить коэффициент полезного действия наклонной плоскости.',
   equip:S=>'доска длиной 0,6 м, штатив с муфтой и лапкой, брусок с грузом (вес P = '+f1(S.P,1)+' Н), динамометр на 2,5 Н, линейка',
-  steps:['Установите высоту наклонной плоскости: перетащите верхний конец доски вверх или вниз. Высоту h покажет линейка.','Тяните кольцо динамометра вдоль доски так, чтобы брусок равномерно поднимался. Показание динамометра — сила тяги F.','Отпустите динамометр и нажмите «Записать измерение». Длина доски l = 0,6 м, вес бруска P = 2 Н.','Вычислите полезную работу Aп = P · h, затраченную работу Aз = F · l и КПД η = Aп / Aз · 100 %.','Повторите опыт ещё при двух разных высотах.'],
+  steps:['Установите высоту наклонной плоскости: перетащите верхний конец доски вверх или вниз. Высоту h покажет линейка.','Тяните кольцо динамометра вдоль доски так, чтобы брусок равномерно поднимался. Показание динамометра — сила тяги F.','Отпустите динамометр и нажмите «Записать измерение». Впишите высоту h и силу тяги F по шкалам; длина доски l = 0,6 м и вес бруска P запишутся сами.','Вычислите полезную работу Aп = P · h, затраченную работу Aз = F · l и КПД η = Aп / Aз · 100 %.','Повторите опыт ещё при двух разных высотах.'],
   rows:3,tip:'Aп = P · h, Aз = F · l, η = Aп / Aз · 100 %.',
   cols:[{id:'h',label:'Высота h, м',src:'m',d:2},{id:'l',label:'Длина l, м',src:'m',d:2},{id:'P',label:'Вес P, Н',src:'m',d:1},{id:'F',label:'Сила тяги F, Н',src:'m',d:2},
     {id:'Ap',label:'Aп = P · h, Дж',src:'c',d:2,f:v=>v.P*v.h,tol:.011},{id:'Az',label:'Aз = F · l, Дж',src:'c',d:2,f:v=>v.F*v.l,tol:.011},{id:'eta',label:'КПД η, %',src:'c',d:0,f:v=>v.P*v.h/(v.F*v.l)*100,tol:1.5}],
@@ -2204,7 +2220,7 @@ mkWork({
       else if(S.mv===-1){const v=650*(net+Fk);if(v>=0){S.v=0;S.mv=0}else S.v=v}else S.v=0;
       S.s+=S.v*h;if(S.s<8){S.s=8;S.v=0;S.mv=0}if(S.s>smax){S.s=smax;S.v=0;S.mv=0}}
     S.Fd=ease(S.Fd,S.F,dt,9);S.mvT=S.mv===1?S.mvT+dt:0;
-    if(S.mvT>.5&&(!S.cap||S.cap.h!==S.h)){S.cap={h:S.h,F:r05(Fg+Fk)};wToast('Брусок поднимается равномерно: F = '+f1(S.cap.F,2)+' Н при h = '+f1(S.h,2)+' м. Можно записывать измерение.','ok')}},
+    if(S.mvT>.5&&(!S.cap||S.cap.h!==S.h)){S.cap={h:S.h,F:r05(Fg+Fk)};wToast('Брусок поднимается равномерно. Посмотрите на шкалу динамометра и нажмите «Записать измерение».','ok')}},
   hookPt(S){const G0=this.geo(S);return this.pt(G0,S.s+this.BW,this.BH/2,29)},
   handles:[
     {hit:(S,x,y)=>{const w=cur,G0=w.geo(S),e=S.F*16,p=w.pt(G0,S.s+w.BW+e+20,w.BH/2,29),q=w.pt(G0,S.s+w.BW+e+140,w.BH/2,29),
@@ -2227,12 +2243,11 @@ mkWork({
     prism3(g,[pt(0,0,0),pt(this.LB,0,0),pt(this.LB,-10,0),pt(0,-10,0)],60,'#C99A62');
     hrod(g,G0.Bx-6,G0.Bx+18,G0.By+8,3.2,STEEL);muff(g,G0.Bx+18,G0.By+8);
     g.setLineDash([4,5]);g.strokeStyle=C.plum;g.lineWidth=1.5;g.beginPath();g.moveTo(G0.Bx+4,G0.By);g.lineTo(rx,G0.By);g.moveTo(this.AX,this.AY);g.lineTo(rx,this.AY);g.stroke();g.setLineDash([]);
-    txt(g,'h = '+f1(S.h,2)+' м',rx+40,(G0.By+this.AY)/2+5,{s:13,w:800});
     // брусок
     const s=S.s;prism3(g,[pt(s,0,14),pt(s+this.BW,0,14),pt(s+this.BW,this.BH,14),pt(s,this.BH,14)],30,WOODC);
     {const c=pt(s+this.BW/2,this.BH/2,14);txt(g,f1(S.P,1)+' Н',c[0],c[1]+5,{a:'center',s:12,c:'#fff',w:700})}
     const[hx,hy]=this.hookPt(S),e=S.F*16;g.fillStyle=metal();g.beginPath();g.arc(hx,hy,2.6,0,7);g.fill();
-    dyn(g,hx,hy,-G0.a,S.F,2.5,110,e);
+    dyn(g,hx,hy,-G0.a,S.F,2.5,110,e,.1);
     const rg=pt(s+this.BW+e+150,this.BH/2,29);
     if(S.dragging)sph(g,rg[0],rg[1],12,'#99CC42');
     else if(!S.used){const p=(Math.sin(S.time*4)+1)/2,a1=pt(s+this.BW+e+150+p*8,this.BH/2+16,29),a2=pt(s+this.BW+e+186+p*8,this.BH/2+16,29);arrow(g,a1[0],a1[1],a2[0],a2[1],rgba(C.plum,.85),4)}
@@ -2244,7 +2259,7 @@ mkWork({
   hint(S){if(S.mv===1)return'Брусок поднимается — тяните равномерно.';if(S.mv===-1)return'Брусок соскальзывает: на крутой доске трение его не удерживает.';
     if(S.cap&&S.cap.h===S.h)return recd('h'+S.h)?'Опыт записан. Измените высоту доски — перетащите её верхний конец.':'Сила тяги измерена — нажмите «Записать измерение».';
     return'Тяните кольцо динамометра вверх вдоль доски.'},
-  outs(S){return[['Динамометр',f1(r05(S.Fd),2)+' Н'],['Высота h',f1(S.h,2)+' м'],['Длина доски l','0,60 м'],['Брусок',S.mv===1?'едет вверх':S.mv===-1?'соскальзывает':'покоится']]}
+  outs(S){return[['Длина доски l','0,60 м'],['Брусок',S.mv===1?'едет вверх':S.mv===-1?'соскальзывает':'покоится']]}
 });
 
 /* 9. Размеры малых тел (метод рядов) */
@@ -2409,7 +2424,7 @@ const GRAPHS={
     ask:'Посмотрите, как расположены точки: ложатся ли они на одну прямую, которая идёт из начала координат?'},
   frictionw:{x:['Вес бруска с грузами P, Н',m=>m.P],y:['Сила трения Fтр, Н',m=>m.F],fit:'origin',
     ask:'Как меняется сила трения, когда брусок становится тяжелее? Ложатся ли точки на прямую из начала координат?'},
-  density:{x:['Объём V, см³',(m,c)=>c.V],y:['Масса m, г',m=>m.m],ser:r=>MATN[r.key],sers:['Алюминий','Сталь','Медь'],fit:'origin',
+  density:{x:['Объём V, см³',(m,c)=>c.V],y:['Масса m, г',m=>m.m],ser:r=>r.k.name,sers:['Цилиндр №1','Цилиндр №2','Цилиндр №3'],fit:'origin',
     need:'Вычислите объём V в таблице — точки появятся на графике.',
     ask:'У каждого вещества своя прямая. Сравните, какая из них круче, с плотностью вещества.'},
   leverw:{x:['Момент F₁ · l₁, Н · см',m=>m.F1*m.l1],y:['Момент F₂ · l₂, Н · см',m=>m.F2*m.l2],ref:'F₁ · l₁ = F₂ · l₂',
@@ -2432,12 +2447,12 @@ function niceStep(max){const raw=max/5,p=10**Math.floor(Math.log10(raw)),n=raw/p
 function gData(w){const G=w.graph,pts=[];let miss=0;
   T.forEach((r,i)=>{if(r.key===null||!r.m)return;const tr=wRow(i),c={};
     w.cols.forEach(col=>{if(col.src==='c')c[col.id]=num(tr.querySelector(`[data-c="${col.id}"]`).value)});
-    const x=G.x[1](r.m,c),y=G.y[1](r.m,c);if(!isFinite(x)||!isFinite(y)){miss++;return}
+    const m=rowM(w,i),x=G.x[1](m,c),y=G.y[1](m,c);if(!isFinite(x)||!isFinite(y)){miss++;return}
     pts.push({i,x,y,s:G.ser?G.ser(r):''})});
   return{pts,miss}}
 function renderGraph(box,w,W){const G=w.graph,{pts,miss}=gData(w);box.textContent='';
   el('p','gask',G.ask,box);
-  if(pts.length<2){el('p','gempty',miss&&G.need?G.need:pts.length?'Запишите ещё один опыт — здесь появится график.':'Запишите хотя бы два опыта — здесь появится график.',box);return null}
+  if(pts.length<2){el('p','gempty',miss?(G.need||'Впишите показания приборов в таблицу — точки появятся на графике.'):pts.length?'Запишите ещё один опыт — здесь появится график.':'Запишите хотя бы два опыта — здесь появится график.',box);return null}
   const sers=G.sers?G.sers.filter(s=>pts.some(p=>p.s===s)):[''],col=s=>'var(--s'+((G.sers?G.sers.indexOf(s):0)+1)+')';
   if(sers.length>1){const lg=el('div','glegend',null,box);lg.setAttribute('aria-label','Обозначения');
     sers.forEach(s=>{const it=el('span',null,null,lg);el('i',null,null,it).style.background=col(s);it.appendChild(document.createTextNode(s))})}
@@ -2523,6 +2538,20 @@ const CHINT={'mass.mkg':'в 1 кг 1000 г — массу в граммах ра
   'small.d':'d = L / n: длину ряда разделите на число тел','buoy.Fa':'Fₐ = P₁ − P₂: из веса в воздухе вычтите вес в жидкости',
   'frictionw.r':'разделите силу трения на вес бруска','leverw.q1':'разделите F₁ на F₂','leverw.q2':'разделите l₂ на l₁','volume.V':'V = V₂ − V₁'};
 WORKS.forEach(w=>{w.test=TESTS[w.id]||[];w.prec=PREC[w.id]||null});
+/* показания, которые ученик читает по шкале сам: rt — допуск (одно деление), rh — как читать */
+const READ={
+  mass:{m:[.1,'сложите массы всех гирь на правой чаше (1 г = 1000 мг)']},
+  volume:{V1:[2,'смотрите по нижнему краю мениска, цена деления мензурки 2 мл'],V2:[2,'смотрите по нижнему краю мениска, цена деления мензурки 2 мл']},
+  density:{m:[.1,'сложите массы всех гирь на правой чаше (1 г = 1000 мг)'],V1:[2,'смотрите по нижнему краю мениска, цена деления мензурки 2 мл'],V2:[2,'смотрите по нижнему краю мениска, цена деления мензурки 2 мл']},
+  spring:{dl:[.5,'считайте от нулевой отметки до указателя, цена деления линейки 0,5 см']},
+  frictionw:{F:[.1,'цена деления динамометра 0,1 Н, цифры стоят у целых ньютонов']},
+  buoy:{P1:[.1,'цена деления динамометра 0,1 Н, цифры стоят у целых ньютонов'],P2:[.1,'цена деления динамометра 0,1 Н, цифры стоят у целых ньютонов']},
+  eff:{h:[.01,'смотрите, у какой отметки линейки верхний конец доски; 1 см = 0,01 м'],F:[.1,'цена деления динамометра 0,1 Н, цифры стоят у целых ньютонов']},
+  small:{L:[2,'длина ряда — от нуля линейки до края последнего тела, в миллиметрах']},
+  floatw:{m:[.1,'смотрите на табло весов'],V:[2,'цена деления пробирки 2 см³; утонувшая пробирка погружена целиком — 40 см³']}};
+WORKS.forEach(w=>{const r=READ[w.id];if(r)w.cols.forEach(c=>{if(c.src==='m'&&r[c.id]){c.rt=r[c.id][0];c.rh=r[c.id][1]}});w.manual=w.cols.some(c=>c.rt)});
+/* значения строки: ручные показания — как вписал ученик, остальные — как записал прибор */
+function rowM(w,i){const r=T[i],tr=wRow(i),o={};w.cols.forEach(c=>{if(c.src==='m')o[c.id]=c.rt?num(tr.querySelector(`[data-c="${c.id}"]`).value):r.m?r.m[c.id]:NaN});return o}
 let TLOCK=null;
 const pl3=(n,a,b,c)=>n+' '+plural(n,a,b,c);
 function errHint(w,c,n,e){if(!isFinite(n)||!isFinite(e)||!e)return CHINT[w.id+'.'+c.id]||'';
@@ -2554,7 +2583,7 @@ function wCheckExtra(w,msgs){const out={};
     else{const okd=Math.abs(nd-p.div)<1e-9,oke=Math.abs(ne-p.div/2)<1e-9;d.classList.add(okd?'ok':'bad');e.classList.add(oke?'ok':'bad');
       if(!okd)msgs.push(`Цена деления ${p.dev} определена неверно. Найдите два соседних числа шкалы, вычтите из большего меньшее и разделите на число делений между ними.`);
       else if(!oke)msgs.push('Погрешность измерения — это половина цены деления.');
-      else{const r=T.find(x=>x.key!==null&&x.m);if(r){const k=p.k||1,v=r.m[p.col]*k;out.prec=`${p.sym} = ${String(+v.toFixed(2)).replace('.',',')} ± ${String(p.div/2).replace('.',',')} ${p.u}`}}}}
+      else{const ri=T.findIndex(x=>x.key!==null&&x.m);if(ri>=0){const k=p.k||1,v=rowM(w,ri)[p.col]*k;out.prec=`${p.sym} = ${String(+v.toFixed(2)).replace('.',',')} ± ${String(p.div/2).replace('.',',')} ${p.u}`}}}}
   return out}
 
 /* ===================== APP ===================== */
@@ -2597,6 +2626,7 @@ const ICON={
   pause:'<svg viewBox="0 0 18 18" fill="currentColor" aria-hidden="true"><rect x="4" y="3" width="3.5" height="12" rx="1.2"/><rect x="10.5" y="3" width="3.5" height="12" rx="1.2"/></svg>',
   again:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.47"/><path d="M3 3v4h4"/></svg>',
   reset:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h12M3 9h12M3 13h12"/><circle cx="6" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="9" r="1.6" fill="currentColor"/><circle cx="8" cy="13" r="1.6" fill="currentColor"/></svg>',
+  loupe:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5"/><path d="M11.3 11.3L16 16M5.5 7.5h4M7.5 5.5v4"/></svg>',
   next:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l6 6-6 6"/></svg>',
   rec:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="13" height="13" rx="2.5"/><path d="M2.5 7h13M7 7v8.5"/></svg>',
   check:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 9.5l3.5 3.5 7.5-8"/></svg>',
@@ -2815,7 +2845,7 @@ function openLab(id){
 const num=v=>{v=String(v).trim().replace(/[\s\u00A0\u202F]/g,'').replace(',','.');return v===''?NaN:Number(v)};
 function shuffled(n){const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function tableHTML(w){
-  return `<thead><tr><th>№</th>${w.cols.map(c=>`<th class="${c.src}">${c.label}</th>`).join('')}<th><span class="sr">Очистить строку</span></th></tr></thead><tbody>${T.map((r,i)=>`<tr data-r="${i}"><td class="n">${i+1}</td>${w.cols.map(c=>c.src==='k'?`<td class="k" data-c="${c.id}">—</td>`:`<td><input data-c="${c.id}" class="${c.src}" inputmode="decimal" autocomplete="off" aria-label="${c.label}, опыт ${i+1}"></td>`).join('')}<td><button class="rowclr" data-act="rowclr" data-r="${i}" aria-label="Очистить строку ${i+1}">×</button></td></tr>`).join('')}</tbody>`;
+  return `<thead><tr><th>№</th>${w.cols.map(c=>`<th class="${c.src}${c.rt?' rd':''}">${c.label}</th>`).join('')}<th><span class="sr">Очистить строку</span></th></tr></thead><tbody>${T.map((r,i)=>`<tr data-r="${i}"><td class="n">${i+1}</td>${w.cols.map(c=>c.src==='k'?`<td class="k" data-c="${c.id}">—</td>`:c.src==='s'?`<td><select data-c="${c.id}" class="s" aria-label="${c.label}, опыт ${i+1}"><option value="">—</option>${c.opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select></td>`:`<td><input data-c="${c.id}" class="${c.src}${c.rt?' rd':''}"${c.rt?' placeholder="?" title="Прочитайте по шкале"':''} inputmode="decimal" autocomplete="off" aria-label="${c.label}, опыт ${i+1}"></td>`).join('')}<td><button class="rowclr" data-act="rowclr" data-r="${i}" aria-label="Очистить строку ${i+1}">×</button></td></tr>`).join('')}</tbody>`;
 }
 function openWork(id){
   if(!cur)worksScroll=window.scrollY;
@@ -2836,15 +2866,17 @@ function openWork(id){
       <button class="btn main" data-act="rec">${ICON.rec}Записать измерение <span class="cnt" id="wcnt">0 / ${w.need||w.rows}</span></button>
       ${(w.actions||[]).map((a,i)=>`<button class="btn" data-wact="${i}">${a[0]}</button>`).join('')}
       <button class="btn" data-act="wreset">${ICON.again}Начать заново</button>
+      <button class="btn" data-act="loupe" aria-pressed="false">${ICON.loupe}Лупа</button>
       <button class="btn" data-act="big">${ICON.full}На весь экран</button>
     </div>
     <div class="outs" id="outs" aria-live="off"></div>
     <details class="note f steps" open><summary>Ход работы</summary>
       <p><b>Оборудование:</b> ${wEquip(w)}.</p>
+      ${w.manual?'<p class="vnote">Кнопка «Записать измерение» запоминает опыт, а показания приборов вы читаете по шкале сами и вписываете в клетки с пунктирной рамкой. Если деления трудно разглядеть, включите лупу.</p>':''}
       ${w.vary?'<p class="vnote">У каждого ученика свой вариант: размеры тел и свойства приборов немного отличаются, поэтому числа в таблице у всех свои.</p>':''}
       <ol>${w.steps.map(t=>`<li>${t}</li>`).join('')}</ol></details>
     <h2>Таблица результатов</h2>
-    <div class="legend"><span><i class="lm"></i>показания приборов — записываются кнопкой</span><span><i class="lc"></i>вычислите и впишите сами</span></div>
+    <div class="legend">${w.cols.some(c=>c.src==='m'&&!c.rt)?'<span><i class="lm"></i>записываются кнопкой</span>':''}${w.manual?'<span><i class="lr"></i>прочитайте по шкале и впишите</span>':''}<span><i class="lc"></i>вычислите и впишите сами</span></div>
     <div class="tblwrap"><table class="res" id="wtab">${tableHTML(w)}</table></div>
     ${w.graph?'<h2>График</h2><div class="graph" id="wgraph"></div>':''}
     ${precHTML(w)}
@@ -2862,6 +2894,8 @@ function openWork(id){
       :`<a class="nextlab" href="#work/${nx.id}" style="--c:${nx.color}"><span><small>${tn?'Следующая работа задания':'Следующая работа'}</small><b>${nx.title}</b></span>${ICON.next}</a>`}
   </main></div>`;
   cv=$('#cv');g=cv.getContext('2d');LIGHT=null;readColors();sizeCanvas();
+  LOUPE=false;LP=null;lcv=null;
+  cv.addEventListener('pointerdown',e=>{if(LOUPE)LP=wxy(e)});cv.addEventListener('pointermove',e=>{if(LOUPE)LP=wxy(e)});
   cv.addEventListener('pointerdown',wDown);cv.addEventListener('pointermove',wMove);
   cv.addEventListener('pointerup',wUp);cv.addEventListener('pointercancel',wUp);
   cv.addEventListener('pointerleave',()=>{if(!S.drag){S.hov=null;cv.style.cursor=''}});
@@ -2872,45 +2906,57 @@ const wEquip=w=>typeof w.equip==='function'?w.equip(S):w.equip;
 function wRow(i){return $(`#wtab tr[data-r="${i}"]`)}
 function wRowEmpty(i){return T[i].key===null&&[...wRow(i).querySelectorAll('input')].every(x=>!x.value.trim())}
 function wCount(){const el=$('#wcnt');if(el)el.textContent=T.filter(r=>r.key!==null).length+' / '+(cur.need||cur.rows)}
-function wClearRow(i){T[i]={key:null,k:{}};const tr=wRow(i);tr.querySelectorAll('input').forEach(x=>{x.value='';x.classList.remove('ok','bad')});tr.querySelectorAll('td.k').forEach(x=>x.textContent='—');wCount();wGraph()}
+function wClearRow(i){T[i]={key:null,k:{}};const tr=wRow(i);tr.querySelectorAll('input,select').forEach(x=>{x.value='';x.classList.remove('ok','bad')});tr.querySelectorAll('td.k').forEach(x=>x.textContent='—');wCount();wGraph()}
 function wRecord(){
   const r=cur.read(S);if(!r||r.err){wToast(r?r.err:'Пока нечего записывать.','err');return}
   let i=T.findIndex(x=>x.key===r.key);
-  if(i>=0){const tr=wRow(i);if(cur.cols.every(c=>c.src!=='m'||tr.querySelector(`[data-c="${c.id}"]`).value===f1(r.m[c.id],c.d))){wToast('Этот опыт уже записан в строку '+(i+1)+'.','err');return}}
+  if(i>=0){const o=T[i].m||{};if(cur.cols.every(c=>c.src!=='m'||Math.abs(o[c.id]-r.m[c.id])<1e-9)){wToast('Этот опыт уже записан в строку '+(i+1)+'.','err');return}}
   else i=T.findIndex((x,j)=>wRowEmpty(j));
   if(i<0){wToast('Таблица заполнена. Очистите строку кнопкой ×, чтобы записать новый опыт.','err');return}
   T[i]={key:r.key,k:r.k||{},m:r.m};const tr=wRow(i);
   cur.cols.forEach(c=>{const el=tr.querySelector(`[data-c="${c.id}"]`);
     if(c.src==='k')el.textContent=T[i].k[c.id]||'—';
-    else{el.value=c.src==='m'?f1(r.m[c.id],c.d):'';el.classList.remove('ok','bad')}});
+    else{el.value=c.src==='m'&&!c.rt?f1(r.m[c.id],c.d):'';el.classList.remove('ok','bad')}});
   tr.classList.remove('flash');void tr.offsetWidth;tr.classList.add('flash');
-  wCount();wGraph();wToast('Опыт записан в строку '+(i+1)+'. Теперь вычислите значения в остальных столбцах.','ok');
+  wCount();wGraph();wToast(cur.manual?'Опыт записан в строку '+(i+1)+'. Прочитайте показания по шкале и впишите их в таблицу.':'Опыт записан в строку '+(i+1)+'. Теперь вычислите значения в остальных столбцах.','ok');
+  if(cur.manual){const el=tr.querySelector('input.rd');if(el&&matchMedia('(hover:hover)').matches)el.focus({preventScroll:true})}
 }
 function wCheck(){
-  const w=cur;let rows=0,bad=0,miss=0,norec=0,forged=0;const hints=[];
+  const w=cur;let rows=0,bad=0,miss=0,norec=0,forged=0,unread=0,misread=0;const hints=[],rhints=[];
   T.forEach((row,i)=>{const tr=wRow(i),v={};let any=false;
     const mins=w.cols.filter(c=>c.src==='m').map(c=>[c,tr.querySelector(`[data-c="${c.id}"]`)]);
-    mins.forEach(([c,el])=>{el.classList.remove('bad');const n=num(el.value);v[c.id]=n;if(!isNaN(n))any=true});
+    mins.forEach(([c,el])=>{el.classList.remove('ok','bad');const n=num(el.value);v[c.id]=n;if(!isNaN(n))any=true});if(row.key!==null)any=true;
     const ins=w.cols.filter(c=>c.src==='c').map(c=>[c,tr.querySelector(`[data-c="${c.id}"]`)]);
     ins.forEach(([c,el])=>el.classList.remove('ok','bad'));if(!any)return;rows++;
     if(row.key===null||!row.m){norec++;mins.forEach(([c,el])=>el.classList.add('bad'))}
-    else mins.forEach(([c,el])=>{const q=10**c.d;if(!(Math.abs(num(el.value)-Math.round(row.m[c.id]*q)/q)<.5/q)){forged++;el.classList.add('bad')}});
+    else mins.forEach(([c,el])=>{const n=num(el.value);
+      if(c.rt){if(isNaN(n)){unread++;el.classList.add('bad')}
+        else if(Math.abs(n-row.m[c.id])<=c.rt+1e-9)el.classList.add('ok');
+        else{misread++;el.classList.add('bad');el.title=c.rh;const h=`строка ${i+1}, «${c.label}»: ${c.rh}`;if(!rhints.includes(h))rhints.push(h)}
+        return}
+      const q=10**c.d;if(!(Math.abs(n-Math.round(row.m[c.id]*q)/q)<.5/q)){forged++;el.classList.add('bad')}});
     ins.forEach(([c,el])=>{const t=el.value.trim();if(!t){miss++;el.classList.add('bad');return}
       const n=num(t),e=c.f(v),tol=Math.max(c.tol||0,Math.abs(e)*.02);
       el.removeAttribute('title');
       if(isFinite(e)&&Math.abs(n-e)<=tol+1e-9)el.classList.add('ok');else{bad++;el.classList.add('bad');const h=errHint(w,c,n,e);if(h){el.title=h;hints.push(`строка ${i+1}, «${c.label}»: ${h}`)}}})});
+  w.cols.filter(c=>c.src==='s').forEach(c=>T.forEach((row,i)=>{const el=wRow(i).querySelector(`[data-c="${c.id}"]`);el.classList.remove('ok','bad');if(row.key===null)return;
+    if(!el.value){miss++;el.classList.add('bad');return}
+    const o=rowM(w,i),rho=o.m/(o.V2-o.V1)*1000,near=isFinite(rho)?c.opts.reduce((a,b)=>Math.abs(b[2]-rho)<Math.abs(a[2]-rho)?b:a)[0]:null;
+    if(el.value===row.k.mat||el.value===near)el.classList.add('ok');else{bad++;el.classList.add('bad');hints.push(`строка ${i+1}, «${c.label}»: сравните свою плотность с таблицей плотностей в ходе работы`)}}));
   const need=w.need||w.rows,q=document.querySelector('input[name="wq"]:checked'),qok=!!q&&+q.value===w.quiz.a;
   document.querySelectorAll('.quiz label').forEach(l=>l.classList.remove('ok','bad'));if(q)q.closest('label').classList.add(qok?'ok':'bad');
   const msgs=[];
   if(rows<need)msgs.push(`Проведено опытов: ${rows} из ${need}. Запишите ещё ${need-rows}.`);
   if(norec)msgs.push(`Строк, вписанных вручную: ${norec}. Показания приборов попадают в таблицу только кнопкой «Записать измерение» — у каждого ученика свои приборы и свои числа.`);
   if(forged)msgs.push('Показания в клетках, отмеченных красным, не совпадают с вашими приборами. Нажмите «Записать измерение» ещё раз или очистите строку.');
+  if(unread)msgs.push('Впишите показания приборов в клетки с пунктирной рамкой — прочитайте их по шкале.');
+  if(misread)msgs.push(`Показания прочитаны неверно: ${misread}. Посмотрите на шкалу ещё раз.`+'<ul class="hints">'+rhints.slice(0,3).map(h=>`<li>${h[0].toUpperCase()+h.slice(1)}.</li>`).join('')+'</ul>');
   if(miss)msgs.push('Заполните пустые клетки в столбцах для вычислений.');
   if(bad)msgs.push(`Ошибок в вычислениях: ${bad}. Проверьте клетки, отмеченные красным.`+(hints.length?'<ul class="hints">'+hints.slice(0,3).map(h=>`<li>${h[0].toUpperCase()+h.slice(1)}.</li>`).join('')+'</ul>':' '+(w.tip||'')));
   if(!q)msgs.push('Выберите ответ в разделе «Вывод».');else if(!qok)msgs.push('Ответ в разделе «Вывод» неверный — подумайте ещё.');
   const ex=wCheckExtra(w,msgs);
   const el=$('#verdict');el.hidden=false;wGraph();
-  if(!msgs.length){doneW.add(w.id);saveDone();const data=T.filter(r=>r.key!==null&&r.m).map(r=>w.cols.filter(c=>c.src==='m').map(c=>Math.round(r.m[c.id]*10**c.d)/10**c.d));
+  if(!msgs.length){doneW.add(w.id);saveDone();const data=T.map((r,i)=>[r,i]).filter(([r])=>r.key!==null&&r.m).map(([r,i])=>{const o=rowM(w,i);return w.cols.filter(c=>c.src==='m').map(c=>Math.round(o[c.id]*10**c.d)/10**c.d)});
     lastRes={w:w.id,rows,test:ex.test||null,prec:ex.prec||null,code:SNAME.trim()?makeCode(w,SNAME.trim(),rows,data,ex.test):null};el.className='note ok';
     const tw=inTask(w.id);let tn=null;
     if(tw){if(lastRes.code){if(!TASK.done.includes(w.id))TASK.done.push(w.id);TASK.codes[w.id]=lastRes.code;setTask(TASK)}tn=taskNext(w.id)}
@@ -2970,6 +3016,18 @@ function toggleBig(){const st=$('.stage');if(!st)return;
   if(!rq){fb();return}try{const p=rq.call(st);if(p&&p.catch)p.catch(fb)}catch(_){fb()}}
 function bigOff(){if(fsEl())try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(_){}const st=$('.stage.big');if(st){st.classList.remove('big');document.body.style.overflow=''}}
 ['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,()=>setTimeout(sizeCanvas,60)));
+/* лупа: круглое окно в углу установки увеличивает место под пальцем или мышью — чтобы читать мелкие деления шкал */
+let LOUPE=false,LP=null,lcv=null;
+function loupeToggle(btn){const st=$('.stage');if(!st)return;LOUPE=!LOUPE;btn.setAttribute('aria-pressed',LOUPE);
+  if(LOUPE){lcv=document.createElement('canvas');lcv.className='loupe';lcv.setAttribute('aria-hidden','true');st.appendChild(lcv);
+    if(!LP)LP=[W/2,H/2];wToast('Лупа включена: коснитесь шкалы или наведите на неё мышь.','ok')}
+  else{if(lcv)lcv.remove();lcv=null}}
+function drawLoupe(){if(!lcv||!cv||!LP)return;const d=lcv.clientWidth,dpr=Math.min(window.devicePixelRatio||1,2.5),px=Math.round(d*dpr);
+  if(lcv.width!==px){lcv.width=px;lcv.height=px}
+  const k=cv.width/cv.clientWidth,z=2.6,sw=d*k/z,cx=LP[0]/W*cv.width,cy=LP[1]/H*cv.height,c=lcv.getContext('2d');
+  c.fillStyle=C.surf;c.fillRect(0,0,px,px);c.drawImage(cv,cx-sw/2,cy-sw/2,sw,sw,0,0,px,px);
+  c.strokeStyle='rgba(196,36,95,.75)';c.lineWidth=1.5*dpr;c.beginPath();c.moveTo(px/2-9*dpr,px/2);c.lineTo(px/2+9*dpr,px/2);c.moveTo(px/2,px/2-9*dpr);c.lineTo(px/2,px/2+9*dpr);c.stroke();
+  lcv.classList.toggle('left',LP[0]>W*.55)}
 function sizeCanvas(){
   if(!cv||!g)return;const dpr=Math.min(window.devicePixelRatio||1,2.5),w=cv.clientWidth||W;
   const pw=Math.round(w*dpr),ph=Math.round(w*dpr*H/W);
@@ -3000,7 +3058,7 @@ function loop(ts){
   if(!cur)return;
   const dt=clamp((ts-last)/1000,0,.033);last=ts;
   if(!paused&&dt>0)cur.step(S,P,dt);
-  frame();
+  frame();if(LOUPE)drawLoupe();
   outT+=dt;if(outT>.15){outT=0;updateOuts();wHintTick()}
   raf=requestAnimationFrame(loop);
 }
@@ -3021,7 +3079,7 @@ app.addEventListener('click',e=>{
     t.innerHTML=th==='dark'?ICON.sun:ICON.moon;t.setAttribute('aria-label',th==='dark'?'Светлая тема':'Тёмная тема');return}
   if(t.dataset.act==='home'){if(cur)goHome();else if(location.hash&&location.hash!=='#')location.hash='';else window.scrollTo({top:0,behavior:'smooth'});return}
   {const ac=t.dataset.act;
-   if(ac==='big'){toggleBig();return}if(ac==='inst'&&instEv){instEv.prompt();instEv.userChoice.finally(()=>{instEv=null;t.hidden=true});return}if(ac==='jcsv'){jCSV();return}if(ac==='jclear'){jClear();return}
+   if(ac==='big'){toggleBig();return}if(ac==='loupe'){loupeToggle(t);return}if(ac==='inst'&&instEv){instEv.prompt();instEv.userChoice.finally(()=>{instEv=null;t.hidden=true});return}if(ac==='jcsv'){jCSV();return}if(ac==='jclear'){jClear();return}
    if(ac==='tlink'){tLink();return}if(ac==='tcopy'){copyText($('#tlinkout').value,t);return}if(ac==='tverify'){tVerify();return}
    if(ac==='taskoff'){setTask(null);showAllW=false;worksHome();return}
    if(ac==='showall'){showAllW=!showAllW;worksHome();return}
