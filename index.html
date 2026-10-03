@@ -305,6 +305,69 @@ table.res tr.dup td{background:rgba(196,36,95,.08)}
 .tlinkfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 20px 40px;padding:18px 20px;border-radius:22px;background:var(--soft);color:var(--ink);text-decoration:none;font-weight:600}
 .tlinkfoot small{display:block;color:var(--muted);font-weight:500;font-size:14px}
 .tlinkfoot svg{flex:none;width:22px;height:22px}
+.accbar{background:var(--soft)}.accbar>div:first-child{flex:1;min-width:0}
+.acode{display:flex;gap:8px;margin-top:12px;max-width:440px}
+.acode input{flex:1;min-width:0;font:inherit;font-size:20px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 14px}
+.acode input::placeholder{letter-spacing:0;text-transform:none;font-size:15px;font-weight:500}
+.acode input:focus{border-color:var(--brand);outline:none}
+.taskbar .aerr,.taskbar .aflash{color:#C4245F;font-weight:700;margin-top:8px}.taskbar .aerr:empty{display:none}
+.aflash.flash{animation:measin .4s ease}
+.ateach{margin:10px 22px 0;font-weight:600}.ateach a{color:var(--brand)}
+.card.locked{filter:saturate(.25);opacity:.72;cursor:not-allowed}
+.card.locked .go{background:rgba(255,255,255,.7);color:#1F2340}
+.mrow svg{flex:none}
+.sacc{display:flex;gap:10px;align-items:flex-start;margin:16px 6px 0;padding:12px 16px;border-radius:16px;background:var(--soft);font-size:15px;line-height:1.4}
+.sacc svg{flex:none;width:20px;height:20px;margin-top:1px;color:var(--brand)}
+.rescode .sok{color:#367A55;font-weight:800}
+.tauth{display:grid;gap:0}@media(min-width:820px){.tauth{grid-template-columns:1fr 1fr;align-items:start}}
+.tauth .tfield input,.tline .tfield input{font:inherit;font-weight:500;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
+.tauth .tfield input:focus,.tline input:focus,.tclass textarea:focus,.tinv input:focus{border-color:var(--brand);outline:none}
+.terr{color:#C4245F;font-weight:700}.terr:empty{display:none}
+.offl{margin:22px 6px 0}.offl>summary{cursor:pointer;font-weight:700;padding:14px 18px;border-radius:18px;background:var(--soft);list-style-position:inside}
+.offl[open]>summary{margin-bottom:4px}
+.th2{margin:26px 8px 10px;font-size:22px}
+.tcme{margin:6px 6px 0;background:var(--soft)}
+.tcls{flex-wrap:wrap;padding:0 6px}.tcls .chip[aria-pressed="true"]{background:var(--brand);color:#fff}.chips.tcls .chip[aria-pressed="true"] .n{background:rgba(255,255,255,.25);color:#fff}
+.tcls .cadd{background:none;border:2px dashed var(--line)}
+.trow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.trow input,.trow select,.tinv input,.tinv select{font:inherit;font-weight:500;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;min-width:0}
+.trow input{flex:1 1 180px}
+.tclass h3{margin:22px 0 4px;font-size:18px}
+.tchead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}.tchead>b{font-size:24px}.tchead .tbtns{display:flex;flex-wrap:wrap;gap:8px}.tchead .btn{padding:8px 14px}
+.twork{display:grid;gap:8px;margin-top:10px}
+.twrow{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;padding:10px 12px;border:2px solid var(--line);border-radius:14px;background:var(--surf)}
+.twrow.on{border-color:var(--green);background:rgba(54,122,85,.08)}
+.twk{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-weight:600;line-height:1.35;flex:1 1 260px}
+.twk input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--green);flex:none}
+.twrow{min-width:0}.tdl{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--muted);font-weight:600;min-width:0;max-width:100%}
+.tdl input{min-width:0;max-width:calc(100vw - 150px);font:inherit;font-size:14px;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:10px;padding:6px 8px}
+.tdl input:disabled{opacity:.45}
+.tclass textarea{display:block;width:100%;min-height:84px;margin-top:10px;font:inherit;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;resize:vertical}
+code.scode{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;font-weight:700;letter-spacing:.08em}
+table.tst td{vertical-align:middle}table.tst td:first-child{min-width:96px}.tst .jy{color:#367A55;font-weight:700}.tst .jn{color:var(--muted)}
+.tact{white-space:nowrap}.mini{font:inherit;font-size:13px;font-weight:700;padding:6px 10px;margin:2px 4px 2px 0;border-radius:10px;border:2px solid var(--line);background:var(--surf);color:var(--ink);cursor:pointer}
+.mini:hover{border-color:var(--brand)}.mini.del{color:#C4245F}
+.jcell{font:inherit;font-weight:800;color:inherit;background:none;border:2px solid transparent;border-radius:10px;padding:4px 8px;cursor:pointer;min-width:44px}
+.jcell[aria-pressed="true"]{border-color:var(--brand);background:var(--soft)}
+table.jtab td.jw{color:#B5531A}
+.jdet{margin:10px 6px}.jdet .tblwrap{margin:10px 0}.jflags{color:#B5531A;font-weight:700}
+.jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
+.bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
+.bigcode code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:28px;font-weight:800;letter-spacing:.14em;color:var(--brand)}
+.bigcode span{color:var(--muted);font-weight:600;flex:1 1 160px}
+.tinv{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}.tinv input{flex:1 1 240px}
+.chk{white-space:nowrap;display:flex;gap:6px;align-items:center;font-weight:600;font-size:14px}.chk input{width:18px;height:18px;accent-color:var(--brand)}
+small.db{display:block;color:var(--muted);font-weight:500}
+.toast{position:fixed;left:50%;bottom:22px;z-index:60;transform:translate(-50%,20px);opacity:0;pointer-events:none;max-width:calc(100% - 32px);padding:12px 18px;border-radius:14px;background:var(--ink);color:var(--surf);font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:opacity .2s,transform .2s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:560px){table.tst thead{display:none}table.tst,table.tst tbody{display:block}
+  table.tst tr{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;padding:12px 14px;border-bottom:1px solid var(--line)}table.tst tr:last-child{border-bottom:0}
+  table.tst td{display:block;padding:0;border:0;min-width:0!important}table.tst td:nth-child(1){font-weight:700}table.tst td:nth-child(3){grid-column:1/-1;font-size:14px}
+  table.tst td.tact{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;white-space:normal}.tact .mini{margin:0}
+  .acode input{font-size:18px}.bigcode code{font-size:24px}.tchead>b{font-size:21px}}
+@media print{body.printing #print .pcards{display:grid;grid-template-columns:1fr 1fr;gap:8mm}
+  #print .pcard{border:1px dashed #888;border-radius:6px;padding:6mm;break-inside:avoid}#print .pcard small{display:block;color:#555;font-size:9pt}
+  #print .pcard b{display:block;font-size:14pt;margin:2mm 0}#print .pcard code{display:block;font-size:20pt;font-weight:800;letter-spacing:.12em;margin:2mm 0 3mm;word-break:normal}#print .pcard p{font-size:9pt;margin:0}}
 #print{display:none}
 @media print{
   body.printing{background:#fff}
@@ -2609,7 +2672,7 @@ try{TASK=JSON.parse(localStorage.getItem('lab-sirius-task')||'null')}catch(_){}
 if(TASK&&!Array.isArray(TASK.w))TASK=null;if(TASK){TASK.done=TASK.done||[];TASK.codes=TASK.codes||{}}
 function setTask(t){TASK=t;try{t?localStorage.setItem('lab-sirius-task',JSON.stringify(t)):localStorage.removeItem('lab-sirius-task')}catch(_){}}
 let showAllW=false;
-const inTask=id=>!!TASK&&TASK.w.includes(id);
+const inTask=id=>!gated()&&!!TASK&&TASK.w.includes(id);
 /* следующая невыполненная работа задания (после after по кругу); null — всё выполнено */
 function taskNext(after){if(!TASK)return null;const w=TASK.w,i=Math.max(0,w.indexOf(after)+1);
   for(let k=0;k<w.length;k++){const id=w[(i+k)%w.length];if(id!==after&&!TASK.done.includes(id))return id}return null}
@@ -2635,6 +2698,7 @@ const ICON={
   again:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.47"/><path d="M3 3v4h4"/></svg>',
   reset:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h12M3 9h12M3 13h12"/><circle cx="6" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="9" r="1.6" fill="currentColor"/><circle cx="8" cy="13" r="1.6" fill="currentColor"/></svg>',
   meas:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12.5a6.5 6.5 0 0 1 13 0"/><path d="M9 12.5l3-4"/><path d="M4.5 9.5l1 .6M9 6v1.2M13.5 9.5l-1 .6"/></svg>',
+  lock:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8" width="11" height="8" rx="2"/><path d="M6 8V5.8a3 3 0 0 1 6 0V8"/></svg>',
   loupe:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5"/><path d="M11.3 11.3L16 16M5.5 7.5h4M7.5 5.5v4"/></svg>',
   next:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l6 6-6 6"/></svg>',
   rec:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="13" height="13" rx="2.5"/><path d="M2.5 7h13M7 7v8.5"/></svg>',
@@ -2666,7 +2730,7 @@ function openMenu(){
   const items=[['#','Все явления',LABS.length+' '+plural(LABS.length,'модель','модели','моделей'),'Все',!inWorks&&filter==='Все']]
     .concat(CATS.slice(1).map((c,i)=>['#','Глава '+(i+1)+'. '+c,cnt(c)+' '+plural(cnt(c),'модель','модели','моделей'),c,!inWorks&&filter===c]))
     .concat([['#works','Лабораторные работы',WORKS.length+' работ · выполнено '+WORKS.filter(w=>doneW.has(w.id)).length,'',inWorks]])
-    .concat([['#teacher','Для учителя','Задание по ссылке и проверка результатов','',h==='#teacher']])
+    .concat([['#teacher','Для учителя','Кабинет: классы, коды учеников, журнал','',h==='#teacher']])
     .concat([['#install','Установить на телефон','Значок на экране и работа без интернета','',h==='#install']]);
   menuEl.innerHTML=`<div class="menu-sheet" role="dialog" aria-modal="true" aria-label="Разделы"><button class="menu-x" data-m="close" aria-label="Закрыть меню">${ICON.close}</button><nav>${items.map(it=>`<a href="${it[0]}" data-cat="${it[3]}"${it[4]?' aria-current="page"':''}>${ICON.lines}<span>${it[1]}<small>${it[2]}</small></span></a>`).join('')}</nav></div>`;
   menuFocus=document.activeElement;menuEl.hidden=false;document.body.style.overflow='hidden';const a=menuEl.querySelector('[aria-current]')||menuEl.querySelector('a');if(a)a.focus();
@@ -2709,6 +2773,7 @@ function home(){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
 }
 function worksHome(){
+  if(gated()){if(SRV==='?'&&!ACC){waitHome();return}worksGated();return}
   const back=cur&&cur.kind==='work';stop();cur=null;document.title='Лабораторные работы — Лаборатория Сириус';
   const inT=inTask,only=!!TASK&&!showAllW;
   const list=only?TASK.w.map(id=>WORKS.find(w=>w.id===id)):TASK?WORKS.filter(w=>inT(w.id)).concat(WORKS.filter(w=>!inT(w.id))):WORKS;
@@ -2732,33 +2797,6 @@ function worksHome(){
   <a class="tlinkfoot" href="#teacher"><span>Для учителя<small>Выдать работы классу по ссылке и проверить коды результатов</small></span>${ICON.next}</a></div>`;
   window.scrollTo(0,back?worksScroll:0);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
-}
-function teacherHome(){
-  stop();cur=null;document.title='Для учителя — Лаборатория Сириус';
-  app.innerHTML=`<div class="view">`+header()+`
-  <section class="hero"><h1>Для учителя</h1><p>Выдайте лабораторные работы классу по ссылке и проверьте результаты учеников.</p></section>
-  <main class="sheet tsheet">
-    <div class="note f"><b>1. Задание по ссылке</b>
-      <label class="tfield">Название задания<input id="ttitle" maxlength="80" value="Лабораторные работы"></label>
-      <div class="tchecks" role="group" aria-label="Работы в задании">${WORKS.map(w=>`<label><input type="checkbox" value="${w.id}" checked><span>№ ${w.num}. ${w.title}</span></label>`).join('')}</div>
-      <div class="tools"><button class="btn main" data-act="tlink">${ICON.link}Создать ссылку</button></div>
-      <div class="tlink" id="tlinkbox" hidden><input id="tlinkout" readonly aria-label="Ссылка на задание"><button class="btn" data-act="tcopy">Копировать</button></div>
-      <p class="tmsg" id="tlinkmsg">По ссылке ученик сразу попадёт в первую работу задания, а в списке увидит только заданные работы.</p>
-    </div>
-    <div class="note f"><b>2. Проверка результатов</b>
-      <p class="tmsg">Выполнив работу, ученик получает код результата. Попросите прислать коды — например, в чат класса — и вставьте их сюда, каждый с новой строки. У каждого ученика свой вариант установки, поэтому одинаковые показания приборов у разных учеников будут отмечены.</p>
-      <textarea id="tcodes" rows="5" placeholder="LS-…" aria-label="Коды результатов"></textarea>
-      <div class="tools"><button class="btn main" data-act="tverify">${ICON.check}Проверить коды</button></div>
-      <div id="tres"></div>
-    </div>
-    <div class="note f"><b>3. Журнал класса</b>
-      <p class="tmsg">Проверенные коды сохраняются здесь, в журнале на этом устройстве. Видно, кто какие работы выполнил и как написал мини-тест.</p>
-      <div id="tjournal"></div>
-      <div class="tools"><button class="btn" data-act="jcsv">${ICON.dl}Скачать для Excel</button><button class="btn" data-act="jclear">Очистить журнал</button></div>
-    </div>
-    <p class="hint">${ICON.teacher}<span>Сайт работает без сервера и не хранит данные учеников. Код защищает от ошибок при копировании и случайных изменений, но не от целенаправленной подделки.</span></p>
-  </main></div>`;
-  window.scrollTo(0,0);jRender();
 }
 /* установка на телефон и работа без интернета */
 let instEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;const b=$('#instbtn');if(b)b.hidden=false});
@@ -2858,7 +2896,7 @@ function tableHTML(w){
 }
 function openWork(id){
   if(!cur)worksScroll=window.scrollY;
-  stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};lastRes=null;TLOCK=null;WSEED=Math.floor(Math.random()*4294967296);cur.init(S);wSnap();
+  stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};lastRes=null;TLOCK=null;WSEED=Math.floor(Math.random()*4294967296);cur.init(S);wSnap();WSTART=Date.now();WATT=0;
   T=Array.from({length:cur.rows},()=>({key:null,k:{}}));
   const w=cur,idx=WORKS.indexOf(w),tw=inTask(w.id),tn=tw?taskNext(w.id):null,nx=WORKS.find(x=>x.id===tn)||WORKS[(idx+1)%WORKS.length];
   document.title=w.title+' — Лаборатория Сириус';
@@ -2866,6 +2904,7 @@ function openWork(id){
   <section class="labhead" style="--lab:${w.color}">
     <button class="back" data-act="back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg>Все работы</button>
     <h1>${w.title}</h1><p>${w.goal}</p><span class="tag">Лабораторная работа № ${w.num}</span>
+    ${gated()&&ACC&&ACC.kind==='s'?`<a class="taskline" href="#works"><span><small>Задание учителя · ${esc(ACC.cls)}</small><b>${wDeadline(w.id)?'Сдать до '+fmtDT(wDeadline(w.id)):'Без срока сдачи'}</b></span><span class="tgo">Все мои работы</span></a>`:''}
     ${tw?`<a class="taskline" href="#works"><span><small>Задание от учителя · работа ${TASK.w.indexOf(w.id)+1} из ${TASK.w.length}</small><b>${esc(TASK.t)}</b></span><span class="tgo">Все работы задания</span></a>`:''}
   </section>
   <main class="sheet" style="--lab:${w.color}">
@@ -2894,7 +2933,7 @@ function openWork(id){
     <h2>Вывод</h2>
     <div class="note f quiz" role="radiogroup" aria-label="${w.quiz.q}"><b>${w.quiz.q}</b>${shuffled(w.quiz.opts.length).map(i=>`<label><input type="radio" name="wq" value="${i}"><span>${w.quiz.opts[i]}</span></label>`).join('')}</div>
     ${testHTML(w)}
-    <label class="sname">Ученик<input id="sname" maxlength="60" autocomplete="name" placeholder="Фамилия Имя, класс" value="${esc(SNAME)}"><small>Попадёт в отчёт и в код результата для учителя</small></label>
+    ${gated()&&ACC?accLine():`<label class="sname">Ученик<input id="sname" maxlength="60" autocomplete="name" placeholder="Фамилия Имя, класс" value="${esc(SNAME)}"><small>Попадёт в отчёт и в код результата для учителя</small></label>`}
     <div class="tools">
       <button class="btn main" data-act="check">${ICON.check}Проверить работу</button>
       <button class="btn" data-act="report">${ICON.doc}Отчёт (PDF)</button>
@@ -2939,7 +2978,7 @@ function wMeasure(){
     '</div><small>В таблицу они не записываются — нажмите «Записать измерение» и впишите их сами.</small>';
   el.hidden=false;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}
 function wCheck(){
-  const w=cur;let rows=0,bad=0,miss=0,norec=0,forged=0,unread=0,misread=0;const hints=[],rhints=[];
+  WATT++;const w=cur;let rows=0,bad=0,miss=0,norec=0,forged=0,unread=0,misread=0;const hints=[],rhints=[];
   T.forEach((row,i)=>{const tr=wRow(i),v={};let any=false;
     const mins=w.cols.filter(c=>c.src==='m').map(c=>[c,tr.querySelector(`[data-c="${c.id}"]`)]);
     mins.forEach(([c,el])=>{el.classList.remove('ok','bad');const n=num(el.value);v[c.id]=n;if(!isNaN(n))any=true});if(row.key!==null)any=true;
@@ -2974,7 +3013,12 @@ function wCheck(){
   const ex=wCheckExtra(w,msgs);
   const el=$('#verdict');el.hidden=false;wGraph();
   if(!msgs.length){doneW.add(w.id);saveDone();const data=T.map((r,i)=>[r,i]).filter(([r])=>r.key!==null&&r.m).map(([r,i])=>{const o=rowM(w,i);return w.cols.filter(c=>c.src==='m').map(c=>Math.round(o[c.id]*10**c.d)/10**c.d)});
-    lastRes={w:w.id,rows,test:ex.test||null,prec:ex.prec||null,code:SNAME.trim()?makeCode(w,SNAME.trim(),rows,data,ex.test):null};el.className='note ok';
+    lastRes={w:w.id,rows,test:ex.test||null,prec:ex.prec||null,code:!gated()&&SNAME.trim()?makeCode(w,SNAME.trim(),rows,data,ex.test):null};el.className='note ok';
+    if(gated()&&ACC){const sv=ACC.kind==='s';
+      el.innerHTML=`<b>Работа выполнена!</b> ${w.concl}`+(ex.prec||ex.test?`<p class="vextra">${ex.prec?`Результат с погрешностью (опыт 1): <b>${ex.prec}</b>.`:''}${ex.test?` Мини-тест: <b>${ex.test[0]} из ${ex.test[1]}</b>.`:''}</p>`:'')
+        +`<div class="rescode" id="wsend"><small>${sv?'Отправляем результат учителю…':ACC.kind==='d'?'Демо-режим: результат не сохраняется.':'Вы вошли как учитель: результат не сохраняется.'}</small>${sv?'':`<a class="btn main" href="#works">К списку работ${ICON.next}</a>`}</div>`;
+      if(sv)wSend(w.id,{r:data,n:rows,t:ex.test||null,p:ex.prec||null,a:WATT,sec:Math.round((Date.now()-WSTART)/1000)});
+      el.scrollIntoView({behavior:'smooth',block:'nearest'});return}
     const tw=inTask(w.id);let tn=null;
     if(tw){if(lastRes.code){if(!TASK.done.includes(w.id))TASK.done.push(w.id);TASK.codes[w.id]=lastRes.code;setTask(TASK)}tn=taskNext(w.id)}
     const go=tw&&lastRes.code?(tn?`<a class="btn main" href="#work/${tn}">Следующая работа задания${ICON.next}</a>`:`<a class="btn main" href="#works">Задание выполнено — все коды${ICON.next}</a>`):'';
@@ -3089,6 +3133,7 @@ function goHome(){if(fromHome){fromHome=false;history.back()}else{location.hash=
 
 app.addEventListener('click',e=>{
   {const l=e.target.closest('a.lang');if(l){e.preventDefault();location.href=LANG.other+location.hash;return}}
+  {const lk=e.target.closest('a.card[data-locked]');if(lk){e.preventDefault();lockedMsg(lk.dataset.locked);return}}
   const a=e.target.closest('a.card,a.nextlab');if(a){if(!cur)fromHome=true;return}
   const t=e.target.closest('button');if(!t)return;
   if(t.dataset.act==='menu'){openMenu();return}
@@ -3101,6 +3146,7 @@ app.addEventListener('click',e=>{
    if(ac==='taskoff'){setTask(null);showAllW=false;worksHome();return}
    if(ac==='showall'){showAllW=!showAllW;worksHome();return}
    if(ac==='copyall'&&TASK){copyText(TASK.w.filter(id=>TASK.codes[id]).map(id=>TASK.codes[id]).join('\n'),t);return}}
+  if(t.dataset.k){kAct(t);return}
   if(t.dataset.act==='back'){goHome();return}
   if(t.dataset.cat){setFilter(t.dataset.cat);return}
   if(!cur)return;
@@ -3132,10 +3178,341 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){if(tag!=='input'||cur.kind!=='work')goHome();return}
   if(e.key===' '&&cur.kind!=='work'&&tag!=='input'&&tag!=='button'&&tag!=='a'){e.preventDefault();setPaused(!paused)}
 });
+/* ===== сервер: классы, личные коды учеников, открытие работ, журнал.
+   Адрес и публичный ключ — Supabase (функции из server/schema.sql). Если сервер недоступен,
+   сайт работает как раньше: работы открыты, результат передаётся кодом. */
+const API=Object.assign({url:'https://meloatifwjyulrzalnfm.supabase.co',key:'sb_publishable_mY3QMOIzexBmm-OdN5R9lg_guAzHqkk'},window.LAB_API||{});
+let SRV='?',ACC=null,SKEW=0,FLASH='',WSTART=0,WATT=0;
+try{ACC=JSON.parse(localStorage.getItem('lab-sirius-acc')||'null')}catch(_){}
+if(!ACC||!ACC.token||!ACC.kind)ACC=null;
+function saveAcc(){try{ACC?localStorage.setItem('lab-sirius-acc',JSON.stringify(ACC)):localStorage.removeItem('lab-sirius-acc')}catch(_){}}
+function devId(){let d='';try{d=localStorage.getItem('lab-sirius-device')||''}catch(_){}
+  if(d.length<16){d=Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');try{localStorage.setItem('lab-sirius-device',d)}catch(_){}}return d}
+async function rpc(fn,args,ms){const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),ms||12000);
+  try{const r=await fetch(API.url+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':API.key,'Content-Type':'application/json'},body:JSON.stringify(args||{}),signal:ac.signal,cache:'no-store'});
+    if(!r.ok)throw new Error('http '+r.status);const j=await r.json();
+    if(j&&j.now)SKEW=Date.parse(j.now)-Date.now();
+    if(j&&j.err==='session'&&ACC&&args&&args.p_token===ACC.token){ACC=null;saveAcc()}
+    return j||{}}
+  finally{clearTimeout(tm)}}
+const srvNow=()=>Date.now()+SKEW;
+const LOC=LANG.code==='ru'?'ru-RU':'en-GB';
+const fmtDT=v=>new Date(v).toLocaleString(LOC,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const fmtT=v=>new Date(v).toLocaleTimeString(LOC,{hour:'2-digit',minute:'2-digit'});
+const toLocalInput=v=>{const d=new Date(v),p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`};
+const ERRS={slow:'Слишком много попыток. Подождите 15 минут и попробуйте снова.',invite:'Код-приглашение не подходит, истёк или уже использован.',email:'Проверьте адрес почты.',name:'Впишите имя.',
+  pass:'Пароль должен быть не короче 8 символов.',taken:'Учитель с такой почтой уже зарегистрирован — войдите.',login:'Неверная почта или пароль.',blocked:'Аккаунт заблокирован. Напишите авторам проекта.',
+  session:'Вход устарел — войдите ещё раз.',code:'Такого кода нет. Проверьте буквы и цифры.',device:'Этот код уже открыт на другом устройстве. Попросите учителя нажать «Новое устройство» рядом с вашим именем.',
+  closed:'Эта работа сейчас закрыта.',late:'Срок сдачи этой работы прошёл.',limit:'Достигнут предел: не больше 40 классов и 60 учеников в классе.',self:'Нельзя заблокировать свой аккаунт.',
+  work:'Неизвестная работа.',data:'Слишком большой результат.',net:'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.'};
+const errText=e=>ERRS[e]||ERRS.net;
+function gated(){return SRV==='on'||!!ACC}
+function accLive(){if(ACC&&ACC.kind==='d'&&Date.parse(ACC.expires)<=srvNow()){ACC=null;saveAcc()}return ACC}
+/* 'open' — можно открыть, 'locked' — закрыта учителем, 'late' — срок сдачи прошёл */
+function wAccess(id){if(!gated())return'open';const a=accLive();if(!a)return'locked';if(a.kind!=='s')return'open';
+  const w=(a.works||[]).find(x=>x.work===id);if(!w)return'locked';return w.deadline&&Date.parse(w.deadline)<srvNow()?'late':'open'}
+const wDeadline=id=>{const w=ACC&&ACC.kind==='s'&&(ACC.works||[]).find(x=>x.work===id);return w?w.deadline:null};
+async function accRefresh(){if(!ACC)return false;const before=JSON.stringify([ACC.works,ACC.done,ACC.name]);
+  try{if(ACC.kind==='t'){const r=await rpc('t_me',{p_token:ACC.token});if(!r.err){ACC.name=r.me.name;ACC.me=r.me}}
+    else{const r=await rpc('s_state',{p_token:ACC.token});if(!r.err&&ACC)Object.assign(ACC,r)}}catch(_){return false}
+  saveAcc();return!ACC||JSON.stringify([ACC.works,ACC.done,ACC.name])!==before}
+async function srvInit(){
+  if(navigator.onLine===false)SRV='off';
+  else{try{const p=await rpc('ping',{},6000);SRV=p&&p.ok?'on':'off'}catch(_){SRV='off'}}
+  if(SRV==='on'&&ACC){await accRefresh();qFlush()}
+  srvReady()}
+function srvReady(){const h=location.hash;
+  if(h.startsWith('#work/')&&cur&&cur.kind==='work'){if(wAccess(cur.id)!=='open'){FLASH=lockText(wAccess(cur.id));location.replace('#works')}}
+  else if(h==='#works'||h==='#teacher'||h.startsWith('#work/')||h.startsWith('#task/'))route()}
+window.addEventListener('online',()=>{if(SRV!=='on')srvInit();else qFlush()});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&SRV==='on'&&ACC&&ACC.kind!=='t'&&location.hash==='#works')accRefresh().then(ch=>{if(ch&&location.hash==='#works')worksHome()})});
+const lockText=a=>a==='late'?'Срок сдачи этой работы прошёл.':'Эта работа пока закрыта — её откроет учитель.';
+function waitHome(){stop();cur=null;
+  app.innerHTML=`<div class="view">`+header()+`<section class="hero"><h1>Лабораторные работы</h1><p>Подключаемся к серверу школы…</p></section><main class="sheet tsheet"><p class="gempty">Проверяем связь с сервером…</p></main></div>`}
+/* результаты, которые не удалось отправить, ждут интернета на устройстве */
+function qGet(){try{return JSON.parse(localStorage.getItem('lab-sirius-queue')||'[]')}catch(_){return[]}}
+function qSet(q){try{q.length?localStorage.setItem('lab-sirius-queue',JSON.stringify(q)):localStorage.removeItem('lab-sirius-queue')}catch(_){}}
+async function qFlush(){const q=qGet();if(!q.length)return;const left=[];
+  for(const it of q){try{const r=await rpc('s_submit',{p_token:it.token,p_work:it.work,p_ok:true,p_data:it.data});
+      if(!r.err&&ACC&&ACC.token===it.token&&!ACC.done.includes(it.work)){ACC.done.push(it.work);saveAcc()}}catch(_){left.push(it)}}
+  qSet(left)}
+async function wSend(id,d){const say=(t,ok)=>{const b=$('#wsend');if(b&&cur&&cur.id===id)b.innerHTML=`<small class="${ok?'sok':''}">${t}</small><a class="btn main" href="#works">К списку работ${ICON.next}</a>`};
+  const tok=ACC.token;
+  try{const r=await rpc('s_submit',{p_token:tok,p_work:id,p_ok:true,p_data:d});
+    if(r.err){say(errText(r.err));return}
+    if(ACC&&!ACC.done.includes(id)){ACC.done.push(id);saveAcc()}say('✓ Результат отправлен учителю — он уже в журнале класса.',true)}
+  catch(_){const q=qGet();q.push({token:tok,work:id,data:d});qSet(q);say('Нет связи с сервером. Результат сохранён на этом устройстве и отправится сам, когда появится интернет.')}}
+function accLine(){const a=accLive();if(!a)return'';
+  if(a.kind==='s')return`<p class="sacc">${ICON.teacher}<span>Ученик: <b>${esc(a.name)}</b> · ${esc(a.cls)}. После проверки результат сам уйдёт учителю.</span></p>`;
+  return`<p class="sacc">${ICON.teacher}<span>${a.kind==='d'?'Демо-режим':'Вы вошли как учитель'}: результаты не сохраняются.</span></p>`}
+
+/* ----- список работ при входе через сервер */
+function accBar(){const a=accLive(),fl=FLASH?`<span class="aflash" role="alert">${FLASH}</span>`:'';FLASH='';
+  const off=SRV==='off'?'<span>Нет связи с сервером — показаны работы, открытые при последнем входе. Результаты отправятся позже.</span>':'';
+  if(!a)return`<div class="taskbar accbar"><div><small>Вход для ученика</small><b>Работы открывает учитель</b><span>Введите личный код из 6 знаков, который выдал учитель, или демо-код.</span>${fl}
+    <form class="acode" data-form="slogin"><input id="scode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Код, например K7M2QX" aria-label="Личный код ученика"><button class="btn main" type="submit">Войти</button></form>
+    <span class="aerr" id="aerr" role="alert"></span></div></div><p class="ateach"><a href="#teacher">Я учитель — войти в кабинет</a></p>`;
+  if(a.kind==='s'){const open=WORKS.filter(w=>wAccess(w.id)==='open').length,dn=WORKS.filter(w=>a.done.includes(w.id)).length;
+    return`<div class="taskbar accbar"><div><small>Ученик · ${esc(a.cls)}</small><b>${esc(a.name)}</b><span>${open?`Открыто работ: ${open}. Отправлено учителю: ${dn}.`:'Учитель пока не открыл ни одной работы. Загляните позже.'}</span>${off}${fl}</div>
+      <div class="tbtns"><button class="btn" data-k="slogout">Выйти</button></div></div>`}
+  if(a.kind==='d')return`<div class="taskbar accbar"><div><small>Демо-режим</small><b>Все работы открыты до ${fmtT(a.expires)}</b><span>Результаты в демо-режиме не сохраняются.</span>${fl}</div><div class="tbtns"><button class="btn" data-k="slogout">Выйти</button></div></div>`;
+  return`<div class="taskbar accbar"><div><small>Учитель</small><b>${esc(a.name||'')}</b><span>Все работы открыты для проверки. Результаты не сохраняются.</span>${fl}</div><div class="tbtns"><a class="btn" href="#teacher">Кабинет учителя</a></div></div>`}
+let accTick=0;
+function worksGated(){
+  const back=cur&&cur.kind==='work';stop();cur=null;document.title='Лабораторные работы — Лаборатория Сириус';
+  const a=accLive(),st=a&&a.kind==='s',isDone=id=>st?a.done.includes(id):doneW.has(id);
+  const list=WORKS.map(w=>[w,wAccess(w.id)]).sort((x,y)=>(x[1]==='open'?0:1)-(y[1]==='open'?0:1));
+  const open=list.filter(x=>x[1]==='open').length,done=list.filter(x=>x[1]==='open'&&isDone(x[0].id)).length;
+  app.innerHTML=`<div class="view">`+header()+accBar()+`
+  <section class="hero"><h1>Лабораторные работы</h1><p>${a?'Берите приборы руками: взвешивайте, погружайте, подвешивайте грузы. Записывайте измерения в таблицу, считайте и делайте вывод.':'Работы откроются, когда вы войдёте по коду. Модели явлений на главной странице открыты всем.'}</p></section>
+  ${a?`<div class="progress"><span>Выполнено ${done} из ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div>`:''}
+  <div class="cards" id="cards">${list.map(([w,ac])=>{const lk=ac!=='open',dl=wDeadline(w.id),dn=isDone(w.id);return`
+    <a class="card ${dn&&!lk?'seen':''}${lk?' locked':''}" style="--c:${w.color}" href="${lk?'#works':'#work/'+w.id}"${lk?` data-locked="${ac}" aria-disabled="true"`:''}>
+      <div class="pb"><i></i></div>
+      <span class="tags"><span class="tag">Лабораторная работа № ${w.num}</span>${st&&!lk?'<span class="tag task">Открыта учителем</span>':''}</span>
+      <h2>${w.title}</h2><p>${w.goal}</p>
+      <div class="foot"><span class="meta"><span class="mrow">${lk?ICON.lock:ICON.flask}<span>${lk?(ac==='late'?'Срок сдачи прошёл':'Откроет учитель'):dl?'Сдать до '+fmtDT(dl):(w.need||w.rows)+' '+plural(w.need||w.rows,'опыт','опыта','опытов')}</span></span><span>${dn?(st?'✓ Отправлена учителю':'✓ Выполнена'):'Не выполнена'}</span></span><span class="go">${lk?'Закрыта':dn?'Повторить':'Начать'}</span></div>
+    </a>`}).join('')}</div>
+  <a class="tlinkfoot" href="#teacher"><span>Для учителя<small>Кабинет: классы, личные коды учеников, открытие работ и журнал результатов</small></span>${ICON.next}</a></div>`;
+  window.scrollTo(0,back?worksScroll:0);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
+  if(SRV==='on'&&a&&a.kind==='s'&&Date.now()-accTick>15000){accTick=Date.now();accRefresh().then(ch=>{if(ch&&location.hash==='#works')worksHome()})}
+}
+function lockedMsg(kind){const el=$('.accbar');if(!el)return;let f=el.querySelector('.aflash');if(!f){f=document.createElement('span');f.className='aflash';f.setAttribute('role','alert');el.firstElementChild.appendChild(f)}
+  f.textContent=lockText(kind)+(ACC?'':' Сначала войдите по коду.');f.classList.remove('flash');void f.offsetWidth;f.classList.add('flash');
+  window.scrollTo({top:0,behavior:'smooth'});const i=$('#scode');if(i)setTimeout(()=>i.focus({preventScroll:true}),300)}
+async function sLogin(){const inp=$('#scode'),er=$('#aerr'),code=inp.value.replace(/[\s-]/g,'');
+  if(code.length<6){er.textContent='Код — 6 букв и цифр.';inp.focus();return}
+  er.textContent='Входим…';
+  try{const r=await rpc('s_login',{p_code:code,p_device:devId()});if(r.err){er.textContent=errText(r.err);return}
+    ACC=r;saveAcc();SRV='on';accTick=Date.now();worksHome()}catch(_){er.textContent=errText('net')}}
+function sLogout(){if(ACC&&!confirm(ACC.kind==='s'?'Выйти? Чтобы снова войти, понадобится ваш личный код.':'Выйти из демо-режима?'))return;
+  if(ACC)rpc('logout',{p_token:ACC.token}).catch(()=>{});ACC=null;saveAcc();worksHome()}
+
+/* ----- кабинет учителя */
+const TC={cls:null,me:null,classes:[],demo:null,cd:null,jr:null,adm:null,sel:null,poll:0,newInv:null,newPw:null};
+function toast(t){let el=$('#toast');if(!el){el=document.createElement('div');el.id='toast';el.className='toast';el.setAttribute('role','status');document.body.appendChild(el)}
+  el.textContent=t;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),2600)}
+async function tcCall(fn,args){try{const r=await rpc(fn,Object.assign({p_token:ACC&&ACC.token},args));
+    if(r.err==='session'){ACC=null;saveAcc();toast(errText('session'));teacherHome();return null}
+    if(r.err){toast(errText(r.err));return null}return r}catch(_){toast(errText('net'));return null}}
+function offlineHTML(open){return`<details class="offl"${open?' open':''}><summary>Без интернета: задание по ссылке и проверка кодов</summary>
+    <div class="note f"><b>1. Задание по ссылке</b>
+      <label class="tfield">Название задания<input id="ttitle" maxlength="80" value="Лабораторные работы"></label>
+      <div class="tchecks" role="group" aria-label="Работы в задании">${WORKS.map(w=>`<label><input type="checkbox" value="${w.id}" checked><span>№ ${w.num}. ${w.title}</span></label>`).join('')}</div>
+      <div class="tools"><button class="btn main" data-act="tlink">${ICON.link}Создать ссылку</button></div>
+      <div class="tlink" id="tlinkbox" hidden><input id="tlinkout" readonly aria-label="Ссылка на задание"><button class="btn" data-act="tcopy">Копировать</button></div>
+      <p class="tmsg" id="tlinkmsg">Ссылка работает, когда сервер недоступен: по ней ученик сразу попадёт в первую работу задания.</p>
+    </div>
+    <div class="note f"><b>2. Проверка кодов результатов</b>
+      <p class="tmsg">Без сервера ученик получает код результата. Вставьте коды сюда, каждый с новой строки. Одинаковые показания приборов у разных учеников будут отмечены.</p>
+      <textarea id="tcodes" rows="5" placeholder="LS-…" aria-label="Коды результатов"></textarea>
+      <div class="tools"><button class="btn main" data-act="tverify">${ICON.check}Проверить коды</button></div>
+      <div id="tres"></div>
+    </div>
+    <div class="note f"><b>3. Журнал на этом устройстве</b>
+      <p class="tmsg">Проверенные коды сохраняются здесь.</p>
+      <div id="tjournal"></div>
+      <div class="tools"><button class="btn" data-act="jcsv">${ICON.dl}Скачать для Excel</button><button class="btn" data-act="jclear">Очистить журнал</button></div>
+    </div></details>`}
+function teacherHome(){
+  stop();cur=null;document.title='Для учителя — Лаборатория Сириус';
+  if(ACC&&ACC.kind==='t'&&SRV!=='off'){tcHome();return}
+  app.innerHTML=`<div class="view">`+header()+`
+  <section class="hero"><h1>Для учителя</h1><p>Кабинет учителя: классы, личные коды учеников, открытие лабораторных работ и журнал результатов.</p></section>
+  <main class="sheet tsheet">
+    ${SRV==='off'?'<div class="note"><b>Нет связи с сервером.</b> Кабинет сейчас недоступен. Задание по ссылке и проверка кодов внизу страницы работают и без интернета.</div>':''}
+    <div class="tauth">
+      <form class="note f" data-form="tlogin"><b>Вход</b>
+        <label class="tfield">Почта<input type="email" id="tle" autocomplete="username" maxlength="120" required></label>
+        <label class="tfield">Пароль<input type="password" id="tlp" autocomplete="current-password" maxlength="72" required></label>
+        <div class="tools"><button class="btn main" type="submit">Войти</button></div>
+        <p class="tmsg terr" id="tlerr" role="alert"></p>
+        <p class="tmsg">Забыли пароль? Напишите авторам проекта — они выдадут временный.</p></form>
+      <form class="note f" data-form="treg"><b>Регистрация учителя</b>
+        <p class="tmsg">Зарегистрироваться учителем можно только с кодом-приглашением от авторов проекта. Ученикам регистрация не нужна — они входят по личному коду.</p>
+        <label class="tfield">Код-приглашение<input id="tri" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX" required></label>
+        <label class="tfield">Как к вам обращаться<input id="trn" maxlength="80" autocomplete="name" placeholder="Например, Мария Ивановна" required></label>
+        <label class="tfield">Почта<input type="email" id="tre" maxlength="120" autocomplete="email" required></label>
+        <label class="tfield">Пароль — не короче 8 символов<input type="password" id="trp" minlength="8" maxlength="72" autocomplete="new-password" required></label>
+        <div class="tools"><button class="btn main" type="submit">Зарегистрироваться</button></div>
+        <p class="tmsg terr" id="trerr" role="alert"></p></form>
+    </div>
+    ${offlineHTML(SRV==='off')}
+  </main></div>`;
+  window.scrollTo(0,0);jRender();
+}
+async function tLogin(reg){const er=$(reg?'#trerr':'#tlerr');er.textContent=reg?'Регистрируем…':'Входим…';
+  try{const r=reg?await rpc('t_register',{p_invite:$('#tri').value,p_email:$('#tre').value,p_name:$('#trn').value,p_pass:$('#trp').value})
+      :await rpc('t_login',{p_email:$('#tle').value,p_pass:$('#tlp').value});
+    if(r.err){er.textContent=errText(r.err);return}
+    ACC={kind:'t',token:r.token,name:r.me.name,me:r.me};saveAcc();SRV='on';TC.cls=null;teacherHome()}
+  catch(_){er.textContent=errText('net')}}
+async function tcHome(){
+  app.innerHTML=`<div class="view">`+header()+`<section class="hero"><h1>Кабинет учителя</h1><p>Классы, личные коды учеников, открытие работ и журнал результатов.</p></section><main class="sheet tsheet" id="tc"><p class="gempty">Загружаем…</p></main></div>`;
+  window.scrollTo(0,0);clearInterval(TC.poll);TC.poll=setInterval(tcPoll,10000);await tcLoad()}
+async function tcLoad(){const r=await tcCall('t_me',{});if(!r){if(!$('#tc .tcme'))$('#tc').innerHTML=`<p class="gempty">${errText('net')}</p>`;return}
+  TC.me=r.me;TC.classes=r.classes;TC.demo=r.demo;ACC.name=r.me.name;ACC.me=r.me;saveAcc();
+  if(!TC.classes.some(c=>c.id===TC.cls)){TC.cls=(TC.classes[0]||{}).id||null;TC.cd=null;TC.jr=null;TC.sel=null}
+  tcRender();if(TC.cls)await tcClass();if(TC.me.admin)await tcAdmin()}
+function tcRender(){const m=TC.me,box=$('#tc');if(!box)return;
+  box.innerHTML=`<div class="taskbar tcme"><div><small>${m.admin?'Учитель · администратор':'Учитель'}</small><b>${esc(m.name)}</b><span>${esc(m.email)}</span></div>
+      <div class="tbtns"><button class="btn" data-k="pw">Сменить пароль</button><button class="btn" data-k="tout">Выйти</button></div></div>
+    <form class="note f tline" data-form="tpass" id="tpassf" hidden><b>Новый пароль</b>
+      <label class="tfield">Старый пароль<input type="password" id="tpo" autocomplete="current-password" required></label>
+      <label class="tfield">Новый пароль — не короче 8 символов<input type="password" id="tpn" minlength="8" maxlength="72" autocomplete="new-password" required></label>
+      <div class="tools"><button class="btn main" type="submit">Сохранить</button></div></form>
+    <h2 class="th2">Классы</h2>
+    <div class="chips tcls" role="group" aria-label="Классы">${TC.classes.map(c=>`<button class="chip" data-k="cls" data-id="${c.id}" aria-pressed="${c.id===TC.cls}">${esc(c.name)}<span class="n" title="вошли / всего учеников">${c.joined}/${c.students}</span></button>`).join('')}<button class="chip cadd" data-k="newcls" aria-pressed="false">+ Новый класс</button></div>
+    <form class="note f tline" data-form="tclass" id="tclassf"${TC.classes.length?' hidden':''}><b>${TC.classes.length?'Новый класс':'Создайте первый класс'}</b>
+      <div class="trow"><input id="tclassn" maxlength="40" placeholder="Например, 7Б" aria-label="Название класса" required><button class="btn main" type="submit">Создать класс</button></div></form>
+    <div id="tcclass">${TC.cls?'<p class="gempty">Загружаем класс…</p>':''}</div>
+    <h2 class="th2">Демо-код</h2><div class="note f" id="tcdemo">${tcDemoHTML()}</div>
+    ${m.admin?'<h2 class="th2">Администрирование</h2><div id="tcadm"><p class="gempty">Загружаем…</p></div>':''}
+    ${offlineHTML()}`;
+  jRender()}
+function tcDemoHTML(){const d=TC.demo&&Date.parse(TC.demo.expires)>srvNow()?TC.demo:null;
+  return`<p class="tmsg">Демо-код открывает все работы на время — например, чтобы показать сайт классу или коллегам. Результаты в демо-режиме не сохраняются. Код создаётся только здесь, в кабинете учителя.</p>`+
+    (d?`<div class="bigcode"><code>${d.code}</code><span>действует до ${fmtT(d.expires)}</span><button class="btn" data-k="copy" data-v="${d.code}">Копировать</button><button class="btn" data-k="demostop">Остановить</button></div>`
+      :`<div class="trow"><select id="tdmin" aria-label="Сколько действует демо-код"><option value="15">15 минут</option><option value="30">30 минут</option><option value="45" selected>45 минут</option><option value="90">90 минут</option></select><button class="btn main" data-k="demo">Создать демо-код</button></div>`)}
+async function tcClass(){const r=await tcCall('t_class',{p_class:TC.cls});if(!r)return;TC.cd=r;TC.jr={since:0,res:[],students:r.students,works:r.works};
+  tcClassRender();await tcPoll(true)}
+function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=TC.cd,ws=c.works;
+  box.innerHTML=`<div class="note f tclass"><div class="tchead"><b>${esc(c.class.name)}</b><span class="tbtns"><button class="btn" data-k="ren">Переименовать</button><button class="btn" data-k="delcls">Удалить класс</button></span></div>
+    <h3>Работы для класса</h3><p class="tmsg">Отметьте работы, которые ученики смогут открыть. Срок сдачи можно не ставить: после срока работа закроется сама. Модели явлений открыты всегда.</p>
+    <div class="twork">${WORKS.map(w=>{const o=ws.find(x=>x.work===w.id);return`<div class="twrow${o?' on':''}"><label class="twk"><input type="checkbox" data-wk="${w.id}"${o?' checked':''}><span>№ ${w.num}. ${w.title}</span></label>
+      <label class="tdl"><span>Срок</span><input type="datetime-local" data-wd="${w.id}" value="${o&&o.deadline?toLocalInput(o.deadline):''}"${o?'':' disabled'} aria-label="Срок сдачи: ${esc(w.title)}"></label></div>`}).join('')}</div>
+    <h3>Ученики</h3>
+    <p class="tmsg">Впишите учеников — каждого с новой строки. Хватит имени и первой буквы фамилии: полные фамилии сайту не нужны. Каждый получит личный код для входа.</p>
+    <form data-form="tadd"><textarea id="tnames" rows="3" placeholder="Анна К.&#10;Пётр С." aria-label="Имена учеников"></textarea><div class="tools"><button class="btn main" type="submit">Добавить учеников</button></div></form>
+    <div id="tcstud">${tcStudHTML()}</div>
+    <h3>Журнал результатов</h3><div id="tcj">${tcJHTML()}</div></div>`}
+function tcStudHTML(){const ss=TC.jr?TC.jr.students:TC.cd.students,codes=Object.fromEntries(TC.cd.students.map(s=>[s.id,s.code]));
+  if(!ss.length)return'<p class="gempty">Учеников пока нет — добавьте их выше.</p>';
+  return`<div class="tblwrap"><table class="res tst"><thead><tr><th>Ученик</th><th>Код для входа</th><th>Вход</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${ss.map(s=>`<tr><td>${esc(s.name)}</td><td><code class="scode">${codes[s.id]||''}</code></td>
+    <td>${s.joined?`<span class="jy">✓ вход ${fmtDT(s.joined)}</span>`:'<span class="jn">ещё нет входа</span>'}</td>
+    <td class="tact"><button class="mini" data-k="sreset" data-id="${s.id}" title="Разрешить вход с другого телефона или компьютера">Новое устройство</button><button class="mini" data-k="sren" data-id="${s.id}">Изменить имя</button><button class="mini del" data-k="sdel" data-id="${s.id}">Удалить</button></td></tr>`).join('')}</tbody></table></div>
+    <div class="tools"><button class="btn" data-k="copycodes">Копировать коды</button><button class="btn" data-k="printcodes">${ICON.doc}Распечатать карточки с кодами</button></div>
+    <p class="tmsg">Ученик входит на странице «Лабораторные работы»: вводит свой код один раз. Один код работает только на одном устройстве — если ученик сменил телефон, нажмите «Новое устройство».</p>`}
+const mCols=w=>w.cols.filter(c=>c.src==='m');
+function jrLatest(){const by={};(TC.jr?TC.jr.res:[]).forEach(r=>{if(r.ok)by[r.student+'|'+r.work]=r});return by}
+function jrFlags(r,by){const f=[],k=JSON.stringify(r.data&&r.data.r),w=WORKS.find(x=>x.id===r.work);
+  if(w&&w.vary&&r.data&&Array.isArray(r.data.r)&&r.data.r.length){const same=Object.values(by).filter(x=>x!==r&&x.work===r.work&&x.student!==r.student&&JSON.stringify(x.data&&x.data.r)===k).map(x=>stName(x.student));
+    if(same.length)f.push('Те же показания приборов, что у: '+same.join(', '))}
+  if(r.data&&r.data.sec>0&&r.data.sec<90)f.push('Выполнена очень быстро: '+r.data.sec+' с');
+  return f}
+const stName=id=>{const s=(TC.jr?TC.jr.students:[]).find(x=>x.id===id);return s?s.name:'—'};
+function tcJHTML(){const jr=TC.jr;if(!jr)return'';const by=jrLatest(),ss=jr.students;
+  const ws=WORKS.filter(w=>jr.works.some(x=>x.work===w.id)||jr.res.some(r=>r.work===w.id));
+  if(!ss.length||!ws.length)return`<p class="gempty">${!ss.length?'Добавьте учеников, и здесь появятся их результаты.':'Откройте классу хотя бы одну работу — результаты появятся здесь сами.'}</p>`;
+  const sel=TC.sel&&by[TC.sel];
+  return`<div class="tblwrap"><table class="res jtab"><thead><tr><th>Ученик</th>${ws.map(w=>`<th title="${esc(w.title)}">№ ${w.num}</th>`).join('')}<th>Сдано</th></tr></thead><tbody>${ss.map(s=>{let k=0;
+    const cells=ws.map(w=>{const r=by[s.id+'|'+w.id];if(!r)return'<td class="jn">—</td>';k++;const fl=jrFlags(r,by).length,t=r.data&&Array.isArray(r.data.t)?r.data.t:null;
+      return`<td class="jy${fl?' jw':''}"><button class="jcell" data-k="jsel" data-id="${s.id}|${w.id}" aria-pressed="${TC.sel===s.id+'|'+w.id}" title="${esc(w.title)} · ${fmtDT(r.at)}">${fl?'⚠':'✓'}${t?`<small>тест ${t[0]}/${t[1]}</small>`:''}</button></td>`}).join('');
+    return`<tr><td>${esc(s.name)}</td>${cells}<td><b>${k}</b></td></tr>`}).join('')}</tbody></table></div>
+    ${sel?tcDetail(sel,by):''}
+    <p class="tmsg jlive">${ICON.check}<span>Журнал обновляется сам каждые 10 секунд · <span class="jtime">${jr.at?'обновлено в '+new Date(jr.at).toLocaleTimeString(LOC):''}</span>. Нажмите на ✓ или ⚠, чтобы увидеть показания приборов.</span></p>
+    <div class="tools"><button class="btn" data-k="jcsv2">${ICON.dl}Скачать журнал для Excel</button></div>`}
+function tcDetail(r,by){const w=WORKS.find(x=>x.id===r.work),d=r.data||{},cols=w?mCols(w):[],fl=jrFlags(r,by),rows=Array.isArray(d.r)?d.r:[];
+  const num=v=>String(v).replace('.',LANG.code==='ru'?',':'.');
+  return`<div class="note f jdet"><b>${esc(stName(r.student))} · № ${w?w.num+'. '+w.title:r.work}</b>
+    <p class="tmsg">Сдано ${fmtDT(r.at)}${d.sec?` · время работы ${Math.floor(d.sec/60)} мин ${d.sec%60} с`:''}${d.a?` · проверок до успеха: ${d.a}`:''}${Array.isArray(d.t)?` · мини-тест ${d.t[0]} из ${d.t[1]}`:''}</p>
+    ${d.p?`<p class="tmsg">Результат с погрешностью: <b>${esc(d.p)}</b></p>`:''}
+    ${rows.length&&cols.length?`<div class="tblwrap"><table class="res"><thead><tr><th>№</th>${cols.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead><tbody>${rows.map((x,i)=>`<tr><td>${i+1}</td>${cols.map((c,j)=>`<td>${Array.isArray(x)&&x[j]!==undefined?num(x[j]):'—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
+    ${fl.length?`<ul class="jflags">${fl.map(f=>`<li>⚠ ${esc(f)}</li>`).join('')}</ul>`:''}</div>`}
+async function tcPoll(force){if(location.hash!=='#teacher'||!ACC||ACC.kind!=='t'){clearInterval(TC.poll);return}
+  if(!TC.cls||!TC.jr||(!force&&document.visibilityState==='hidden'))return;const cls=TC.cls;
+  let r;try{r=await rpc('t_journal',{p_token:ACC.token,p_class:cls,p_since:TC.jr.since})}catch(_){return}
+  if(!r||r.err||cls!==TC.cls||!TC.jr)return;const jr=TC.jr,before=JSON.stringify([jr.students,jr.works]);
+  r.results.forEach(x=>jr.res.push(x));if(jr.res.length)jr.since=jr.res[jr.res.length-1].id;
+  jr.students=r.students;jr.works=r.works;jr.at=Date.now();
+  const st=$('#tcstud');if(st&&JSON.stringify([jr.students,jr.works])!==before&&!st.contains(document.activeElement))st.innerHTML=tcStudHTML();
+  const c=TC.classes.find(x=>x.id===cls);if(c){c.students=jr.students.length;c.joined=jr.students.filter(s=>s.joined).length;const n=$(`.tcls [data-id="${cls}"] .n`);if(n)n.textContent=c.joined+'/'+c.students}
+  const j=$('#tcj');if(!j)return;
+  if(force||r.results.length||JSON.stringify([jr.students,jr.works])!==before){if(force||!j.contains(document.activeElement))j.innerHTML=tcJHTML()}
+  else{const t=j.querySelector('.jtime');if(t)t.textContent='обновлено в '+new Date(jr.at).toLocaleTimeString(LOC)}}
+async function tcWork(id){const box=$(`.twrow input[data-wk="${id}"]`),dl=$(`.twrow input[data-wd="${id}"]`);if(!box||!dl)return;
+  const open=box.checked,dv=open&&dl.value?new Date(dl.value):null;
+  if(dv&&dv.getTime()<Date.now()&&!confirm('Этот срок уже прошёл — работа сразу закроется для учеников. Сохранить?')){dl.value='';return}
+  const r=await tcCall('t_work_set',{p_class:TC.cls,p_work:id,p_open:open,p_deadline:dv?dv.toISOString():null});
+  if(!r){box.checked=!open;return}
+  TC.cd.works=r.works;if(TC.jr)TC.jr.works=r.works;
+  const row=box.closest('.twrow');row.classList.toggle('on',open);dl.disabled=!open;if(!open)dl.value='';
+  const w=WORKS.find(x=>x.id===id);toast(open?`Работа № ${w.num} открыта${dv?' до '+fmtDT(dv):''}`:`Работа № ${w.num} закрыта`);
+  const j=$('#tcj');if(j)j.innerHTML=tcJHTML()}
+function printCodes(){const c=TC.cd;if(!c||!c.students.length)return;const url=location.href.split('#')[0];
+  let el=$('#print');if(!el){el=document.createElement('div');el.id='print';document.body.appendChild(el)}
+  el.innerHTML=`<div class="pcards">${c.students.map(s=>`<div class="pcard"><small>Лаборатория Сириус · ${esc(c.class.name)}</small><b>${esc(s.name)}</b><code>${s.code}</code>
+    <p>1. Откройте ${esc(url)}<br>2. Раздел «Лабораторные работы»<br>3. Введите этот код. Никому его не показывайте.</p></div>`).join('')}</div>`;
+  document.body.classList.add('printing');
+  const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);
+  setTimeout(()=>window.print(),60)}
+function jCSV2(){const jr=TC.jr;if(!jr||!jr.res.length){toast('В журнале пока нет результатов.');return}const by=jrLatest();
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"',lines=[['Ученик','Работа','Когда','Мини-тест','Время, мин','Проверок','Показания приборов','Отметки'].map(q).join(';')];
+  Object.values(by).sort((a,b)=>stName(a.student).localeCompare(stName(b.student),'ru')||a.id-b.id).forEach(r=>{const w=WORKS.find(y=>y.id===r.work),d=r.data||{};
+    lines.push([stName(r.student),w?'№ '+w.num+'. '+w.title:r.work,fmtDT(r.at),Array.isArray(d.t)?d.t[0]+' из '+d.t[1]:'',d.sec?String(Math.round(d.sec/6)/10).replace('.',','):'',d.a||'',
+      (Array.isArray(d.r)?d.r:[]).map(x=>(Array.isArray(x)?x:[]).map(v=>String(v).replace('.',',')).join(' / ')).join(' · '),jrFlags(r,by).join('; ')].map(q).join(';'))});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='zhurnal-'+(TC.cd?TC.cd.class.name:'klass').replace(/[^\wА-Яа-яЁё-]+/g,'_')+'.csv';
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+/* администраторы: приглашения для учителей и список учителей */
+async function tcAdmin(){const r=await tcCall('a_overview',{});if(!r)return;TC.adm=r;tcAdminRender()}
+function tcAdminRender(){const box=$('#tcadm'),a=TC.adm;if(!box||!a)return;const now=srvNow();
+  box.innerHTML=`<div class="note f"><b>Приглашения для учителей</b>
+    <p class="tmsg">Учителем можно зарегистрироваться только по приглашению. Создайте код и передайте его учителю лично или в мессенджере. Один код — одна регистрация.</p>
+    <form data-form="ainv" class="tinv"><input id="ainote" maxlength="80" placeholder="Кому: например, Мария Ивановна, школа № 5" aria-label="Кому выдаётся приглашение">
+      <select id="aidays" aria-label="Срок действия"><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="30">30 дней</option></select>
+      <label class="chk"><input type="checkbox" id="aiadm"> тоже администратор</label><button class="btn main" type="submit">Создать приглашение</button></form>
+    ${TC.newInv?`<div class="bigcode"><code>${TC.newInv}</code><span>новое приглашение</span><button class="btn" data-k="copy" data-v="${TC.newInv}">Копировать</button></div>`:''}
+    ${a.invites.length?`<div class="tblwrap"><table class="res"><thead><tr><th>Код</th><th>Кому</th><th>Статус</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${a.invites.map(i=>`<tr><td><code class="scode">${i.code}</code>${i.admin?'<small> админ</small>':''}</td><td>${esc(i.note||'—')}</td>
+      <td>${i.used?`✓ ${esc(i.by||'')}`:Date.parse(i.expires)<now?'истёк':'действует до '+fmtDT(i.expires)}</td><td>${i.used?'':`<button class="mini del" data-k="idel" data-id="${i.code}">Удалить</button>`}</td></tr>`).join('')}</tbody></table></div>`:''}</div>
+    <div class="note f"><b>Учителя</b>
+    ${TC.newPw?`<div class="bigcode"><code>${esc(TC.newPw[1])}</code><span>временный пароль для ${esc(TC.newPw[0])} — передайте его учителю: пароль можно сменить в кабинете</span><button class="btn" data-k="copy" data-v="${esc(TC.newPw[1])}">Копировать</button></div>`:''}
+    <div class="tblwrap"><table class="res"><thead><tr><th>Учитель</th><th>Классов / учеников</th><th>Статус</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${a.teachers.map(t=>`<tr><td><b>${esc(t.name)}</b><small class="db">${esc(t.email)}</small></td><td>${t.classes} / ${t.students}</td>
+      <td>${t.blocked?'заблокирован':t.admin?'администратор':'активен'}</td><td class="tact">${t.id===TC.me.id?'<small>это вы</small>':`<button class="mini" data-k="tblock" data-id="${t.id}" data-v="${t.blocked?0:1}">${t.blocked?'Разблокировать':'Заблокировать'}</button><button class="mini" data-k="treset" data-id="${t.id}">Временный пароль</button>`}</td></tr>`).join('')}</tbody></table></div></div>`}
+async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
+  if(k==='slogout'){sLogout();return}
+  if(k==='copy'){copyText(t.dataset.v,t);return}
+  if(!ACC||ACC.kind!=='t')return;
+  if(k==='tout'){if(!confirm('Выйти из кабинета учителя?'))return;rpc('logout',{p_token:ACC.token}).catch(()=>{});ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null});teacherHome();return}
+  if(k==='pw'){const f=$('#tpassf');f.hidden=!f.hidden;if(!f.hidden)$('#tpo').focus();return}
+  if(k==='newcls'){const f=$('#tclassf');f.hidden=false;$('#tclassn').focus();return}
+  if(k==='cls'){if(id===TC.cls)return;TC.cls=id;TC.cd=null;TC.jr=null;TC.sel=null;document.querySelectorAll('.tcls [data-k="cls"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));$('#tcclass').innerHTML='<p class="gempty">Загружаем класс…</p>';await tcClass();return}
+  if(k==='ren'){const n=prompt('Новое название класса',TC.cd.class.name);if(!n||!n.trim())return;if(await tcCall('t_class_rename',{p_class:TC.cls,p_name:n})){await tcLoad()}return}
+  if(k==='delcls'){if(!confirm(`Удалить класс «${TC.cd.class.name}» вместе с учениками и их результатами? Это нельзя отменить.`))return;if(await tcCall('t_class_delete',{p_class:TC.cls})){TC.cls=null;toast('Класс удалён');await tcLoad()}return}
+  if(k==='sreset'){if(!confirm(`Разрешить «${stName(id)}» войти с другого устройства? На старом устройстве вход закроется.`))return;if(await tcCall('t_student_reset',{p_student:id})){toast('Готово: ученик может войти с нового устройства');await tcClass()}return}
+  if(k==='sren'){const n=prompt('Имя ученика',stName(id));if(!n||!n.trim())return;if(await tcCall('t_student_rename',{p_student:id,p_name:n}))await tcClass();return}
+  if(k==='sdel'){if(!confirm(`Удалить ученика «${stName(id)}» и все результаты ученика?`))return;if(await tcCall('t_student_delete',{p_student:id}))await tcClass();return}
+  if(k==='copycodes'){copyText(TC.cd.students.map(s=>s.name+' — '+s.code).join('\n'),t);return}
+  if(k==='printcodes'){printCodes();return}
+  if(k==='jsel'){TC.sel=TC.sel===id?null:id;$('#tcj').innerHTML=tcJHTML();const d=$('#tcj .jdet');if(d)d.scrollIntoView({behavior:'smooth',block:'nearest'});return}
+  if(k==='jcsv2'){jCSV2();return}
+  if(k==='demo'){const r=await tcCall('t_demo',{p_minutes:+$('#tdmin').value});if(r){TC.demo=r;$('#tcdemo').innerHTML=tcDemoHTML()}return}
+  if(k==='demostop'){if(await tcCall('t_demo_stop',{})){TC.demo=null;$('#tcdemo').innerHTML=tcDemoHTML();toast('Демо-код остановлен')}return}
+  if(k==='idel'){if(!confirm('Удалить неиспользованное приглашение '+id+'?'))return;if(await tcCall('a_invite_delete',{p_code:id})){TC.newInv=null;await tcAdmin()}return}
+  if(k==='tblock'){const on=t.dataset.v==='1';if(on&&!confirm('Заблокировать учителя? Учитель не сможет войти, а демо-код учителя перестанет действовать.'))return;if(await tcCall('a_teacher_block',{p_teacher:id,p_blocked:on}))await tcAdmin();return}
+  if(k==='treset'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!confirm(`Выдать временный пароль для ${tt.name}? Старый пароль перестанет работать.`))return;const r=await tcCall('a_teacher_reset',{p_teacher:id});if(r){TC.newPw=[tt.name,r.pass];tcAdminRender()}return}
+}
+async function formAct(kind,f){
+  if(kind==='slogin'){sLogin();return}
+  if(kind==='tlogin'){tLogin(false);return}
+  if(kind==='treg'){tLogin(true);return}
+  if(!ACC||ACC.kind!=='t')return;
+  if(kind==='tpass'){const r=await tcCall('t_password',{p_old:$('#tpo').value,p_new:$('#tpn').value});if(r){f.hidden=true;f.reset();toast('Пароль изменён')}return}
+  if(kind==='tclass'){const r=await tcCall('t_class_create',{p_name:$('#tclassn').value});if(r){TC.cls=r.id;TC.cd=null;toast('Класс создан');await tcLoad()}return}
+  if(kind==='tadd'){const names=$('#tnames').value.split(/\n/).map(s=>s.trim()).filter(Boolean);if(!names.length){$('#tnames').focus();return}
+    const r=await tcCall('t_students_add',{p_class:TC.cls,p_names:names});if(r){toast('Добавлено учеников: '+r.added);await tcClass();const c=TC.classes.find(x=>x.id===TC.cls);if(c){c.students=TC.cd.students.length;const n=$(`.tcls [data-id="${TC.cls}"] .n`);if(n)n.textContent=c.joined+'/'+c.students}}return}
+  if(kind==='ainv'){const r=await tcCall('a_invite',{p_note:$('#ainote').value,p_days:+$('#aidays').value,p_admin:$('#aiadm').checked});if(r){TC.newInv=r.code;await tcAdmin()}return}
+}
+app.addEventListener('submit',e=>{const f=e.target.closest('form[data-form]');if(!f)return;e.preventDefault();formAct(f.dataset.form,f)});
+app.addEventListener('change',e=>{const el=e.target;if(el.dataset.wk||el.dataset.wd){const id=el.dataset.wk||el.dataset.wd;if(el.dataset.wk&&el.checked){const d=$(`.twrow input[data-wd="${id}"]`);if(d)d.disabled=false}tcWork(id)}});
+
 function route(){
   const h=location.hash;let m;bigOff();
   if((m=h.match(/^#lab\/([\w-]+)$/))&&LABS.some(l=>l.id===m[1]))openLab(m[1]);
-  else if((m=h.match(/^#work\/([\w-]+)$/))&&WORKS.some(w=>w.id===m[1]))openWork(m[1]);
+  else if((m=h.match(/^#work\/([\w-]+)$/))&&WORKS.some(w=>w.id===m[1])){
+    if(SRV==='?'&&!ACC){waitHome();return}
+    const ac=wAccess(m[1]);if(ac!=='open'){FLASH=lockText(ac);location.replace('#works');return}
+    openWork(m[1])}
   else if((m=h.match(/^#task\/([A-Za-z0-9_-]+)$/))){let o=null;try{o=JSON.parse(b64d(m[1]))}catch(_){}
     const w=o&&Array.isArray(o.w)?o.w.filter((id,i,a)=>WORKS.some(x=>x.id===id)&&a.indexOf(id)===i):[];
     if(!w.length){location.replace('#works');return}
@@ -3170,7 +3547,7 @@ new MutationObserver(themeUpdate).observe(document.documentElement,{attributes:t
 document.addEventListener('visibilitychange',()=>{last=performance.now()});
 
 try{const th=localStorage.getItem('lab-sirius-theme');if(th==='light'||th==='dark')document.documentElement.dataset.theme=th}catch(_){}
-readColors();route();
+readColors();route();srvInit();
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 })();
 </script>
