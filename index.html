@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Лаборатория Сириус — физика 7 класса</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#5B3C9E">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Сириус">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -181,7 +187,16 @@ input[type=range]:focus-visible::-webkit-slider-thumb{outline:3px solid var(--br
 .wstatus{display:flex;gap:10px;align-items:center;margin:8px 2px 0;padding:8px 12px;min-height:46px;border-radius:14px;background:var(--soft);
   font-size:14px;font-weight:600;line-height:1.35;transition:background-color .25s}
 .wstatus .dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--lab);box-shadow:0 0 0 4px rgba(255,255,255,.5)}
-.wstatus.err{background:var(--pink)}.wstatus.err .dot{background:#C4245F}
+.wstatus.err{background:var(--pink)}
+.stage .bigx{display:none}
+.stage:fullscreen,.stage.big{position:fixed;inset:0;z-index:300;margin:0;border-radius:0;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:var(--surf)}
+.stage:-webkit-full-screen{position:fixed;inset:0;margin:0;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;background:var(--surf)}
+.stage:fullscreen canvas,.stage.big canvas,.stage:fullscreen .wstatus,.stage.big .wstatus{width:min(100%,calc((100vh - 100px)*1.6));flex:none}
+.stage:-webkit-full-screen canvas,.stage:-webkit-full-screen .wstatus{width:min(100%,calc((100vh - 100px)*1.6));flex:none}
+.stage:fullscreen .bigx,.stage.big .bigx,.stage:-webkit-full-screen .bigx{display:flex;align-items:center;justify-content:center;position:absolute;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));
+  width:44px;height:44px;border-radius:14px;border:2px solid var(--line);background:var(--surf);color:var(--ink);cursor:pointer;z-index:2}
+.stage .bigx svg{width:20px;height:20px}.wstatus.err .dot{background:#C4245F}
 .wstatus.ok{background:var(--okbg)}.wstatus.ok .dot{background:#6FA52A}
 .wstatus.flash{animation:pop .3s ease-out}
 .btn .cnt{background:rgba(27,42,10,.14);border-radius:999px;padding:1px 9px;font-size:13px;font-variant-numeric:tabular-nums}
@@ -235,6 +250,13 @@ table.res tr.flash td{animation:flash 1.4s ease-out}
 .taskline .tgo{flex:none;font-weight:700;font-size:14px;text-decoration:underline}.taskline:hover{background:rgba(255,255,255,.24)}
 .rescode a.btn{text-decoration:none}
 .vnote{color:var(--muted);font-size:14px}
+table.jtab td.jy{color:#367A55;font-weight:800;text-align:center}table.jtab td.jy small{display:block;color:var(--muted);font-weight:600;font-size:12px}
+table.jtab td.jn{color:var(--muted);text-align:center}table.jtab th{text-align:center}table.jtab td:first-child,table.jtab th:first-child{text-align:left}
+.mtest .tq{margin-top:14px}.mtest .tq>b{display:block}.mtest .tq label:has(input:disabled){cursor:default}
+.prec .pfields{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0 4px}.prec label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px;flex:1 1 180px}
+.prec input{font:inherit;font-weight:600;color:var(--ink);background:var(--surf);border:2px solid var(--lab);border-radius:12px;padding:9px 10px;max-width:220px}
+.prec input.ok{border-color:#367A55;background:rgba(54,122,85,.16)}.prec input.bad{border-color:#C4245F;background:rgba(196,36,95,.12)}
+#verdict ul.hints{margin:6px 0 0;padding-left:18px;font-size:14px}.vextra{margin:10px 0 0}
 table.res td.tnums{font-variant-numeric:tabular-nums;min-width:140px}table.res td.tnums small{display:block;color:#C4245F;font-weight:700;margin-top:4px}
 table.res tr.dup td{background:rgba(196,36,95,.08)}
 .graph{--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;background:var(--surf);border:2px solid var(--line);border-radius:24px;padding:16px 16px 10px;margin:0 6px}
@@ -2445,6 +2467,91 @@ function renderGraph(box,w,W){const G=w.graph,{pts,miss}=gData(w);box.textConten
   return svg}
 function wGraph(){if(!cur||cur.kind!=='work'||!cur.graph)return;const b=$('#wgraph');if(b)renderGraph(b,cur,b.clientWidth)}
 let gT=0;const wGraphSoon=()=>{clearTimeout(gT);gT=setTimeout(wGraph,250)};
+/* ---------- мини-тест после работы: ответы фиксируются при первой проверке и входят в код для учителя ---------- */
+const TESTS={
+  mass:[{q:'На какую чашу весов кладут взвешиваемое тело?',o:['На левую','На правую','На любую — разницы нет'],a:0},
+    {q:'Масса тела 250 г. Сколько это в килограммах?',o:['0,25 кг','2,5 кг','25 кг','0,025 кг'],a:0},
+    {q:'Весы уравновешены гирями 100 г, 20 г, 5 г и 200 мг. Какова масса тела?',o:['125,2 г','125,02 г','327 г','325 г'],a:0}],
+  volume:[{q:'Уровень воды был 60 мл, после погружения тела стал 85 мл. Каков объём тела?',o:['25 см³','85 см³','145 см³','60 см³'],a:0},
+    {q:'Как правильно снимать показания мензурки?',o:['Глаз на уровне воды, отсчёт по нижнему краю мениска','Смотреть сверху на поверхность воды','Отсчёт по верхнему краю воды у стенки'],a:0},
+    {q:'Сколько кубических сантиметров в 1 мл?',o:['1 см³','10 см³','100 см³','1000 см³'],a:0}],
+  density:[{q:'Тело массой 270 г имеет объём 100 см³. Какова его плотность?',o:['2,7 г/см³','27 г/см³','0,37 г/см³','270 г/см³'],a:0},
+    {q:'Плотность 7,8 г/см³ — это сколько в кг/м³?',o:['7800 кг/м³','780 кг/м³','78 кг/м³','0,0078 кг/м³'],a:0},
+    {q:'Стальной и алюминиевый кубики одинакового объёма. Масса какого больше?',o:['Стального','Алюминиевого','Массы одинаковые'],a:0}],
+  spring:[{q:'Сила 2 Н растянула пружину на 4 см. Какое будет удлинение при силе 3 Н?',o:['6 см','5 см','8 см','12 см'],a:0},
+    {q:'Сила 5 Н растягивает пружину на 0,1 м. Какова жёсткость пружины?',o:['50 Н/м','0,5 Н/м','5 Н/м','500 Н/м'],a:0},
+    {q:'Пружину динамометра заменили более жёсткой. Что станет с делениями шкалы?',o:['Станут ближе друг к другу','Станут дальше друг от друга','Не изменятся'],a:0}],
+  frictionw:[{q:'Почему брусок нужно тянуть равномерно?',o:['Тогда сила тяги равна силе трения','Так быстрее','Иначе динамометр сломается'],a:0},
+    {q:'На брусок положили груз, и его вес увеличился вдвое. Как изменится сила трения скольжения?',o:['Увеличится вдвое','Не изменится','Уменьшится вдвое'],a:0},
+    {q:'Как можно уменьшить силу трения?',o:['Смазать трущиеся поверхности','Положить на брусок груз','Сделать поверхность шероховатой'],a:0}],
+  buoy:[{q:'Вес тела в воздухе 3 Н, в воде — 2,2 Н. Чему равна выталкивающая сила?',o:['0,8 Н','5,2 Н','2,2 Н','3 Н'],a:0},
+    {q:'В какой жидкости на одно и то же тело действует бо́льшая выталкивающая сила?',o:['В солёной воде','В пресной воде','Сила одинаковая'],a:0},
+    {q:'Зависит ли выталкивающая сила от вещества тела, если объём одинаковый?',o:['Не зависит','Зависит: на тяжёлые тела она больше','Зависит: на лёгкие тела она больше'],a:0}],
+  leverw:[{q:'Слева на плече 10 см висит груз 3 Н. Какой груз нужно повесить справа на плечо 15 см?',o:['2 Н','4,5 Н','3 Н','1,5 Н'],a:0},
+    {q:'Что называют плечом силы?',o:['Кратчайшее расстояние от оси вращения до линии действия силы','Длину всего рычага','Расстояние между грузами'],a:0},
+    {q:'Как с помощью рычага получить выигрыш в силе?',o:['Приложить силу к длинному плечу','Приложить силу к короткому плечу','Сделать плечи равными'],a:0}],
+  eff:[{q:'Почему КПД наклонной плоскости меньше 100 %?',o:['Часть работы уходит на преодоление трения','Доска слишком короткая','Брусок слишком тяжёлый'],a:0},
+    {q:'Полезная работа 3 Дж, затраченная 4 Дж. Каков КПД?',o:['75 %','133 %','12 %','7 %'],a:0},
+    {q:'Даёт ли наклонная плоскость выигрыш в работе?',o:['Нет: выигрываем в силе, но проигрываем в расстоянии','Да, всегда','Да, если доска длинная'],a:0}],
+  small:[{q:'Почему метод рядов точнее, чем измерение одного тела?',o:['Ошибка измерения делится на число тел в ряду','Линейка становится длиннее','Тела в ряду становятся крупнее'],a:0},
+    {q:'50 дробинок в ряду заняли 15 см. Каков диаметр одной дробинки?',o:['3 мм','0,3 мм','30 мм','7,5 мм'],a:0},
+    {q:'Что ещё можно измерить методом рядов?',o:['Толщину листа книги','Массу яблока','Температуру воды'],a:0}],
+  floatw:[{q:'Тело массой 50 г при полном погружении вытесняет 40 см³ воды. Что с ним будет в воде?',o:['Утонет','Всплывёт','Будет плавать внутри воды'],a:0},
+    {q:'Почему стальной корабль не тонет?',o:['Он вытесняет так много воды, что архимедова сила уравновешивает силу тяжести','Сталь легче воды','Его держат волны'],a:0},
+    {q:'Пробирка плавает. Что будет, если насыпать в неё ещё песка?',o:['Она погрузится глубже','Она поднимется выше','Ничего не изменится'],a:0}]
+};
+/* цена деления и погрешность: прибор, единица, цена деления; col — какое показание записать с погрешностью, k — перевод в единицы прибора */
+const PREC={
+  volume:{dev:'мензурки',u:'мл',div:2,col:'V2',sym:'V₂'},
+  density:{dev:'мензурки',u:'мл',div:2,col:'V2',sym:'V₂'},
+  spring:{dev:'линейки',u:'см',div:.5,col:'dl',sym:'Δl'},
+  frictionw:{dev:'динамометра',u:'Н',div:.1,col:'F',sym:'Fтр',note:'Шкала динамометра — от 0 до 2 Н, длинные штрихи стоят у 0, 1 и 2 Н.'},
+  buoy:{dev:'динамометра',u:'Н',div:.1,col:'P1',sym:'P₁',note:'Шкала динамометра — от 0 до 2 Н, длинные штрихи стоят у 0, 1 и 2 Н.'},
+  eff:{dev:'линейки, которой измеряют высоту',u:'см',div:1,col:'h',k:100,sym:'h'},
+  small:{dev:'линейки',u:'мм',div:1,col:'L',sym:'L'},
+  floatw:{dev:'шкалы пробирки',u:'см³',div:2,col:'V',sym:'V'}
+};
+/* подсказки к частым ошибкам в вычисляемых столбцах */
+const CHINT={'mass.mkg':'в 1 кг 1000 г — массу в граммах разделите на 1000','spring.k':'удлинение переведите в метры: 1 см = 0,01 м',
+  'density.rg':'ρ = m / V, где V = V₂ − V₁','density.rk':'чтобы перевести г/см³ в кг/м³, умножьте на 1000',
+  'floatw.Ft':'массу переведите в килограммы (разделите на 1000) и умножьте на g = 9,8 Н/кг','floatw.Fa':'объём переведите в м³: 1 см³ = 0,000001 м³',
+  'eff.eta':'КПД = Aп / Aз · 100 %','eff.Ap':'Aп = P · h, высота в метрах','eff.Az':'Aз = F · l, длина доски в метрах',
+  'small.d':'d = L / n: длину ряда разделите на число тел','buoy.Fa':'Fₐ = P₁ − P₂: из веса в воздухе вычтите вес в жидкости',
+  'frictionw.r':'разделите силу трения на вес бруска','leverw.q1':'разделите F₁ на F₂','leverw.q2':'разделите l₂ на l₁','volume.V':'V = V₂ − V₁'};
+WORKS.forEach(w=>{w.test=TESTS[w.id]||[];w.prec=PREC[w.id]||null});
+let TLOCK=null;
+const pl3=(n,a,b,c)=>n+' '+plural(n,a,b,c);
+function errHint(w,c,n,e){if(!isFinite(n)||!isFinite(e)||!e)return CHINT[w.id+'.'+c.id]||'';
+  const tol=Math.max(c.tol||0,Math.abs(e)*.02),r=n/e,tip=CHINT[w.id+'.'+c.id];
+  for(const[k,t]of[[1000,'в 1000 раз больше'],[.001,'в 1000 раз меньше'],[100,'в 100 раз больше'],[.01,'в 100 раз меньше'],[10,'в 10 раз больше'],[.1,'в 10 раз меньше']])
+    if(Math.abs(r/k-1)<.04)return'значение '+t+' верного — проверьте перевод единиц'+(tip?': '+tip:'');
+  if(Math.abs(n-1/e)<=Math.max(.02*Math.abs(1/e),tol))return'похоже, вы разделили наоборот — поменяйте местами делимое и делитель';
+  if(Math.abs(n+e)<=tol)return'знак наоборот — из большего вычитайте меньшее';
+  if(Math.abs(n-e)<=Math.max(3*tol,Math.abs(e)*.06))return c.d>0?'почти верно — проверьте округление: оставьте '+pl3(c.d,'знак','знака','знаков')+' после запятой':'почти верно — пересчитайте и округлите до целых';
+  return tip||''}
+function testHTML(w){if(!w.test.length)return'';
+  return`<h2>Мини-тест</h2><div class="note f mtest" id="mtest"><p class="tmsg">${pl3(w.test.length,'вопрос','вопроса','вопросов')} по теме работы. Ответы засчитываются при первой проверке работы и попадают в код для учителя.</p>
+    ${w.test.map((t,qi)=>`<div class="quiz tq" role="radiogroup" aria-label="${t.q}"><b>${qi+1}. ${t.q}</b>${shuffled(t.o.length).map(i=>`<label><input type="radio" name="t${qi}" value="${i}"><span>${t.o[i]}</span></label>`).join('')}</div>`).join('')}</div>`}
+function precHTML(w){const p=w.prec;if(!p)return'';
+  return`<h2>Точность измерений</h2><div class="note f prec"><p>Определите по шкале цену деления ${p.dev} и погрешность измерения. Цена деления: возьмите два соседних числа на шкале, из большего вычтите меньшее и разделите на число делений между ними.${p.note?' '+p.note:''}</p>
+    <div class="pfields"><label>Цена деления, ${p.u}<input id="pdiv" inputmode="decimal" autocomplete="off"></label><label>Погрешность, ${p.u}<input id="perr" inputmode="decimal" autocomplete="off"></label></div>
+    <p class="tmsg">Погрешность измерения равна половине цены деления шкалы. Результат записывают так: ${p.sym} = значение ± погрешность.</p></div>`}
+/* проверка теста и погрешности; возвращает сообщения для итогового списка */
+function wCheckExtra(w,msgs){const out={};
+  if(w.test.length){const box=$('#mtest'),ans=w.test.map((t,qi)=>box.querySelector(`input[name="t${qi}"]:checked`));
+    if(TLOCK===null){const left=ans.filter(x=>!x).length;
+      if(left)msgs.push(`Ответьте на ${left===w.test.length?'вопросы':'оставшиеся вопросы'} мини-теста (осталось ${left}).`);
+      else{TLOCK=ans.map((x,qi)=>+x.value===w.test[qi].a?1:0);box.querySelectorAll('input').forEach(x=>x.disabled=true)}}
+    if(TLOCK!==null){w.test.forEach((t,qi)=>{const q=box.querySelectorAll('.tq')[qi];q.querySelectorAll('label').forEach(l=>{const v=+l.querySelector('input').value,ch=l.querySelector('input').checked;
+        l.classList.toggle('ok',v===t.a&&(ch||!TLOCK[qi]));l.classList.toggle('bad',ch&&v!==t.a)})});
+      out.test=[TLOCK.reduce((a,b)=>a+b,0),w.test.length]}}
+  const p=w.prec;if(p){const d=$('#pdiv'),e=$('#perr'),nd=num(d.value),ne=num(e.value);[d,e].forEach(x=>x.classList.remove('ok','bad'));
+    if(isNaN(nd)||isNaN(ne))msgs.push('Заполните цену деления и погрешность в разделе «Точность измерений».');
+    else{const okd=Math.abs(nd-p.div)<1e-9,oke=Math.abs(ne-p.div/2)<1e-9;d.classList.add(okd?'ok':'bad');e.classList.add(oke?'ok':'bad');
+      if(!okd)msgs.push(`Цена деления ${p.dev} определена неверно. Найдите два соседних числа шкалы, вычтите из большего меньшее и разделите на число делений между ними.`);
+      else if(!oke)msgs.push('Погрешность измерения — это половина цены деления.');
+      else{const r=T.find(x=>x.key!==null&&x.m);if(r){const k=p.k||1,v=r.m[p.col]*k;out.prec=`${p.sym} = ${String(+v.toFixed(2)).replace('.',',')} ± ${String(p.div/2).replace('.',',')} ${p.u}`}}}}
+  return out}
 
 /* ===================== APP ===================== */
 const app=$('#app');
@@ -2470,7 +2577,7 @@ const b64e=v=>{const b=new TextEncoder().encode(v);let t='';b.forEach(x=>t+=Stri
 const b64d=v=>{v=v.replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const t=atob(v),b=new Uint8Array(t.length);for(let i=0;i<t.length;i++)b[i]=t.charCodeAt(i);return new TextDecoder().decode(b)};
 function fnv(v){let h=0x811c9dc5;for(let i=0;i<v.length;i++){h^=v.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}return h.toString(36)}
 const SALT='lab-sirius-7';
-function makeCode(w,name,rows,d){const p=b64e(JSON.stringify({v:1,n:name,w:w.id,t:Math.round(Date.now()/60000),r:rows,d}));return'LS-'+p+'-'+fnv(p+SALT)}
+function makeCode(w,name,rows,d,s){const p=b64e(JSON.stringify({v:1,n:name,w:w.id,t:Math.round(Date.now()/60000),r:rows,d,s}));return'LS-'+p+'-'+fnv(p+SALT)}
 function readCode(c){const m=String(c).trim().match(/^LS-([A-Za-z0-9_-]+)-([0-9a-z]+)$/);if(!m)return null;let o;try{o=JSON.parse(b64d(m[1]))}catch(_){return null}
   if(!o||typeof o!=='object')return null;return{o,ok:fnv(m[1]+SALT)===m[2]}}
 function copyText(v,btn){const done=()=>{if(!btn)return;const o=btn.textContent;btn.textContent='Скопировано ✓';setTimeout(()=>{btn.textContent=o},1600)};
@@ -2497,6 +2604,9 @@ const ICON={
   lines:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square" aria-hidden="true"><path d="M3 6h22M3 11h22M3 16h22M3 21h12"/></svg>',
   flask:'<svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="15" r="13"/><path d="M12 8h6M13 8v5l-4.5 7.5a1.5 1.5 0 0 0 1.3 2.3h10.4a1.5 1.5 0 0 0 1.3-2.3L17 13V8"/><path d="M10.6 18h8.8"/></svg>',
   doc:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 2H5a1.5 1.5 0 0 0-1.5 1.5v11A1.5 1.5 0 0 0 5 16h8a1.5 1.5 0 0 0 1.5-1.5V6z"/><path d="M10.5 2v4h4M6.5 10h5M6.5 13h3"/></svg>',
+  full:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5v-4h4M15.5 6.5v-4h-4M2.5 11.5v4h4M15.5 11.5v4h-4"/></svg>',
+  shrink:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 2.5v4h-4M11.5 2.5v4h4M6.5 15.5v-4h-4M11.5 15.5v-4h4"/></svg>',
+  dl:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2.5v9M5 8l4 4 4-4M3 15.5h12"/></svg>',
   link:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 10.5a3 3 0 0 0 4.2 0l2.6-2.6a3 3 0 0 0-4.2-4.2L9 4.8"/><path d="M10.5 7.5a3 3 0 0 0-4.2 0L3.7 10.1a3 3 0 0 0 4.2 4.2L9 13.2"/></svg>',
   teacher:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4M21 9v5"/></svg>',
   hand:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10V4.5a1.5 1.5 0 0 1 3 0V9m0-1.5a1.5 1.5 0 0 1 3 0V9m0-.5a1.5 1.5 0 0 1 3 0V12a6 6 0 0 1-6 6h-.6a5 5 0 0 1-4-2L3 12.6a1.5 1.5 0 0 1 2.3-1.9L7 12.5"/></svg>'
@@ -2511,7 +2621,8 @@ function openMenu(){
   const items=[['#','Все явления',LABS.length+' '+plural(LABS.length,'модель','модели','моделей'),'Все',!inWorks&&filter==='Все']]
     .concat(CATS.slice(1).map((c,i)=>['#','Глава '+(i+1)+'. '+c,cnt(c)+' '+plural(cnt(c),'модель','модели','моделей'),c,!inWorks&&filter===c]))
     .concat([['#works','Лабораторные работы',WORKS.length+' работ · выполнено '+WORKS.filter(w=>doneW.has(w.id)).length,'',inWorks]])
-    .concat([['#teacher','Для учителя','Задание по ссылке и проверка результатов','',h==='#teacher']]);
+    .concat([['#teacher','Для учителя','Задание по ссылке и проверка результатов','',h==='#teacher']])
+    .concat([['#install','Установить на телефон','Значок на экране и работа без интернета','',h==='#install']]);
   menuEl.innerHTML=`<div class="menu-sheet" role="dialog" aria-modal="true" aria-label="Разделы"><button class="menu-x" data-m="close" aria-label="Закрыть меню">${ICON.close}</button><nav>${items.map(it=>`<a href="${it[0]}" data-cat="${it[3]}"${it[4]?' aria-current="page"':''}>${ICON.lines}<span>${it[1]}<small>${it[2]}</small></span></a>`).join('')}</nav></div>`;
   menuFocus=document.activeElement;menuEl.hidden=false;document.body.style.overflow='hidden';const a=menuEl.querySelector('[aria-current]')||menuEl.querySelector('a');if(a)a.focus();
 }
@@ -2521,6 +2632,7 @@ menuEl.addEventListener('click',e=>{
   const a=e.target.closest('a');if(!a)return;e.preventDefault();closeMenu();fromHome=false;
   if(a.getAttribute('href')==='#works'){location.hash='works';return}
   if(a.getAttribute('href')==='#teacher'){location.hash='teacher';return}
+  if(a.getAttribute('href')==='#install'){location.hash='install';return}
   filter=a.dataset.cat;try{sessionStorage.setItem('lab-sirius-filter',filter)}catch(_){}
   homeScroll=0;if(location.hash&&location.hash!=='#')location.hash='';else{setFilter(filter);window.scrollTo({top:0,behavior:'smooth'})}
 });
@@ -2594,10 +2706,50 @@ function teacherHome(){
       <div class="tools"><button class="btn main" data-act="tverify">${ICON.check}Проверить коды</button></div>
       <div id="tres"></div>
     </div>
+    <div class="note f"><b>3. Журнал класса</b>
+      <p class="tmsg">Проверенные коды сохраняются здесь, в журнале на этом устройстве. Видно, кто какие работы выполнил и как написал мини-тест.</p>
+      <div id="tjournal"></div>
+      <div class="tools"><button class="btn" data-act="jcsv">${ICON.dl}Скачать для Excel</button><button class="btn" data-act="jclear">Очистить журнал</button></div>
+    </div>
     <p class="hint">${ICON.teacher}<span>Сайт работает без сервера и не хранит данные учеников. Код защищает от ошибок при копировании и случайных изменений, но не от целенаправленной подделки.</span></p>
   </main></div>`;
-  window.scrollTo(0,0);
+  window.scrollTo(0,0);jRender();
 }
+/* установка на телефон и работа без интернета */
+let instEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;const b=$('#instbtn');if(b)b.hidden=false});
+const standalone=()=>(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+function installHome(){stop();cur=null;document.title='Установить — Лаборатория Сириус';
+  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  app.innerHTML=`<div class="view">`+header()+`
+  <section class="hero"><h1>Установить на телефон</h1><p>Значок «Сириус» появится на экране телефона, а сайт будет открываться и без интернета.</p></section>
+  <main class="sheet tsheet">
+    ${standalone()?'<div class="note ok"><b>Уже установлено.</b> Вы открыли «Сириус» с экрана телефона — он работает и без интернета.</div>':''}
+    <div class="note f"><b>Android и компьютер (Chrome, Edge, Яндекс Браузер)</b>
+      <div class="tools"><button class="btn main" id="instbtn" data-act="inst"${instEv?'':' hidden'}>${ICON.dl}Установить</button></div>
+      <ol><li>Откройте меню браузера (три точки).</li><li>Выберите «Установить приложение» или «Добавить на главный экран».</li></ol></div>
+    <div class="note f"><b>iPhone и iPad (Safari)</b><ol><li>Нажмите кнопку «Поделиться» — квадрат со стрелкой вверх.</li><li>Выберите «На экран „Домой“».</li><li>Нажмите «Добавить».</li></ol>${ios?'<p class="tmsg">Похоже, у вас iPhone или iPad — вам подходит этот способ.</p>':''}</div>
+    <p class="hint">${ICON.check}<span>Чтобы сайт работал без интернета, откройте его хотя бы один раз с интернетом. Новые версии подгружаются сами, когда интернет есть.</span></p>
+  </main></div>`;window.scrollTo(0,0)}
+/* журнал класса: проверенные коды на устройстве учителя */
+let JOURNAL=[];try{JOURNAL=JSON.parse(localStorage.getItem('lab-sirius-journal')||'[]').filter(x=>x&&x.c&&x.w)}catch(_){}
+function jSave(){try{localStorage.setItem('lab-sirius-journal',JSON.stringify(JOURNAL))}catch(_){}}
+function jAdd(list){let n=0;list.forEach(([c,o])=>{if(JOURNAL.some(x=>x.c===c))return;JOURNAL.push({c,n:String(o.n||'—').slice(0,60),w:o.w,t:+o.t||0,r:+o.r||0,d:Array.isArray(o.d)?o.d:[],s:Array.isArray(o.s)?o.s:null});n++});if(n)jSave();return n}
+const jWhen=t=>new Date(t*60000).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+function jRender(){const box=$('#tjournal');if(!box)return;
+  if(!JOURNAL.length){box.innerHTML='<p class="gempty">Журнал пока пуст — проверьте коды учеников выше, и они появятся здесь.</p>';return}
+  const names=[...new Set(JOURNAL.map(x=>x.n))].sort((a,b)=>a.localeCompare(b,'ru')),ws=WORKS.filter(w=>JOURNAL.some(x=>x.w===w.id));
+  const best=(n,w)=>JOURNAL.filter(x=>x.n===n&&x.w===w).sort((a,b)=>b.t-a.t)[0];
+  box.innerHTML=`<div class="tblwrap"><table class="res jtab"><thead><tr><th>Ученик</th>${ws.map(w=>`<th title="${esc(w.title)}">№ ${w.num}</th>`).join('')}<th>Всего</th></tr></thead><tbody>${names.map(n=>{let k=0;
+    const cells=ws.map(w=>{const e=best(n,w.id);if(!e)return'<td class="jn">—</td>';k++;return`<td class="jy" title="${esc(w.title)} · ${jWhen(e.t)}">✓${e.s?`<small>тест ${e.s[0]}/${e.s[1]}</small>`:''}</td>`}).join('');
+    return`<tr><td>${esc(n)}</td>${cells}<td><b>${k}</b></td></tr>`}).join('')}</tbody></table></div>
+    <p class="tmsg">${pl3(names.length,'ученик','ученика','учеников')}, ${pl3(JOURNAL.length,'проверенная работа','проверенные работы','проверенных работ')}. Наведите на ✓, чтобы увидеть название работы и время.</p>`}
+function jCSV(){if(!JOURNAL.length){$('#tjournal').innerHTML='<p class="gempty">Журнал пуст — сначала проверьте коды учеников.</p>';return}
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"',lines=[['Ученик','Работа','Когда','Опытов','Мини-тест','Показания приборов'].map(q).join(';')];
+  JOURNAL.slice().sort((a,b)=>a.n.localeCompare(b.n,'ru')||a.t-b.t).forEach(x=>{const w=WORKS.find(y=>y.id===x.w);
+    lines.push([x.n,w?'№ '+w.num+'. '+w.title:x.w,jWhen(x.t),x.r,x.s?x.s[0]+' из '+x.s[1]:'',x.d.map(r=>(Array.isArray(r)?r:[]).map(v=>String(v).replace('.',',')).join(' / ')).join(' · ')].map(q).join(';'))});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='zhurnal-laboratoriya-sirius.csv';
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function jClear(){if(!JOURNAL.length)return;if(!confirm('Очистить журнал класса на этом устройстве? Коды учеников можно будет проверить заново.'))return;JOURNAL=[];jSave();jRender()}
 function tLink(){const ids=[...document.querySelectorAll('.tchecks input:checked')].map(x=>x.value);
   if(!ids.length){$('#tlinkmsg').textContent='Отметьте хотя бы одну работу.';return}
   $('#tlinkout').value=location.href.split('#')[0]+'#task/'+b64e(JSON.stringify({t:$('#ttitle').value.trim()||'Лабораторные работы',w:ids}));
@@ -2606,11 +2758,13 @@ function tVerify(){const codes=$('#tcodes').value.split(/\s+/).filter(Boolean),o
   if(!codes.length){out.innerHTML='<p class="tmsg">Вставьте хотя бы один код.</p>';return}
   const all=codes.map(readCode),dkey=o=>Array.isArray(o.d)&&o.d.length?o.w+'|'+JSON.stringify(o.d):null;
   const fmtD=d=>Array.isArray(d)&&d.length?d.map(r=>(Array.isArray(r)?r:[]).map(x=>String(+x).replace('.',',')).join(' / ')).join(' · '):'—';
-  const rows=codes.map((c,i)=>{const r=all[i];if(!r)return`<tr><td colspan="5">Это не код результата: ${esc(c.slice(0,24))}${c.length>24?'…':''}</td><td>✗ ошибка</td></tr>`;
+  const rows=codes.map((c,i)=>{const r=all[i];if(!r)return`<tr><td colspan="6">Это не код результата: ${esc(c.slice(0,24))}${c.length>24?'…':''}</td><td>✗ ошибка</td></tr>`;
     const w=WORKS.find(x=>x.id===r.o.w),d=new Date((+r.o.t||0)*60000),n=+r.o.r||0,k=dkey(r.o);
     const same=k&&w&&w.vary?[...new Set(all.filter((o,j)=>o&&j!==i&&o.ok&&dkey(o.o)===k&&o.o.n!==r.o.n).map(o=>o.o.n))]:[];
-    return`<tr${same.length?' class="dup"':''}><td>${esc(r.o.n||'—')}</td><td>${w?'№ '+w.num+'. '+w.title:'неизвестная работа'}</td><td>${d.toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>${n} ${plural(n,'опыт','опыта','опытов')}</td><td class="tnums">${esc(fmtD(r.o.d))}${same.length?`<small>⚠ Те же числа, что у: ${esc(same.join(', '))}</small>`:''}</td><td>${r.ok?'✓ верный':'✗ изменён'}</td></tr>`});
-  out.innerHTML=`<div class="tblwrap"><table class="res"><thead><tr><th>Ученик</th><th>Работа</th><th>Когда</th><th>Опытов</th><th>Показания приборов</th><th>Код</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`}
+    return`<tr${same.length?' class="dup"':''}><td>${esc(r.o.n||'—')}</td><td>${w?'№ '+w.num+'. '+w.title:'неизвестная работа'}</td><td>${d.toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>${n} ${plural(n,'опыт','опыта','опытов')}</td><td>${Array.isArray(r.o.s)?r.o.s[0]+' из '+r.o.s[1]:'—'}</td><td class="tnums">${esc(fmtD(r.o.d))}${same.length?`<small>⚠ Те же числа, что у: ${esc(same.join(', '))}</small>`:''}</td><td>${r.ok?'✓ верный':'✗ изменён'}</td></tr>`});
+  out.innerHTML=`<div class="tblwrap"><table class="res"><thead><tr><th>Ученик</th><th>Работа</th><th>Когда</th><th>Опытов</th><th>Тест</th><th>Показания приборов</th><th>Код</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+  const added=jAdd(codes.map((c,i)=>[c.trim(),all[i]]).filter(([c,r])=>r&&r.ok&&WORKS.some(w=>w.id===r.o.w)).map(([c,r])=>[c,r.o]));
+  jRender();if(added)out.insertAdjacentHTML('beforeend',`<p class="tmsg">В журнал класса добавлено: ${pl3(added,'работа','работы','работ')}.</p>`)}
 function setFilter(c){
   filter=c;try{sessionStorage.setItem('lab-sirius-filter',c)}catch(e){}
   document.querySelectorAll('.chips .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cat===c));
@@ -2631,11 +2785,12 @@ function openLab(id){
     <h1>${l.title}</h1><p>${l.short}</p><span class="tag">${l.cat}</span>
   </section>
   <main class="sheet" style="--lab:${l.color}">
-    <div class="stage"><canvas id="cv" role="img" aria-label="Интерактивная модель: ${l.title}"></canvas><span class="paused">Пауза</span></div>
+    <div class="stage"><canvas id="cv" role="img" aria-label="Интерактивная модель: ${l.title}"></canvas><span class="paused">Пауза</span><button class="bigx" data-act="big" aria-label="Выйти из полноэкранного режима">${ICON.shrink}</button></div>
     <div class="tools">
       ${l.launch?`<button class="btn main" data-act="restart">${ICON.again}${l.launchLabel||'Запустить снова'}</button>`:''}
       <button class="btn ${l.launch?'':'main'}" data-act="pause" aria-pressed="false">${ICON.pause}<span>Пауза</span></button>
       <button class="btn" data-act="reset">${ICON.reset}Сбросить параметры</button>
+      <button class="btn" data-act="big">${ICON.full}На весь экран</button>
     </div>
     <div class="outs" id="outs" aria-live="off"></div>
     <h2>Настрой опыт</h2>
@@ -2658,7 +2813,7 @@ function tableHTML(w){
 }
 function openWork(id){
   if(!cur)worksScroll=window.scrollY;
-  stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};lastRes=null;WSEED=Math.floor(Math.random()*4294967296);cur.init(S);wSnap();
+  stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};lastRes=null;TLOCK=null;WSEED=Math.floor(Math.random()*4294967296);cur.init(S);wSnap();
   T=Array.from({length:cur.rows},()=>({key:null,k:{}}));
   const w=cur,idx=WORKS.indexOf(w),tw=inTask(w.id),tn=tw?taskNext(w.id):null,nx=WORKS.find(x=>x.id===tn)||WORKS[(idx+1)%WORKS.length];
   document.title=w.title+' — Лаборатория Сириус';
@@ -2669,12 +2824,13 @@ function openWork(id){
     ${tw?`<a class="taskline" href="#works"><span><small>Задание от учителя · работа ${TASK.w.indexOf(w.id)+1} из ${TASK.w.length}</small><b>${esc(TASK.t)}</b></span><span class="tgo">Все работы задания</span></a>`:''}
   </section>
   <main class="sheet" style="--lab:${w.color}">
-    <div class="stage work"><canvas id="cv" role="img" aria-label="Лабораторная установка: ${w.title}"></canvas><div class="wstatus" id="wmsg" role="status" aria-live="polite"><span class="dot" aria-hidden="true"></span><span class="tx"></span></div></div>
+    <div class="stage work"><canvas id="cv" role="img" aria-label="Лабораторная установка: ${w.title}"></canvas><div class="wstatus" id="wmsg" role="status" aria-live="polite"><span class="dot" aria-hidden="true"></span><span class="tx"></span></div><button class="bigx" data-act="big" aria-label="Выйти из полноэкранного режима">${ICON.shrink}</button></div>
     <p class="hint">${ICON.hand}<span>Берите предметы мышью или пальцем и переносите их. Можно и касаниями: коснитесь предмета, затем места, куда его поставить.</span></p>
     <div class="tools">
       <button class="btn main" data-act="rec">${ICON.rec}Записать измерение <span class="cnt" id="wcnt">0 / ${w.need||w.rows}</span></button>
       ${(w.actions||[]).map((a,i)=>`<button class="btn" data-wact="${i}">${a[0]}</button>`).join('')}
       <button class="btn" data-act="wreset">${ICON.again}Начать заново</button>
+      <button class="btn" data-act="big">${ICON.full}На весь экран</button>
     </div>
     <div class="outs" id="outs" aria-live="off"></div>
     <details class="note f steps" open><summary>Ход работы</summary>
@@ -2685,8 +2841,10 @@ function openWork(id){
     <div class="legend"><span><i class="lm"></i>показания приборов — записываются кнопкой</span><span><i class="lc"></i>вычислите и впишите сами</span></div>
     <div class="tblwrap"><table class="res" id="wtab">${tableHTML(w)}</table></div>
     ${w.graph?'<h2>График</h2><div class="graph" id="wgraph"></div>':''}
+    ${precHTML(w)}
     <h2>Вывод</h2>
     <div class="note f quiz" role="radiogroup" aria-label="${w.quiz.q}"><b>${w.quiz.q}</b>${shuffled(w.quiz.opts.length).map(i=>`<label><input type="radio" name="wq" value="${i}"><span>${w.quiz.opts[i]}</span></label>`).join('')}</div>
+    ${testHTML(w)}
     <label class="sname">Ученик<input id="sname" maxlength="60" autocomplete="name" placeholder="Фамилия Имя, класс" value="${esc(SNAME)}"><small>Попадёт в отчёт и в код результата для учителя</small></label>
     <div class="tools">
       <button class="btn main" data-act="check">${ICON.check}Проверить работу</button>
@@ -2723,7 +2881,7 @@ function wRecord(){
   wCount();wGraph();wToast('Опыт записан в строку '+(i+1)+'. Теперь вычислите значения в остальных столбцах.','ok');
 }
 function wCheck(){
-  const w=cur;let rows=0,bad=0,miss=0,norec=0,forged=0;
+  const w=cur;let rows=0,bad=0,miss=0,norec=0,forged=0;const hints=[];
   T.forEach((row,i)=>{const tr=wRow(i),v={};let any=false;
     const mins=w.cols.filter(c=>c.src==='m').map(c=>[c,tr.querySelector(`[data-c="${c.id}"]`)]);
     mins.forEach(([c,el])=>{el.classList.remove('bad');const n=num(el.value);v[c.id]=n;if(!isNaN(n))any=true});
@@ -2733,7 +2891,8 @@ function wCheck(){
     else mins.forEach(([c,el])=>{const q=10**c.d;if(!(Math.abs(num(el.value)-Math.round(row.m[c.id]*q)/q)<.5/q)){forged++;el.classList.add('bad')}});
     ins.forEach(([c,el])=>{const t=el.value.trim();if(!t){miss++;el.classList.add('bad');return}
       const n=num(t),e=c.f(v),tol=Math.max(c.tol||0,Math.abs(e)*.02);
-      if(isFinite(e)&&Math.abs(n-e)<=tol+1e-9)el.classList.add('ok');else{bad++;el.classList.add('bad')}})});
+      el.removeAttribute('title');
+      if(isFinite(e)&&Math.abs(n-e)<=tol+1e-9)el.classList.add('ok');else{bad++;el.classList.add('bad');const h=errHint(w,c,n,e);if(h){el.title=h;hints.push(`строка ${i+1}, «${c.label}»: ${h}`)}}})});
   const need=w.need||w.rows,q=document.querySelector('input[name="wq"]:checked'),qok=!!q&&+q.value===w.quiz.a;
   document.querySelectorAll('.quiz label').forEach(l=>l.classList.remove('ok','bad'));if(q)q.closest('label').classList.add(qok?'ok':'bad');
   const msgs=[];
@@ -2741,15 +2900,16 @@ function wCheck(){
   if(norec)msgs.push(`Строк, вписанных вручную: ${norec}. Показания приборов попадают в таблицу только кнопкой «Записать измерение» — у каждого ученика свои приборы и свои числа.`);
   if(forged)msgs.push('Показания в клетках, отмеченных красным, не совпадают с вашими приборами. Нажмите «Записать измерение» ещё раз или очистите строку.');
   if(miss)msgs.push('Заполните пустые клетки в столбцах для вычислений.');
-  if(bad)msgs.push(`Ошибок в вычислениях: ${bad}. Проверьте клетки, отмеченные красным. ${w.tip||''}`);
+  if(bad)msgs.push(`Ошибок в вычислениях: ${bad}. Проверьте клетки, отмеченные красным.`+(hints.length?'<ul class="hints">'+hints.slice(0,3).map(h=>`<li>${h[0].toUpperCase()+h.slice(1)}.</li>`).join('')+'</ul>':' '+(w.tip||'')));
   if(!q)msgs.push('Выберите ответ в разделе «Вывод».');else if(!qok)msgs.push('Ответ в разделе «Вывод» неверный — подумайте ещё.');
+  const ex=wCheckExtra(w,msgs);
   const el=$('#verdict');el.hidden=false;wGraph();
   if(!msgs.length){doneW.add(w.id);saveDone();const data=T.filter(r=>r.key!==null&&r.m).map(r=>w.cols.filter(c=>c.src==='m').map(c=>Math.round(r.m[c.id]*10**c.d)/10**c.d));
-    lastRes={w:w.id,rows,code:SNAME.trim()?makeCode(w,SNAME.trim(),rows,data):null};el.className='note ok';
+    lastRes={w:w.id,rows,test:ex.test||null,prec:ex.prec||null,code:SNAME.trim()?makeCode(w,SNAME.trim(),rows,data,ex.test):null};el.className='note ok';
     const tw=inTask(w.id);let tn=null;
     if(tw){if(lastRes.code){if(!TASK.done.includes(w.id))TASK.done.push(w.id);TASK.codes[w.id]=lastRes.code;setTask(TASK)}tn=taskNext(w.id)}
     const go=tw&&lastRes.code?(tn?`<a class="btn main" href="#work/${tn}">Следующая работа задания${ICON.next}</a>`:`<a class="btn main" href="#works">Задание выполнено — все коды${ICON.next}</a>`):'';
-    el.innerHTML=`<b>Работа выполнена!</b> ${w.concl}`+(lastRes.code?`<div class="rescode"><small>Код результата для учителя</small><code>${lastRes.code}</code><button class="btn" data-act="copycode">Копировать</button>${go}</div>`
+    el.innerHTML=`<b>Работа выполнена!</b> ${w.concl}`+(ex.prec||ex.test?`<p class="vextra">${ex.prec?`Результат с погрешностью (опыт 1): <b>${ex.prec}</b>.`:''}${ex.test?` Мини-тест: <b>${ex.test[0]} из ${ex.test[1]}</b>.`:''}</p>`:'')+(lastRes.code?`<div class="rescode"><small>Код результата для учителя</small><code>${lastRes.code}</code><button class="btn" data-act="copycode">Копировать</button>${go}</div>`
       :`<div class="rescode"><small>Впишите фамилию и имя в поле «Ученик» и нажмите «Проверить работу» ещё раз — появится код результата для учителя${tw?' и работа зачтётся в задании':''}.</small></div>`)}
   else{lastRes=null;el.className='note';el.innerHTML='<b>Почти готово.</b><ul>'+msgs.map(m=>`<li>${m}</li>`).join('')+'</ul>'}
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -2768,6 +2928,8 @@ function printReport(){
     <table><tr><th>№</th>${w.cols.map(c=>`<th>${c.label}</th>`).join('')}</tr>${rows.length?rows.map((r,i)=>`<tr><td>${i+1}</td>${r.map(x=>`<td>${esc(x.t)}${x.ok?' ✓':x.bad?' ✗':''}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${w.cols.length+1}">Измерения не записаны</td></tr>`}</table>
     ${w.graph?'<h3>График</h3><div id="pgraph" class="graph"></div>':''}
     <h3>Вывод</h3><p><i>${w.quiz.q}</i><br>${q?esc(w.quiz.opts[+q.value]):'Ответ не выбран.'}</p>
+    ${done&&lastRes.prec?`<h3>Точность измерений</h3><p>Результат с погрешностью (опыт 1): ${lastRes.prec}.</p>`:''}
+    ${done&&lastRes.test?`<p><b>Мини-тест:</b> ${lastRes.test[0]} из ${lastRes.test[1]}.</p>`:''}
     ${done?`<p>${w.concl}</p><p class="pv"><b>Работа выполнена и проверена на сайте.</b>${lastRes.code?`<br>Код результата: <code>${lastRes.code}</code>`:''}</p>`:'<p class="pv">Работа ещё не проверена на сайте.</p>'}
     <p class="pf">Лаборатория Сириус · ${esc(location.href.split('#')[0])}</p>`;
   {const pg=$('#pgraph');if(pg&&!renderGraph(pg,w,620)){pg.previousElementSibling.remove();pg.remove()}}
@@ -2793,6 +2955,15 @@ function changed(id){
   const r=cur.restartOn;
   if(r==='all'||(Array.isArray(r)&&r.includes(id)))cur.init(S,P);
 }
+/* режим «на проекторе»: установка на весь экран; если браузер не умеет (iPhone) — растягиваем её стилями */
+const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
+function toggleBig(){const st=$('.stage');if(!st)return;
+  if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document);return}
+  if(st.classList.contains('big')){st.classList.remove('big');document.body.style.overflow='';setTimeout(sizeCanvas,30);return}
+  const rq=st.requestFullscreen||st.webkitRequestFullscreen,fb=()=>{st.classList.add('big');document.body.style.overflow='hidden';setTimeout(sizeCanvas,30)};
+  if(!rq){fb();return}try{const p=rq.call(st);if(p&&p.catch)p.catch(fb)}catch(_){fb()}}
+function bigOff(){if(fsEl())try{(document.exitFullscreen||document.webkitExitFullscreen).call(document)}catch(_){}const st=$('.stage.big');if(st){st.classList.remove('big');document.body.style.overflow=''}}
+['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,()=>setTimeout(sizeCanvas,60)));
 function sizeCanvas(){
   if(!cv||!g)return;const dpr=Math.min(window.devicePixelRatio||1,2.5),w=cv.clientWidth||W;
   const pw=Math.round(w*dpr),ph=Math.round(w*dpr*H/W);
@@ -2843,6 +3014,7 @@ app.addEventListener('click',e=>{
     t.innerHTML=th==='dark'?ICON.sun:ICON.moon;t.setAttribute('aria-label',th==='dark'?'Светлая тема':'Тёмная тема');return}
   if(t.dataset.act==='home'){if(cur)goHome();else if(location.hash&&location.hash!=='#')location.hash='';else window.scrollTo({top:0,behavior:'smooth'});return}
   {const ac=t.dataset.act;
+   if(ac==='big'){toggleBig();return}if(ac==='inst'&&instEv){instEv.prompt();instEv.userChoice.finally(()=>{instEv=null;t.hidden=true});return}if(ac==='jcsv'){jCSV();return}if(ac==='jclear'){jClear();return}
    if(ac==='tlink'){tLink();return}if(ac==='tcopy'){copyText($('#tlinkout').value,t);return}if(ac==='tverify'){tVerify();return}
    if(ac==='taskoff'){setTask(null);showAllW=false;worksHome();return}
    if(ac==='showall'){showAllW=!showAllW;worksHome();return}
@@ -2873,12 +3045,13 @@ app.addEventListener('input',e=>{
 });
 document.addEventListener('keydown',e=>{
   if(!cur||e.altKey||e.ctrlKey||e.metaKey)return;const tag=(e.target.tagName||'').toLowerCase();
+  if(e.key==='Escape'&&$('.stage.big')){toggleBig();return}
   if(e.key==='Escape'&&cur.kind==='work'&&S.sel){S.sel=null;return}
   if(e.key==='Escape'){if(tag!=='input'||cur.kind!=='work')goHome();return}
   if(e.key===' '&&cur.kind!=='work'&&tag!=='input'&&tag!=='button'&&tag!=='a'){e.preventDefault();setPaused(!paused)}
 });
 function route(){
-  const h=location.hash;let m;
+  const h=location.hash;let m;bigOff();
   if((m=h.match(/^#lab\/([\w-]+)$/))&&LABS.some(l=>l.id===m[1]))openLab(m[1]);
   else if((m=h.match(/^#work\/([\w-]+)$/))&&WORKS.some(w=>w.id===m[1]))openWork(m[1]);
   else if((m=h.match(/^#task\/([A-Za-z0-9_-]+)$/))){let o=null;try{o=JSON.parse(b64d(m[1]))}catch(_){}
@@ -2887,6 +3060,7 @@ function route(){
     if(!TASK||TASK.k!==m[1])setTask({k:m[1],t:String(o.t||'Лабораторные работы').slice(0,80),w,done:[],codes:{}});
     showAllW=false;location.replace('#work/'+(taskNext(null)||w[0]));return}
   else if(h==='#teacher'){fromHome=false;teacherHome()}
+  else if(h==='#install'){fromHome=false;installHome()}
   else if(h==='#works'){fromHome=false;worksHome()}
   else{fromHome=false;home()}
 }
@@ -2915,6 +3089,7 @@ document.addEventListener('visibilitychange',()=>{last=performance.now()});
 
 try{const th=localStorage.getItem('lab-sirius-theme');if(th==='light'||th==='dark')document.documentElement.dataset.theme=th}catch(_){}
 readColors();route();
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 })();
 </script>
 </body>

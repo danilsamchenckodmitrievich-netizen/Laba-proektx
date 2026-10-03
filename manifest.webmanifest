@@ -1,0 +1,15 @@
+{
+  "name": "Лаборатория Сириус — физика 7 класса",
+  "short_name": "Сириус",
+  "description": "Интерактивные модели и лабораторные работы по физике 7 класса",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FBFBF7",
+  "theme_color": "#5B3C9E",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
