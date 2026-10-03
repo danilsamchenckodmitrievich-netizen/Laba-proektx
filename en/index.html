@@ -121,6 +121,14 @@ a.btn{color:inherit;text-decoration:none}
 .btn svg{width:18px;height:18px;flex:none}
 .btn.main{background:var(--lime);border-color:var(--lime);color:#1B2A0A}
 @media(hover:hover){.btn:not(.main):hover{border-color:var(--muted)}}
+.meas{margin:14px 6px 0;padding:12px 16px 14px;border-radius:18px;border:2px dashed var(--lab);background:var(--soft)}
+.meas h3{margin:0 0 8px;font-size:15px}
+.meas .mv{display:flex;flex-wrap:wrap;gap:8px 24px}
+.meas .mv span{font-size:13px;color:var(--muted);line-height:1.25}
+.meas .mv b{display:block;font-size:22px;font-weight:700;color:var(--ink,inherit);font-variant-numeric:tabular-nums;margin-top:2px}
+.meas small{display:block;margin-top:8px;color:var(--muted);font-size:13px}
+.meas.flash{animation:measin .5s ease}
+@keyframes measin{from{transform:scale(.98);opacity:.4}to{transform:none;opacity:1}}
 .outs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 6px}
 .out{background:var(--soft);border-radius:18px;padding:12px 14px;min-width:0}
 .out small{display:block;color:var(--muted);font-size:13px;line-height:1.25}
@@ -2626,6 +2634,7 @@ const ICON={
   pause:'<svg viewBox="0 0 18 18" fill="currentColor" aria-hidden="true"><rect x="4" y="3" width="3.5" height="12" rx="1.2"/><rect x="10.5" y="3" width="3.5" height="12" rx="1.2"/></svg>',
   again:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9a6 6 0 1 0 2-4.47"/><path d="M3 3v4h4"/></svg>',
   reset:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M3 5h12M3 9h12M3 13h12"/><circle cx="6" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="9" r="1.6" fill="currentColor"/><circle cx="8" cy="13" r="1.6" fill="currentColor"/></svg>',
+  meas:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12.5a6.5 6.5 0 0 1 13 0"/><path d="M9 12.5l3-4"/><path d="M4.5 9.5l1 .6M9 6v1.2M13.5 9.5l-1 .6"/></svg>',
   loupe:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5"/><path d="M11.3 11.3L16 16M5.5 7.5h4M7.5 5.5v4"/></svg>',
   next:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4l6 6-6 6"/></svg>',
   rec:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="13" height="13" rx="2.5"/><path d="M2.5 7h13M7 7v8.5"/></svg>',
@@ -2864,15 +2873,17 @@ function openWork(id){
     <p class="hint">${ICON.hand}<span>Pick up objects with the mouse or your finger and move them. You can also tap: tap an object, then the place where you want to put it.</span></p>
     <div class="tools">
       <button class="btn main" data-act="rec">${ICON.rec}Record measurement <span class="cnt" id="wcnt">0 / ${w.need||w.rows}</span></button>
+      ${w.manual?`<button class="btn" data-act="meas">${ICON.meas}Measure</button>`:''}
       ${(w.actions||[]).map((a,i)=>`<button class="btn" data-wact="${i}">${a[0]}</button>`).join('')}
       <button class="btn" data-act="wreset">${ICON.again}Start over</button>
       <button class="btn" data-act="loupe" aria-pressed="false">${ICON.loupe}Magnifier</button>
       <button class="btn" data-act="big">${ICON.full}Full screen</button>
     </div>
+    <div class="meas" id="wmeas" role="status" aria-live="polite" hidden></div>
     <div class="outs" id="outs" aria-live="off"></div>
     <details class="note f steps" open><summary>Procedure</summary>
       <p><b>Equipment:</b> ${wEquip(w)}.</p>
-      ${w.manual?'<p class="vnote">The “Record measurement” button saves the experiment, but you read the instrument scales yourself and enter the readings in the cells with a dashed border. If the divisions are hard to see, turn on the magnifier.</p>':''}
+      ${w.manual?'<p class="vnote">The “Record measurement” button saves the experiment, but you enter the instrument readings in the cells with a dashed border yourself. Read them from the scales; if the divisions are hard to see, turn on the magnifier or press “Measure” — the readings will appear below the setup.</p>':''}
       ${w.vary?'<p class="vnote">Every student has their own variant: the sizes of the bodies and the properties of the instruments differ slightly, so everyone’s numbers in the table are different.</p>':''}
       <ol>${w.steps.map(t=>`<li>${t}</li>`).join('')}</ol></details>
     <h2>Results table</h2>
@@ -2921,6 +2932,12 @@ function wRecord(){
   wCount();wGraph();wToast(cur.manual?'Experiment recorded in row '+(i+1)+'. Read the instruments and enter the readings in the table.':'Experiment recorded in row '+(i+1)+'. Now calculate the values in the other columns.','ok');
   if(cur.manual){const el=tr.querySelector('input.rd');if(el&&matchMedia('(hover:hover)').matches)el.focus({preventScroll:true})}
 }
+function wMeasure(){
+  const r=cur.read(S);if(!r||r.err){wToast(r?r.err:'Nothing to measure yet.','err');return}
+  const el=$('#wmeas'),dg=t=>t>=1?0:t>=.1?1:2;
+  el.innerHTML='<h3>Instrument readings</h3><div class="mv">'+cur.cols.filter(c=>c.rt).map(c=>`<span>${c.label}<b>${f1(Math.round(r.m[c.id]/c.rt)*c.rt,dg(c.rt))}</b></span>`).join('')+
+    '</div><small>They are not entered in the table — press “Record measurement” and enter them yourself.</small>';
+  el.hidden=false;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}
 function wCheck(){
   const w=cur;let rows=0,bad=0,miss=0,norec=0,forged=0,unread=0,misread=0;const hints=[],rhints=[];
   T.forEach((row,i)=>{const tr=wRow(i),v={};let any=false;
@@ -2989,7 +3006,7 @@ function printReport(){
   const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);
   setTimeout(()=>window.print(),60);
 }
-function wRestart(){cur.init(S);wSnap();updateOuts();statusUntil=0;wHintTick()}
+function wRestart(){cur.init(S);{const m=$('#wmeas');if(m)m.hidden=true}wSnap();updateOuts();statusUntil=0;wHintTick()}
 function controlHTML(p){
   if(p.type==='seg')return `<div class="ctl"><div class="r"><span>${p.label}</span></div><div class="seg" role="group" aria-label="${p.label}" data-seg="${p.id}">${p.options.map(o=>`<button data-v="${o[0]}" aria-pressed="${o[0]===P[p.id]}">${o[1]}</button>`).join('')}</div></div>`;
   return `<div class="ctl"><label class="r" for="p_${p.id}"><span>${p.label}</span><span class="val" id="v_${p.id}">${fmtVal(p,P[p.id])}</span></label><input type="range" id="p_${p.id}" data-p="${p.id}" min="${p.min}" max="${p.max}" step="${p.step}" value="${P[p.id]}"></div>`;
@@ -3088,7 +3105,7 @@ app.addEventListener('click',e=>{
   if(t.dataset.cat){setFilter(t.dataset.cat);return}
   if(!cur)return;
   if(cur.kind==='work'){const a=t.dataset.act;
-    if(a==='rec')wRecord();else if(a==='wreset')wRestart();else if(a==='check')wCheck();
+    if(a==='rec')wRecord();else if(a==='meas')wMeasure();else if(a==='wreset')wRestart();else if(a==='check')wCheck();
     else if(a==='report')printReport();else if(a==='copycode'){if(lastRes&&lastRes.code)copyText(lastRes.code,t)}
     else if(a==='tclear'){T.forEach((r,i)=>wClearRow(i));$('#verdict').hidden=true}
     else if(a==='rowclr')wClearRow(+t.dataset.r);

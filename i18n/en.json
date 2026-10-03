@@ -1307,5 +1307,9 @@
  "Показания прочитаны неверно: ": "Incorrect readings: ",
  ". Посмотрите на шкалу ещё раз.": ". Look at the scale again.",
  "Лупа включена: коснитесь шкалы или наведите на неё мышь.": "Magnifier on: touch the scale or move the mouse over it.",
- "Прочитайте по шкале": "Read from the scale"
+ "Прочитайте по шкале": "Read from the scale",
+ "Измерить": "Measure",
+ "Пока нечего измерять.": "Nothing to measure yet.",
+ "В таблицу они не записываются — нажмите «Записать измерение» и впишите их сами.": "They are not entered in the table — press “Record measurement” and enter them yourself.",
+ "Кнопка «Записать измерение» запоминает опыт, а показания приборов вы вписываете в клетки с пунктирной рамкой сами. Читайте их по шкале; если деления трудно разглядеть, включите лупу или нажмите «Измерить» — показания появятся под установкой.": "The “Record measurement” button saves the experiment, but you enter the instrument readings in the cells with a dashed border yourself. Read them from the scales; if the divisions are hard to see, turn on the magnifier or press “Measure” — the readings will appear below the setup."
 }
