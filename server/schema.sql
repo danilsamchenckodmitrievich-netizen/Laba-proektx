@@ -111,9 +111,9 @@ begin
   return coalesce(nullif(split_part(coalesce(h::json->>'cf-connecting-ip', h::json->>'x-forwarded-for', ''), ',', 1), ''), 'local');
 exception when others then return 'local'; end $$;
 
--- слишком много неудачных попыток входа с одного адреса за 10 минут
+-- слишком много неудачных попыток входа с одного адреса за 10 минут (у класса часто один адрес на всех)
 create or replace function lab.too_many() returns boolean language sql stable set search_path = '' as $$
-  select count(*) >= 30 from lab.login_fails where ip = lab.ip() and at > now() - interval '10 minutes' $$;
+  select count(*) >= 100 from lab.login_fails where ip = lab.ip() and at > now() - interval '10 minutes' $$;
 
 create or replace function lab.fail() returns void language sql set search_path = '' as $$
   delete from lab.login_fails where at < now() - interval '1 day';
