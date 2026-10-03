@@ -331,7 +331,7 @@ table.res tr.dup td{background:rgba(196,36,95,.08)}
 .tcls .cadd{background:none;border:2px dashed var(--line)}
 .trow{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .trow input,.trow select,.tinv input,.tinv select{font:inherit;font-weight:500;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;min-width:0}
-.trow input{flex:1 1 180px}
+.trow>input{flex:1 1 180px}.trow .tfield input{flex:none;width:100%}
 .tclass h3{margin:22px 0 4px;font-size:18px}
 .tchead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}.tchead>b{font-size:24px}.tchead .tbtns{display:flex;flex-wrap:wrap;gap:8px}.tchead .btn{padding:8px 14px}
 .twork{display:grid;gap:8px;margin-top:10px}
@@ -368,6 +368,25 @@ small.db{display:block;color:var(--muted);font-weight:500}
 @media print{body.printing #print .pcards{display:grid;grid-template-columns:1fr 1fr;gap:8mm}
   #print .pcard{border:1px dashed #888;border-radius:6px;padding:6mm;break-inside:avoid}#print .pcard small{display:block;color:#555;font-size:9pt}
   #print .pcard b{display:block;font-size:14pt;margin:2mm 0}#print .pcard code{display:block;font-size:20pt;font-weight:800;letter-spacing:.12em;margin:2mm 0 3mm;word-break:normal}#print .pcard p{font-size:9pt;margin:0}}
+.stth{margin:22px 22px 10px}.stlist{display:grid;gap:10px;margin:0 20px 18px}
+.strow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:20px;background:var(--surf);border:2px solid var(--line)}
+.strow b{display:block;font-size:17px}.strow span{color:var(--muted);font-size:14px}.strow .btn{padding:10px 18px;text-decoration:none}.strow.st-new{border-color:var(--brand)}
+.stres{font-weight:700;color:var(--ink)!important;font-size:15px!important}.stres b{color:#367A55}
+.ttbar{position:sticky;top:0;z-index:20;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin:0;padding:10px 22px;background:var(--brand);color:#fff;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.12)}
+.ttime{font-size:18px;font-variant-numeric:tabular-nums}.ttime.warn{color:#FFD24D}.tsave{margin-left:auto;font-weight:600;opacity:.85;font-size:14px}
+.ttest{margin-top:10px}.tq .tqn{display:block;color:var(--muted);font-size:14px}.tqt{font-size:18px;font-weight:600;margin:6px 0 12px;line-height:1.45;-webkit-user-select:none;user-select:none}
+.topts{display:grid;gap:8px}.topts label{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:var(--surf);cursor:pointer;line-height:1.35;-webkit-user-select:none;user-select:none}
+.topts label:has(input:checked){border-color:var(--brand);background:rgba(91,60,158,.08)}.topts input{width:20px;height:20px;margin:0;accent-color:var(--brand);flex:none}
+.tin{width:100%;max-width:420px;font:inherit;font-size:18px;font-weight:600;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:12px 14px}.tin:focus{border-color:var(--brand);outline:none}
+.thint{display:block;margin-top:8px;color:var(--muted);font-size:13px}.tleave{margin:12px 6px 0;padding:12px 16px;border-radius:16px;background:rgba(196,36,95,.12);color:#C4245F;font-weight:700}
+.tbig{font-size:22px;margin:10px 0}
+table.jtab td.jx{color:#C4245F;font-weight:800;text-align:center}td.jfl{color:#B5531A;font-weight:600;font-size:13px;min-width:160px}
+.tedit .tfield input,.tedit textarea,.teq select,.teo input:not([type]),.tev input{font:inherit;font-weight:500;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:12px;padding:9px 12px;min-width:0}
+.tedit textarea{display:block;width:100%;resize:vertical;margin-top:8px}.tedit .tnums .tfield{flex:1 1 200px;margin:6px 0}
+.teq{margin:14px 0;padding:14px;border-radius:18px;background:var(--surf);border:2px solid var(--line)}
+.teqh{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}.teqh b{font-size:16px}.teqh .tact{margin-left:auto}
+.teopts{display:grid;gap:8px;margin-top:10px}.teo{display:flex;gap:8px;align-items:center}.teo input:not([type]){flex:1;width:0}.teo .mini{margin:0;flex:none}@media(max-width:560px){.teq{padding:10px}.tedit .note{padding:12px}}.teo input[type]{width:20px;height:20px;accent-color:var(--green);flex:none}
+.tenum .trow .tfield{flex:1 1 160px;margin:6px 0}.tevars{display:grid;gap:8px;margin-top:10px}.tev{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;color:var(--muted);font-weight:600}.tev input{width:72px}
 #print{display:none}
 @media print{
   body.printing{background:#fff}
@@ -3266,6 +3285,7 @@ function worksGated(){
   app.innerHTML=`<div class="view">`+header()+accBar()+`
   <section class="hero"><h1>Lab works</h1><p>${a?'Handle the equipment yourself: weigh, immerse, hang loads. Record your measurements in the table, calculate and draw a conclusion.':'The labs open once you sign in with your code. The phenomena models on the home page are open to everyone.'}</p></section>
   ${a?`<div class="progress"><span>Done ${done} of ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div>`:''}
+  ${st?'<div id="stests"></div>':''}
   <div class="cards" id="cards">${list.map(([w,ac])=>{const lk=ac!=='open',dl=wDeadline(w.id),dn=isDone(w.id);return`
     <a class="card ${dn&&!lk?'seen':''}${lk?' locked':''}" style="--c:${w.color}" href="${lk?'#works':'#work/'+w.id}"${lk?` data-locked="${ac}" aria-disabled="true"`:''}>
       <div class="pb"><i></i></div>
@@ -3276,6 +3296,7 @@ function worksGated(){
   <a class="tlinkfoot" href="#teacher"><span>For teachers<small>Dashboard: classes, personal student codes, opening labs and the results journal</small></span>${ICON.next}</a></div>`;
   window.scrollTo(0,back?worksScroll:0);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
+  if(st)stTestsLoad();
   if(SRV==='on'&&a&&a.kind==='s'&&Date.now()-accTick>15000){accTick=Date.now();accRefresh().then(ch=>{if(ch&&location.hash==='#works')worksHome()})}
 }
 function lockedMsg(kind){const el=$('.accbar');if(!el)return;let f=el.querySelector('.aflash');if(!f){f=document.createElement('span');f.className='aflash';f.setAttribute('role','alert');el.firstElementChild.appendChild(f)}
@@ -3354,7 +3375,7 @@ async function tcHome(){
 async function tcLoad(){const r=await tcCall('t_me',{});if(!r){if(!$('#tc .tcme'))$('#tc').innerHTML=`<p class="gempty">${errText('net')}</p>`;return}
   TC.me=r.me;TC.classes=r.classes;TC.demo=r.demo;ACC.name=r.me.name;ACC.me=r.me;saveAcc();
   if(!TC.classes.some(c=>c.id===TC.cls)){TC.cls=(TC.classes[0]||{}).id||null;TC.cd=null;TC.jr=null;TC.sel=null}
-  tcRender();if(TC.cls)await tcClass();if(TC.me.admin)await tcAdmin()}
+  tcRender();await tcTestsList();if(TC.cls)await tcClass();if(TC.me.admin)await tcAdmin()}
 function tcRender(){const m=TC.me,box=$('#tc');if(!box)return;
   box.innerHTML=`<div class="taskbar tcme"><div><small>${m.admin?'Teacher · administrator':'Teacher'}</small><b>${esc(m.name)}</b><span>${esc(m.email)}</span></div>
       <div class="tbtns"><button class="btn" data-k="pw">Change password</button><button class="btn" data-k="tout">Sign out</button></div></div>
@@ -3367,6 +3388,7 @@ function tcRender(){const m=TC.me,box=$('#tc');if(!box)return;
     <form class="note f tline" data-form="tclass" id="tclassf"${TC.classes.length?' hidden':''}><b>${TC.classes.length?'New class':'Create your first class'}</b>
       <div class="trow"><input id="tclassn" maxlength="40" placeholder="For example, 7B" aria-label="Class name" required><button class="btn main" type="submit">Create class</button></div></form>
     <div id="tcclass">${TC.cls?'<p class="gempty">Loading the class…</p>':''}</div>
+    <h2 class="th2">Test builder</h2><div class="note f" id="tcte">${TE?teHTML():TC.tests?tcTLHTML():'<p class="gempty">Loading…</p>'}</div>
     <h2 class="th2">Demo code</h2><div class="note f" id="tcdemo">${tcDemoHTML()}</div>
     ${m.admin?'<h2 class="th2">Administration</h2><div id="tcadm"><p class="gempty">Loading…</p></div>':''}
     ${offlineHTML()}`;
@@ -3376,12 +3398,14 @@ function tcDemoHTML(){const d=TC.demo&&Date.parse(TC.demo.expires)>srvNow()?TC.d
     (d?`<div class="bigcode"><code>${d.code}</code><span>valid until ${fmtT(d.expires)}</span><button class="btn" data-k="copy" data-v="${d.code}">Copy</button><button class="btn" data-k="demostop">Stop</button></div>`
       :`<div class="trow"><select id="tdmin" aria-label="How long the demo code is valid"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="45" selected>45 minutes</option><option value="90">90 minutes</option></select><button class="btn main" data-k="demo">Create demo code</button></div>`)}
 async function tcClass(){const r=await tcCall('t_class',{p_class:TC.cls});if(!r)return;TC.cd=r;TC.jr={since:0,res:[],students:r.students,works:r.works};
-  tcClassRender();await tcPoll(true)}
+  tcClassRender();await tcPoll(true);await tcCTests()}
 function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=TC.cd,ws=c.works;
   box.innerHTML=`<div class="note f tclass"><div class="tchead"><b>${esc(c.class.name)}</b><span class="tbtns"><button class="btn" data-k="ren">Rename</button><button class="btn" data-k="delcls">Delete class</button></span></div>
     <h3>Labs for the class</h3><p class="tmsg">Tick the labs students can open. The due date is optional: after it the lab closes by itself. Phenomena models are always open.</p>
     <div class="twork">${WORKS.map(w=>{const o=ws.find(x=>x.work===w.id);return`<div class="twrow${o?' on':''}"><label class="twk"><input type="checkbox" data-wk="${w.id}"${o?' checked':''}><span>No. ${w.num}. ${w.title}</span></label>
       <label class="tdl"><span>Due</span><input type="datetime-local" data-wd="${w.id}" value="${o&&o.deadline?toLocalInput(o.deadline):''}"${o?'':' disabled'} aria-label="Due date: ${esc(w.title)}"></label></div>`}).join('')}</div>
+    <h3>Tests for the class</h3><p class="tmsg">Tick a test so students see it on the labs page. Each student has one attempt; the server keeps the time.</p>
+    <div id="tcct">${TC.ct?tcCTHTML():'<p class="gempty">Loading…</p>'}</div>
     <h3>Students</h3>
     <p class="tmsg">Enter students one per line. A first name and the first letter of the surname are enough: the site does not need full surnames. Each student gets a personal sign-in code.</p>
     <form data-form="tadd"><textarea id="tnames" rows="3" placeholder="Anna K.&#10;Peter S." aria-label="Student names"></textarea><div class="tools"><button class="btn main" type="submit">Add students</button></div></form>
@@ -3472,11 +3496,20 @@ function tcAdminRender(){const box=$('#tcadm'),a=TC.adm;if(!box||!a)return;const
 async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='slogout'){sLogout();return}
   if(k==='copy'){copyText(t.dataset.v,t);return}
+  if(k==='tstart'){if(confirm('Start the test? You have one attempt and the timer starts right away. Do not leave the page during the test.'))location.hash='#test/'+id;return}
+  if(k==='tfinish'){testFinish(false);return}
   if(!ACC||ACC.kind!=='t')return;
-  if(k==='tout'){if(!confirm('Sign out of the teacher dashboard?'))return;rpc('logout',{p_token:ACC.token}).catch(()=>{});ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null});teacherHome();return}
+  if(['qadd','qdel','qup','qdown','oadd','odel','vadd','vdel','tsave','tcancel'].includes(k)){teAct(k,t);return}
+  if(k==='tnew'){TE={id:null,used:false,title:'',minutes:15,pick:'',qs:[qBlank('one')]};teRender();$('#tcte').scrollIntoView({behavior:'smooth',block:'start'});return}
+  if(k==='tedit'){tcTestOpen(id,false);return}
+  if(k==='tcopy'){tcTestOpen(id,true);return}
+  if(k==='tdel'){const tt=(TC.tests||[]).find(x=>x.id===id);if(!confirm(`Delete test “${tt?tt.title:''}” together with the students’ results?`))return;if(await tcCall('t_test_delete',{p_test:id})){toast('Test deleted');if(TC.tres&&TC.tres.test.id===id)TC.tres=null;await tcTestsList();if(TC.cls)await tcCTests()}return}
+  if(k==='tres'){tcResults(id);return}
+  if(k==='tresx'){TC.tres=null;const b=$('#tcres');if(b)b.innerHTML='';return}
+  if(k==='tout'){if(!confirm('Sign out of the teacher dashboard?'))return;rpc('logout',{p_token:ACC.token}).catch(()=>{});ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null,tests:null,ct:null,tres:null});TE=null;teacherHome();return}
   if(k==='pw'){const f=$('#tpassf');f.hidden=!f.hidden;if(!f.hidden)$('#tpo').focus();return}
   if(k==='newcls'){const f=$('#tclassf');f.hidden=false;$('#tclassn').focus();return}
-  if(k==='cls'){if(id===TC.cls)return;TC.cls=id;TC.cd=null;TC.jr=null;TC.sel=null;document.querySelectorAll('.tcls [data-k="cls"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));$('#tcclass').innerHTML='<p class="gempty">Loading the class…</p>';await tcClass();return}
+  if(k==='cls'){if(id===TC.cls)return;TC.cls=id;TC.cd=null;TC.jr=null;TC.sel=null;TC.ct=null;TC.tres=null;document.querySelectorAll('.tcls [data-k="cls"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));$('#tcclass').innerHTML='<p class="gempty">Loading the class…</p>';await tcClass();return}
   if(k==='ren'){const n=prompt('New class name',TC.cd.class.name);if(!n||!n.trim())return;if(await tcCall('t_class_rename',{p_class:TC.cls,p_name:n})){await tcLoad()}return}
   if(k==='delcls'){if(!confirm(`Delete class “${TC.cd.class.name}” with its students and their results? This cannot be undone.`))return;if(await tcCall('t_class_delete',{p_class:TC.cls})){TC.cls=null;toast('Class deleted');await tcLoad()}return}
   if(k==='sreset'){if(!confirm(`Allow “${stName(id)}” to sign in from another device? The old device will be signed out.`))return;if(await tcCall('t_student_reset',{p_student:id})){toast('Done: the student can sign in from a new device');await tcClass()}return}
@@ -3504,7 +3537,162 @@ async function formAct(kind,f){
   if(kind==='ainv'){const r=await tcCall('a_invite',{p_note:$('#ainote').value,p_days:+$('#aidays').value,p_admin:$('#aiadm').checked});if(r){TC.newInv=r.code;await tcAdmin()}return}
 }
 app.addEventListener('submit',e=>{const f=e.target.closest('form[data-form]');if(!f)return;e.preventDefault();formAct(f.dataset.form,f)});
-app.addEventListener('change',e=>{const el=e.target;if(el.dataset.wk||el.dataset.wd){const id=el.dataset.wk||el.dataset.wd;if(el.dataset.wk&&el.checked){const d=$(`.twrow input[data-wd="${id}"]`);if(d)d.disabled=false}tcWork(id)}});
+app.addEventListener('input',e=>{const el=e.target;if(!el.closest)return;if(el.closest('.tedit'))teInput(el);else if(el.closest('.ttest'))testInput(el)});
+app.addEventListener('change',e=>{const el=e.target;if(el.dataset.tk||el.dataset.td){const id=el.dataset.tk||el.dataset.td;if(el.dataset.tk&&el.checked){const d=$(`input[data-td="${id}"]`);if(d)d.disabled=false}tcTestSet(id);return}
+  if(el.dataset.wk||el.dataset.wd){const id=el.dataset.wk||el.dataset.wd;if(el.dataset.wk&&el.checked){const d=$(`.twrow input[data-wd="${id}"]`);if(d)d.disabled=false}tcWork(id)}});
+
+/* ----- тесты: конструктор учителя, выдача классу, прохождение учеником (проверка на сервере) */
+const QK=[['one','Single choice'],['many','Multiple choice'],['num','Number'],['text','Short answer']];
+const decRu=v=>LANG.code==='ru'?String(v).replace(/(\d)\.(\d)/g,'$1,$2'):String(v);
+const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+/* ученик: список тестов на странице работ */
+async function stTestsLoad(){const box=$('#stests');if(!box||!ACC||ACC.kind!=='s'||SRV!=='on')return;
+  let r;try{r=await rpc('s_tests',{p_token:ACC.token})}catch(_){return}
+  if(!r||r.err||!$('#stests'))return;const ts=r.tests||[];
+  box.innerHTML=ts.length?`<h2 class="th2 stth">Tests from your teacher</h2><div class="stlist">${ts.map(t=>`<div class="strow st-${t.state}"><div><b>${esc(t.title)}</b><span>${pl3(t.n,'question','questions','questions')} · ${t.minutes} min${t.deadline?' · until '+fmtDT(t.deadline):''}</span></div>
+    ${t.state==='new'?`<button class="btn main" data-k="tstart" data-id="${t.id}">Start</button>`:t.state==='active'?`<a class="btn main" href="#test/${t.id}">Continue</a>`:t.state==='done'?`<span class="stres">Submitted${t.max?`: <b>${decRu(+t.score)} of ${t.max}</b>`:''}</span>`:'<span class="stres">Due date passed</span>'}</div>`).join('')}</div>`:''}
+let TT=null;
+function testHome(id){stop();cur=null;clearInterval(TT&&TT.tick);TT=null;
+  if(!ACC||ACC.kind!=='s'){FLASH='Tests are available after signing in with your personal code.';location.replace('#works');return}
+  document.title='Test — Sirius Lab';
+  app.innerHTML=`<div class="view">`+header()+`<section class="hero"><h1>Test</h1><p>Loading the questions…</p></section><main class="sheet tsheet" id="tst"><p class="gempty">Loading…</p></main></div>`;window.scrollTo(0,0);
+  rpc('s_test_start',{p_token:ACC.token,p_test:id}).then(v=>{if(location.hash!=='#test/'+id)return;
+    if(v.err){FLASH=v.err==='done'?'This test has already been submitted. There is no second attempt.':errText(v.err);location.replace('#works');return}
+    TT={id,v,ans:Object.assign({},v.answers||{}),leaves:v.leaves||0,saved:true,end:Date.parse(v.ends)};testRender()}).catch(()=>{$('#tst').innerHTML=`<p class="gempty">${errText('net')}</p>`})}
+function testRender(){const v=TT.v,qs=v.qs;
+  app.innerHTML=`<div class="view">`+header()+`
+  <section class="labhead" style="--lab:#5B3C9E"><a class="back" href="#works"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg>All works</a>
+    <h1>${esc(v.title)}</h1><p>${pl3(qs.length,'question','questions','questions')}. Answers are saved automatically. One attempt: after “Submit test” the answers cannot be changed.</p></section>
+  <div class="ttbar" role="status"><span class="ttime" id="ttime">—</span><span id="tcount"></span><span class="tsave" id="tsave"></span></div>
+  <main class="sheet tsheet ttest" style="--lab:#5B3C9E">
+    <p class="sacc">${ICON.teacher}<span>Do not leave the page or switch tabs during the test — your teacher will see how many times you left.</span></p>
+    <p class="tleave" id="tleave"${TT.leaves?'':' hidden'}></p>
+    ${qs.map((q,i)=>{const a=TT.ans[i];return`<div class="note f tq" data-qi="${i}"><b class="tqn">Question ${i+1}</b><p class="tqt">${esc(decRu(q.t)).replace(/\n/g,'<br>')}</p>
+      ${q.k==='one'||q.k==='many'?`<div class="topts" role="${q.k==='one'?'radiogroup':'group'}">${q.o.map((o,j)=>`<label><input type="${q.k==='one'?'radio':'checkbox'}" name="tq${i}" value="${j}"${q.k==='one'?(a===j?' checked':''):(Array.isArray(a)&&a.includes(j)?' checked':'')}><span>${esc(decRu(o))}</span></label>`).join('')}</div>${q.k==='many'?'<small class="thint">Tick all correct answers.</small>':''}`
+      :`<input class="tin" data-ti="${i}" ${q.k==='num'?'inputmode="decimal" placeholder="Number"':'placeholder="Your answer"'} autocomplete="off" spellcheck="false" maxlength="200" value="${esc(a==null?'':a)}">`}</div>`}).join('')}
+    <div class="tools"><button class="btn main" data-k="tfinish">${ICON.check}Submit test</button></div>
+  </main></div>`;
+  window.scrollTo(0,0);testCount();testTick();TT.tick=setInterval(testTick,1000)}
+function testCount(){const n=TT.v.qs.length,k=TT.v.qs.filter((q,i)=>{const a=TT.ans[i];return a!=null&&a!==''&&!(Array.isArray(a)&&!a.length)}).length;const el=$('#tcount');if(el)el.textContent=`Answered: ${k} of ${n}`;return n-k}
+function testTick(){if(!TT||location.hash!=='#test/'+TT.id){if(TT)clearInterval(TT.tick);return}
+  const left=(TT.end-srvNow())/1000,el=$('#ttime');if(el){el.textContent='Time left '+mmss(left);el.classList.toggle('warn',left<60)}
+  if(left<=0&&!TT.done)testFinish(true)}
+let ttSaveT=0;
+function testInput(el){if(!TT||TT.done)return;const q=el.closest('.tq');if(!q)return;const i=+q.dataset.qi,k=TT.v.qs[i].k;
+  if(k==='one')TT.ans[i]=+el.value;else if(k==='many')TT.ans[i]=[...q.querySelectorAll('input:checked')].map(x=>+x.value);else TT.ans[i]=el.value.slice(0,200);
+  testCount();TT.saved=false;$('#tsave').textContent='Saving…';clearTimeout(ttSaveT);ttSaveT=setTimeout(testSave,700)}
+async function testSave(){if(!TT||TT.done)return;const at=TT.v.attempt;
+  try{const r=await rpc('s_test_save',{p_token:ACC.token,p_attempt:at,p_answers:TT.ans,p_leaves:TT.leaves});if(!TT||TT.v.attempt!==at)return;
+    if(r.err){if(r.err==='done')testFinish(true);return}TT.saved=true;if(r.ends)TT.end=Date.parse(r.ends);const s=$('#tsave');if(s)s.textContent='Saved ✓'}
+  catch(_){const s=$('#tsave');if(s)s.textContent='No connection — answers will be saved when the internet is back'}}
+async function testFinish(auto){if(!TT||TT.done)return;
+  if(!auto){const left=testCount();if(!confirm(left?`Unanswered: ${pl3(left,'question','questions','questions')}. Submit the test anyway? The answers cannot be changed.`:'Submit the test? The answers cannot be changed.'))return}
+  TT.done=true;clearInterval(TT.tick);clearTimeout(ttSaveT);const b=$('[data-k="tfinish"]');if(b)b.disabled=true;
+  let r=null;for(let k=0;k<3&&!r;k++){try{r=await rpc('s_test_finish',{p_token:ACC.token,p_attempt:TT.v.attempt,p_answers:TT.ans,p_leaves:TT.leaves})}catch(_){await new Promise(z=>setTimeout(z,1500))}}
+  const m=$('#tst')||$('main.ttest');if(!m)return;
+  m.innerHTML=r&&!r.err?`<div class="note ok"><b>${auto?'Time is up — the test has been submitted.':'The test has been submitted.'}</b><p class="tbig">Result: <b>${decRu(+r.score)} of ${r.max}</b></p><p class="tmsg">Your teacher already has the result.</p><div class="tools"><a class="btn main" href="#works">Back to the labs${ICON.next}</a></div></div>`
+    :`<div class="note"><b>Could not reach the server.</b><p class="tmsg">Your teacher will see the answers that were saved. Check the internet.</p><div class="tools"><a class="btn" href="#works">Back to the labs</a></div></div>`;
+  $('.ttbar')&&$('.ttbar').remove();window.scrollTo(0,0)}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&TT&&!TT.done&&location.hash==='#test/'+TT.id){TT.leaves++;
+  const el=$('#tleave');if(el){el.hidden=false;el.textContent=`Times you left the test page: ${TT.leaves}. Your teacher will see this.`}testSave()}});
+app.addEventListener('copy',e=>{if(e.target.closest&&e.target.closest('.ttest'))e.preventDefault()});
+app.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.ttest .tqt'))e.preventDefault()});
+
+/* учитель: тесты класса и результаты */
+async function tcCTests(){const r=await tcCall('t_class_tests',{p_class:TC.cls});if(!r)return;TC.ct=r.tests;if(!TC.tests)await tcTestsList(true);const b=$('#tcct');if(b)b.innerHTML=tcCTHTML()}
+function tcCTHTML(){const ts=TC.tests||[],ct=TC.ct||[];
+  if(!ts.length)return'<p class="gempty">First create a test in the builder below — then you can open it for the class.</p>';
+  return`<div class="twork">${ts.map(t=>{const o=ct.find(x=>x.test===t.id);return`<div class="twrow${o?' on':''}"><label class="twk"><input type="checkbox" data-tk="${t.id}"${o?' checked':''}><span>${esc(t.title)}<small class="db">${pl3(t.pick||t.n,'question','questions','questions')} · ${t.minutes} min${o?' · submitted: '+o.done:''}</small></span></label>
+    <label class="tdl"><span>Due</span><input type="datetime-local" data-td="${t.id}" value="${o&&o.deadline?toLocalInput(o.deadline):''}"${o?'':' disabled'} aria-label="Test due date: ${esc(t.title)}"></label>${o?`<button class="mini" data-k="tres" data-id="${t.id}">Results</button>`:''}</div>`}).join('')}</div>
+    <div id="tcres">${TC.tres?tcResHTML():''}</div>`}
+async function tcTestSet(id){const box=$(`input[data-tk="${id}"]`),dl=$(`input[data-td="${id}"]`);if(!box||!dl)return;
+  const open=box.checked,dv=open&&dl.value?new Date(dl.value):null;
+  if(dv&&dv.getTime()<Date.now()&&!confirm('This date has already passed — the test will close for students right away. Save?')){dl.value='';return}
+  const r=await tcCall('t_test_set',{p_class:TC.cls,p_test:id,p_open:open,p_deadline:dv?dv.toISOString():null});if(!r){box.checked=!open;return}
+  TC.ct=r.tests;if(!open&&TC.tres&&TC.tres.test.id===id)TC.tres=null;$('#tcct').innerHTML=tcCTHTML();toast(open?'Test opened for the class'+(dv?' until '+fmtDT(dv):''):'Test closed')}
+async function tcResults(id){const r=await tcCall('t_test_results',{p_class:TC.cls,p_test:id});if(!r)return;TC.tres=r;const b=$('#tcres');if(b){b.innerHTML=tcResHTML();b.scrollIntoView({behavior:'smooth',block:'nearest'})}}
+function tcResHTML(){const r=TC.tres,qs=r.test.qs,at=r.attempts,ss=(TC.jr?TC.jr.students:[]);
+  const flags=a=>{const f=[];if(a.leaves)f.push('left the page: '+a.leaves);
+    const dur=a.finished?(Date.parse(a.finished)-Date.parse(a.started))/1000:0;if(a.finished&&a.max&&dur<a.max*8)f.push('very fast: '+Math.round(dur)+' s');
+    const wr=(a.det||[]).filter(d=>!d.ok&&d.g!=null&&d.g!=='').map(d=>d.i+'|'+JSON.stringify(d.g));
+    const same=at.filter(b=>b!==a&&(b.det||[]).filter(d=>!d.ok&&d.g!=null&&wr.includes(d.i+'|'+JSON.stringify(d.g))).length>=2).map(b=>b.name);
+    if(same.length)f.push('same wrong answers as: '+same.join(', '));return f};
+  const not=ss.filter(s=>!at.some(a=>a.student===s.id));
+  return`<div class="note f jdet"><div class="tchead"><b>Results: ${esc(r.test.title)}</b><span class="tbtns"><button class="mini" data-k="tres" data-id="${r.test.id}">Refresh</button><button class="mini" data-k="tresx">Hide</button></span></div>
+    ${at.length?`<div class="tblwrap"><table class="res jtab"><thead><tr><th>Student</th><th>Score</th>${qs.map((q,i)=>`<th title="${esc(q.t)}">Q${i+1}</th>`).join('')}<th>Time</th><th>Flags</th></tr></thead><tbody>${at.map(a=>{const f=flags(a),dur=a.finished?(Date.parse(a.finished)-Date.parse(a.started))/1000:0;
+      return`<tr><td>${esc(a.name)}</td><td><b>${a.active?'in progress':decRu(+a.score)+' / '+a.max}</b></td>${qs.map((q,i)=>{const d=(a.det||[]).find(x=>x.i===i);return d?`<td class="${d.ok?'jy':'jx'}" title="${esc(d.g==null?'no answer':typeof d.g==='string'?d.g:JSON.stringify(d.g))}">${d.ok?'✓':'✗'}</td>`:'<td class="jn">—</td>'}).join('')}
+        <td>${a.active?'until '+fmtT(a.ends):mmss(dur)}</td><td class="jfl">${f.length?'⚠ '+esc(f.join('; ')):''}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="gempty">Nobody has started the test yet.</p>'}
+    ${not.length?`<p class="tmsg">Not started yet: ${esc(not.map(s=>s.name).join(', '))}.</p>`:''}
+    <p class="tmsg">Q1, Q2… are the test questions in builder order; “—” means the student did not get that question (questions are picked at random). Hover over ✗ to see the student’s answer.</p></div>`}
+
+/* учитель: конструктор тестов */
+let TE=null;
+async function tcTestsList(quiet){const r=await tcCall('t_tests',{});if(!r)return;TC.tests=r.tests;if(!quiet){const b=$('#tcte');if(b&&!TE)b.innerHTML=tcTLHTML()}}
+function tcTLHTML(){const ts=TC.tests||[];
+  return`<p class="tmsg">Build a test from four question types: single choice, multiple choice, number (each student can get their own numbers) and short answer. Correct answers are stored only on the server — students never see them. Each student can get a random subset of questions in their own order.</p>
+    ${ts.length?`<div class="twork">${ts.map(t=>`<div class="twrow"><span class="twk"><span>${esc(t.title)}<small class="db">${pl3(t.n,'question','questions','questions')}${t.pick?', each student gets '+t.pick:''} · ${t.minutes} min${t.used?' · already taken':''}</small></span></span>
+      <span class="tact"><button class="mini" data-k="tedit" data-id="${t.id}">Edit</button><button class="mini" data-k="tcopy" data-id="${t.id}">Copy</button><button class="mini del" data-k="tdel" data-id="${t.id}">Delete</button></span></div>`).join('')}</div>`:''}
+    <div class="tools"><button class="btn main" data-k="tnew">+ New test</button></div>`}
+const qBlank=k=>({k,t:'',o:k==='one'||k==='many'?['','']:[],cor:[],ans:'',tol:1,vars:[]});
+function qFromSrv(q){const u=qBlank(q.k);u.t=q.t;if(q.k==='one'||q.k==='many'){u.o=q.o.slice();u.cor=q.k==='one'?[q.a]:q.a.slice()}
+  else if(q.k==='num'){u.vars=Object.entries(q.v||{}).map(([n,r])=>[n,decRu(r[0]),decRu(r[1]),decRu(r[2])]);u.ans=u.vars.length?q.a:decRu(q.a);u.tol=q.tol!=null?q.tol:1}
+  else u.ans=q.a.join('\n');return u}
+const pnum=v=>{const x=parseFloat(String(v).replace(/\s/g,'').replace(',','.'));return isFinite(x)?x:NaN};
+function qToSrv(u,i){const n=i+1;if(!u.t.trim())throw`Question ${n}: enter the question text.`;
+  if(u.k==='one'||u.k==='many'){const o=u.o.map(x=>x.trim());if(o.length<2||o.some(x=>!x))throw`Question ${n}: fill in all answer options (2 to 8).`;
+    if(!u.cor.length)throw`Question ${n}: mark the correct answer.`;return u.k==='one'?{k:'one',t:u.t.trim(),o,a:u.cor[0]}:{k:'many',t:u.t.trim(),o,a:u.cor.slice().sort((a,b)=>a-b)}}
+  if(u.k==='num'){const tol=pnum(u.tol);if(!(tol>=0&&tol<=50))throw`Question ${n}: the tolerance must be 0–50 %.`;
+    if(u.vars.length){const v={};for(const [nm,a,b,s] of u.vars){const name=nm.trim().toLowerCase();if(!/^[a-z][a-z0-9_]{0,9}$/.test(name))throw`Question ${n}: write number names in Latin letters, e.g. m or v.`;
+        const A=pnum(a),B=pnum(b),S=pnum(s);if([A,B,S].some(isNaN)||B<A||S<=0)throw`Question ${n}: for the number ${name} set “from”, “to” and a step greater than zero.`;v[name]=[A,B,S]}
+      if(!u.ans.trim())throw`Question ${n}: enter the answer formula, e.g. m/v.`;return{k:'num',t:u.t.trim(),v,a:u.ans.trim().replace(/,/g,'.'),tol}}
+    const a=pnum(u.ans);if(isNaN(a))throw`Question ${n}: enter the correct answer as a number.`;return{k:'num',t:u.t.trim(),a,tol}}
+  const a=u.ans.split(/\n|;/).map(x=>x.trim()).filter(Boolean);if(!a.length)throw`Question ${n}: enter at least one correct answer.`;return{k:'text',t:u.t.trim(),a}}
+function teHTML(){const e=TE;
+  return`<div class="tedit"><div class="tchead"><b>${e.id?'Edit test':'New test'}</b></div>
+    ${e.used?'<p class="note">Students have already taken this test. You can change the title and time; to change the questions, make a copy of the test.</p>':''}
+    <label class="tfield">Test title<input data-te="title" maxlength="120" value="${esc(e.title)}" placeholder="For example, Density of matter"></label>
+    <div class="trow tnums"><label class="tfield">Time for the test, minutes<input data-te="minutes" inputmode="numeric" maxlength="3" value="${e.minutes}"></label>
+      <label class="tfield">Questions per student<input data-te="pick" inputmode="numeric" maxlength="3" value="${e.pick||''}" placeholder="all (${e.qs.length})"></label></div>
+    <p class="tmsg">If the test has more questions than are shown, each student gets a random set. The order of questions and options is different for everyone.</p>
+    ${e.qs.map((q,i)=>`<div class="teq" data-q="${i}"><div class="teqh"><b>Question ${i+1}</b><select data-f="k" aria-label="Question type"${e.used?' disabled':''}>${QK.map(([k,n])=>`<option value="${k}"${q.k===k?' selected':''}>${n}</option>`).join('')}</select>
+      <span class="tact"><button type="button" class="mini" data-k="qup" title="Up"${i?'':' disabled'}>↑</button><button type="button" class="mini" data-k="qdown" title="Down"${i<e.qs.length-1?'':' disabled'}>↓</button><button type="button" class="mini del" data-k="qdel">Delete</button></span></div>
+      <textarea data-f="t" rows="2" maxlength="2000" placeholder="${q.k==='num'&&q.vars.length?'Question text. Insert own numbers like this: {m}':'Question text'}">${esc(q.t)}</textarea>
+      ${q.k==='one'||q.k==='many'?`<div class="teopts">${q.o.map((o,j)=>`<div class="teo"><input type="${q.k==='one'?'radio':'checkbox'}" name="cor${i}" data-f="cor" value="${j}"${q.cor.includes(j)?' checked':''} aria-label="Correct answer"><input data-f="o" data-j="${j}" maxlength="300" value="${esc(o)}" placeholder="Option ${j+1}"><button type="button" class="mini del" data-k="odel" data-j="${j}"${q.o.length>2?'':' disabled'} aria-label="Delete option">×</button></div>`).join('')}
+        ${q.o.length<8?'<button type="button" class="mini" data-k="oadd">+ option</button>':''}<small class="thint">Mark ${q.k==='one'?'the correct option':'all correct options'} with the box on the left.</small></div>`
+      :q.k==='num'?`<div class="tenum">${q.vars.length?`<div class="tevars"><small class="thint">Own numbers for each student: the server picks a value from “from” to “to” with the step and calculates the answer with the formula.</small>${q.vars.map((v,j)=>`<div class="tev"><input data-f="vn" data-j="${j}" maxlength="10" value="${esc(v[0])}" placeholder="m" aria-label="Number name"><span>from</span><input data-f="va" data-j="${j}" value="${esc(v[1])}" inputmode="decimal" aria-label="from"><span>to</span><input data-f="vb" data-j="${j}" value="${esc(v[2])}" inputmode="decimal" aria-label="to"><span>step</span><input data-f="vs" data-j="${j}" value="${esc(v[3])}" inputmode="decimal" aria-label="step"><button type="button" class="mini del" data-k="vdel" data-j="${j}" aria-label="Delete number">×</button></div>`).join('')}</div>`:''}
+        <div class="trow"><label class="tfield">${q.vars.length?'Answer formula (e.g. m/v)':'Correct answer'}<input data-f="ans" value="${esc(q.ans)}" ${q.vars.length?'placeholder="m/v"':'inputmode="decimal"'}></label><label class="tfield">Tolerance, %<input data-f="tol" value="${esc(q.tol)}" inputmode="decimal"></label></div>
+        <button type="button" class="mini" data-k="vadd">+ own number for each student</button></div>`
+      :`<label class="tfield">Correct answers — one per line<textarea data-f="ans" rows="2" placeholder="measuring cylinder&#10;graduated cylinder">${esc(q.ans)}</textarea></label><small class="thint">Letter case and extra spaces do not matter.</small>`}
+    </div>`).join('')}
+    ${e.used?'':`<div class="tools"><button type="button" class="btn" data-k="qadd">+ Question</button></div>`}
+    <p class="terr" id="teerr" role="alert"></p>
+    <div class="tools"><button type="button" class="btn main" data-k="tsave">${ICON.check}Save test</button><button type="button" class="btn" data-k="tcancel">Cancel</button></div></div>`}
+function teRender(){const b=$('#tcte');if(b)b.innerHTML=TE?teHTML():tcTLHTML()}
+function teInput(el){if(!TE)return;if(el.dataset.te){TE[el.dataset.te]=el.value;return}
+  const qe=el.closest('.teq');if(!qe)return;const q=TE.qs[+qe.dataset.q],f=el.dataset.f,j=+el.dataset.j;
+  if(f==='t')q.t=el.value;else if(f==='o')q.o[j]=el.value;else if(f==='ans')q.ans=el.value;else if(f==='tol')q.tol=el.value;
+  else if(f==='cor'){q.cor=q.k==='one'?[+el.value]:[...qe.querySelectorAll('[data-f="cor"]:checked')].map(x=>+x.value)}
+  else if(f==='vn'||f==='va'||f==='vb'||f==='vs')q.vars[j][{vn:0,va:1,vb:2,vs:3}[f]]=el.value;
+  else if(f==='k'){const nq=qBlank(el.value);nq.t=q.t;if((el.value==='one'||el.value==='many')&&(q.k==='one'||q.k==='many')){nq.o=q.o;nq.cor=el.value==='one'?q.cor.slice(0,1):q.cor}TE.qs[+qe.dataset.q]=nq;teRender()}}
+async function teAct(k,t){const qe=t.closest('.teq'),i=qe?+qe.dataset.q:-1,q=i>=0?TE.qs[i]:null,j=+t.dataset.j;
+  if(k==='qadd'){if(TE.qs.length>=100)return;TE.qs.push(qBlank('one'));teRender();const l=document.querySelectorAll('.teq');l[l.length-1].querySelector('textarea').focus();return}
+  if(k==='qdel'){if(TE.qs.length<2){toast('A test needs at least one question');return}if((q.t.trim()||q.o.some(x=>x.trim()))&&!confirm(`Delete question ${i+1}?`))return;TE.qs.splice(i,1);teRender();return}
+  if(k==='qup'||k==='qdown'){const d=k==='qup'?-1:1;[TE.qs[i],TE.qs[i+d]]=[TE.qs[i+d],TE.qs[i]];teRender();return}
+  if(k==='oadd'){q.o.push('');teRender();return}
+  if(k==='odel'){q.o.splice(j,1);q.cor=q.cor.filter(x=>x!==j).map(x=>x>j?x-1:x);teRender();return}
+  if(k==='vadd'){if(q.vars.length>=5)return;const nm=['m','v','f','h','s'].find(n=>!q.vars.some(v=>v[0]===n))||'x';if(!q.vars.length&&q.ans&&!isNaN(pnum(q.ans)))q.ans='';q.vars.push([nm,'1','5','1']);teRender();return}
+  if(k==='vdel'){q.vars.splice(j,1);teRender();return}
+  if(k==='tcancel'){TE=null;teRender();return}
+  if(k==='tsave'){const er=$('#teerr');let qs;try{qs=TE.qs.map(qToSrv)}catch(m){er.textContent=m;return}
+    if(!TE.title.trim()){er.textContent='Enter the test title.';return}
+    const mi=parseInt(TE.minutes,10);if(!(mi>=1&&mi<=180)){er.textContent='The time must be 1 to 180 minutes.';return}
+    const pk=String(TE.pick).trim()?parseInt(TE.pick,10):null;if(pk!==null&&!(pk>=1&&pk<=qs.length)){er.textContent=`You can show 1 to ${qs.length} questions.`;return}
+    er.textContent='Saving…';let r;try{r=await rpc('t_test_save',{p_token:ACC.token,p_test:TE.id||null,p_title:TE.title,p_minutes:mi,p_pick:pk,p_qs:qs})}catch(_){er.textContent=errText('net');return}
+    if(r.err){er.textContent=r.err==='used'?'The test has already been taken — the questions cannot be changed. Make a copy of the test.':r.err==='qs'?'Check question '+String(r.what||'').split(':')[1]+': '+({opts:'it needs 2 to 8 filled-in options.',answer:'the correct answer is not marked or not filled in.',formula:'the formula cannot be calculated — use number names, digits and + − * / ^ ( ).',vars:'check the own numbers.',text:'the question text is too short.',tol:'the tolerance must be 0–50 %.'}[String(r.what||'').split(':')[0]]||'')
+      :r.err==='limit'?'Too many tests (200 at most).':errText(r.err);return}
+    TE=null;toast('Test saved');await tcTestsList();teRender();if(TC.cls)await tcCTests()}}
+async function tcTestOpen(id,copy){const r=await tcCall('t_test_get',{p_test:id});if(!r)return;
+  TE={id:copy?null:r.id,used:!copy&&r.used,title:copy?r.title+' (copy)':r.title,minutes:r.minutes,pick:r.pick||'',qs:r.qs.map(qFromSrv)};teRender();$('#tcte').scrollIntoView({behavior:'smooth',block:'start'})}
 
 function route(){
   const h=location.hash;let m;bigOff();
@@ -3518,6 +3706,7 @@ function route(){
     if(!w.length){location.replace('#works');return}
     if(!TASK||TASK.k!==m[1])setTask({k:m[1],t:String(o.t||'Lab works').slice(0,80),w,done:[],codes:{}});
     showAllW=false;location.replace('#work/'+(taskNext(null)||w[0]));return}
+  else if((m=h.match(/^#test\/([0-9a-f-]{36})$/))){fromHome=false;if(SRV==='?'&&!ACC){waitHome();return}testHome(m[1])}
   else if(h==='#teacher'){fromHome=false;teacherHome()}
   else if(h==='#install'){fromHome=false;installHome()}
   else if(h==='#works'){fromHome=false;worksHome()}
