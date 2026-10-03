@@ -212,6 +212,43 @@ table.res tr.flash td{animation:flash 1.4s ease-out}
 .quiz label.bad{border-color:#C4245F;background:rgba(196,36,95,.08)}
 .quiz input{accent-color:var(--lab);width:18px;height:18px;margin:2px 0 0;flex:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sname{display:flex;flex-direction:column;gap:6px;margin:16px 6px 0;font-weight:700;font-size:15px}
+.sname small{font-weight:500;color:var(--muted);font-size:13px}
+.sname input,.tfield input,#tcodes,.tlink input{font:inherit;font-weight:500;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
+.sname input:focus,.tfield input:focus,#tcodes:focus,.tlink input:focus{border-color:var(--brand);outline:none}
+.rescode{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:14px;padding:12px 14px;background:var(--surf);border-radius:16px}
+.rescode small{display:block;width:100%;color:var(--muted);font-weight:600;font-size:13px}
+.rescode code{flex:1 1 220px;min-width:0;font-size:13px;line-height:1.4;word-break:break-all;font-family:ui-monospace,Menlo,Consolas,monospace}
+.rescode .btn{padding:9px 14px}
+.taskbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:18px 20px 0;padding:16px 18px;border-radius:22px;background:var(--pink)}
+.taskbar small{display:block;color:var(--muted);font-weight:700;font-size:13px}.taskbar b{display:block;font-size:19px;line-height:1.25}
+.taskbar span{display:block;font-size:14px;color:var(--muted);margin-top:2px}.taskbar .btn{flex:none;padding:10px 14px}
+.card .tag.task{background:var(--lime);color:#1B2A0A;margin-left:6px}
+.card .tags{display:flex;flex-wrap:wrap;gap:6px}
+.sheet.tsheet{margin-top:0}
+.tfield{display:flex;flex-direction:column;gap:6px;margin:12px 0;font-weight:600;font-size:15px}
+.tchecks{display:grid;gap:8px;margin:8px 0 4px}
+@media(min-width:640px){.tchecks{grid-template-columns:1fr 1fr}}
+.tchecks label{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:2px solid var(--line);border-radius:14px;background:var(--surf);cursor:pointer;font-weight:500;line-height:1.35}
+.tchecks input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--brand);flex:none}
+.tlink{display:flex;gap:8px;margin-top:12px}.tlink input{flex:1;min-width:0;font-size:13px}
+#tcodes{min-height:120px;resize:vertical;margin-top:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+.tmsg{color:var(--muted);margin:10px 0 0}
+.tlinkfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 20px 40px;padding:18px 20px;border-radius:22px;background:var(--soft);color:var(--ink);text-decoration:none;font-weight:600}
+.tlinkfoot small{display:block;color:var(--muted);font-weight:500;font-size:14px}
+.tlinkfoot svg{flex:none;width:22px;height:22px}
+#print{display:none}
+@media print{
+  body.printing{background:#fff}
+  body.printing #app,body.printing .menu{display:none!important}
+  body.printing #print{display:block;color:#000;font:11pt/1.45 'Golos Text',Arial,sans-serif}
+  #print h1{font-size:17pt;margin:0 0 2pt}#print h2{font-size:13pt;margin:0 0 10pt;font-weight:600}
+  #print h3{font-size:12pt;margin:14pt 0 6pt}#print p{margin:0 0 6pt}
+  #print table{border-collapse:collapse;width:100%}#print th,#print td{border:1px solid #888;padding:4pt 6pt;font-size:10pt;text-align:left;vertical-align:top}
+  #print th{background:#eee}#print code{font-size:8pt;word-break:break-all}
+  #print .pv{margin-top:10pt;padding:6pt 8pt;border:1px solid #888}#print .pf{margin-top:18pt;color:#555;font-size:9pt}
+  @page{margin:14mm}
+}
 @media (prefers-reduced-motion:reduce){
   .card:hover,.stage canvas{transform:none!important}
   .view,.val.pop{animation:none}
@@ -227,6 +264,15 @@ table.res tr.flash td{animation:flash 1.4s ease-out}
 <script>
 (function(){
 'use strict';
+/* совместимость: roundRect у холста есть не во всех браузерах (Safari до 16, старые Firefox) */
+if(window.CanvasRenderingContext2D&&!CanvasRenderingContext2D.prototype.roundRect){
+  CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
+    let a=Array.isArray(r)?r.slice():[r===undefined?0:r];
+    if(w<0){x+=w;w=-w}if(h<0){y+=h;h=-h}
+    const q=a.length===1?[a[0],a[0],a[0],a[0]]:a.length===2?[a[0],a[1],a[0],a[1]]:a.length===3?[a[0],a[1],a[2],a[1]]:a.slice(0,4);
+    const m=Math.min(w,h)/2,[tl,tr,br,bl]=q.map(v=>Math.max(0,Math.min(+v||0,m)));
+    this.moveTo(x+tl,y);this.lineTo(x+w-tr,y);this.arcTo(x+w,y,x+w,y+tr,tr);this.lineTo(x+w,y+h-br);this.arcTo(x+w,y+h,x+w-br,y+h,br);
+    this.lineTo(x+bl,y+h);this.arcTo(x,y+h,x,y+h-bl,bl);this.lineTo(x,y+tl);this.arcTo(x,y,x+tl,y,tl);this.closePath();return this}}
 const W=640,H=400;
 const $=(s,r=document)=>r.querySelector(s);
 const NF={};
@@ -1616,6 +1662,7 @@ function drawIt(g,it,noSh){const x=it.x,y=it.y;
   else if(it.type==='body'){const r=it.r,h=it.bh;if(!noSh)shadow(g,x,y+1,r*1.3,.22);
     cyl(g,x,y-h,y,r,it.col,{ry:r*.3});
     g.strokeStyle=wire();g.lineWidth=2;g.beginPath();g.ellipse(x,y-h-r*.3-3.5,2.8,4,0,0,7);g.stroke()}
+  else if(it.type==='tube')drawTube(g,x,y,it.sand||0,noSh);
 }
 function itRect(it){const hw=Math.max(it.w,24)/2+5,h=Math.max(it.h,26)+4;return it.hang?[it.x-hw,it.y-8,it.x+hw,it.y+h]:[it.x-hw,it.y-h,it.x+hw,it.y+6]}
 function initItems(S){S.ord=0;S.drag=null;S.sel=null;S.hov=null;S.hz=null;S.time=0;
@@ -2134,6 +2181,156 @@ mkWork({
   outs(S){return[['Динамометр',f1(r05(S.Fd),2)+' Н'],['Высота h',f1(S.h,2)+' м'],['Длина доски l','0,60 м'],['Брусок',S.mv===1?'едет вверх':S.mv===-1?'соскальзывает':'покоится']]}
 });
 
+/* 9. Размеры малых тел (метод рядов) */
+const SMALL={pea:{name:'Горох',gen:'горошин',d:6.2,col:'#8DBF4A'},shot:{name:'Дробь',gen:'дробинок',d:4.1,col:'#9AA3B5'}};
+function dishDraw(g,cx,cy,pile,col,label){
+  shadow(g,cx+6,cy+6,70,.16);
+  g.save();g.globalAlpha=.9;cyl(g,cx,cy-8,cy,68,C.dark?'#6f8096':'#CFDBE7',{ry:19});g.restore();
+  g.fillStyle=C.dark?'rgba(255,255,255,.08)':'rgba(255,255,255,.55)';g.beginPath();g.ellipse(cx,cy-8,62,16,0,0,7);g.fill();
+  for(const p of pile)sph(g,cx+p[0],cy-8+p[1],p[2],col);
+  g.strokeStyle='rgba(255,255,255,.6)';g.lineWidth=1.4;g.beginPath();g.ellipse(cx,cy-8,67,18.5,0,.1*Math.PI,.9*Math.PI);g.stroke();
+  txt(g,label,cx,cy-38,{a:'center',s:13,w:700})}
+mkWork({
+  id:'small',num:9,title:'Измерение размеров малых тел',color:'#A33B5E',
+  goal:'Научиться измерять размеры малых тел методом рядов.',
+  equip:'линейка с миллиметровыми делениями и желобком, горох, дробь (металлические шарики)',
+  steps:['Коснитесь чашки с горохом: горошина ляжет в желобок линейки вплотную к соседней. Горошины можно и переносить пальцем или мышью.','Выложите в ряд не меньше 10 горошин и определите по линейке длину ряда L в миллиметрах.','Нажмите «Записать измерение» и вычислите размер одной горошины d = L / n.','Повторите опыт с другим числом горошин, а затем ссыпьте ряд и проделайте то же с дробью.','Сравните результаты. Убрать последнее тело из ряда можно касанием.'],
+  rows:3,tip:'Размер одного тела d = L / n: длину ряда делите на число тел.',
+  cols:[{id:'name',label:'Тела',src:'k'},{id:'n',label:'Число тел в ряду n',src:'m',d:0},{id:'L',label:'Длина ряда L, мм',src:'m',d:0},{id:'d',label:'Размер одного тела d = L / n, мм',src:'c',d:1,f:v=>v.L/v.n,tol:.06}],
+  quiz:{q:'20 горошин, выложенных в ряд, заняли 12 см. Каков диаметр одной горошины?',opts:['6 мм','12 мм','2,4 мм','0,6 мм'],a:0},
+  concl:'Размер малого тела трудно измерить линейкой напрямую: он сравним с ценой деления. Если выложить в ряд n одинаковых тел и измерить длину ряда L, то размер одного тела d = L / n получится гораздо точнее. Это метод рядов: чем больше тел в ряду, тем меньше ошибка.',
+  actions:[['Ссыпать ряд обратно',S=>{if(!S.row.length){wToast('Ряд и так пуст.','err');return}S.row=[];S.kind=null;wToast('Ряд ссыпан обратно в чашку.','ok')}]],
+  X0:40,PXMM:4,RY:328,DISH:{pea:[170,276],shot:[450,276]},
+  init(S){S.row=[];S.kind=null;S.dragB=null;S.used=false;S.items=[];S.pile={};
+    for(const k in SMALL){const a=[],r=SMALL[k].d*2;for(let i=0;i<18;i++){const t=i*2.39996,rr=Math.sqrt((i+.5)/18);a.push([Math.cos(t)*rr*48,Math.sin(t)*rr*11-2-(1-rr)*6,r])}a.sort((p,q)=>p[1]-q[1]);S.pile[k]=a}
+    initItems(S)},
+  rowLen(S){return S.row.reduce((a,b)=>a+b,0)},
+  beadX(S,i){let s=0;for(let j=0;j<i;j++)s+=S.row[j];return this.X0+(s+S.row[i]/2)*this.PXMM+4*DX},
+  beadY(d){return this.RY+28*DY-d*this.PXMM*.45},
+  dishAt(x,y){for(const k in this.DISH){const[cx,cy]=this.DISH[k];if(((x-cx)/74)**2+((y-cy+6)/28)**2<=1)return k}return null},
+  lastHit(S,x,y){const n=S.row.length;if(!n)return false;const d=S.row[n-1];return Math.hypot(x-this.beadX(S,n-1),y-this.beadY(d))<d*this.PXMM/2+8},
+  inRow(x,y){return x>20&&x<630&&y>288&&y<352},
+  addBead(S,k,d){if(S.kind&&S.kind!==k){wToast('В ряд кладут одинаковые тела. Ссыпьте ряд, чтобы взять '+SMALL[k].name.toLowerCase()+'.','err');return false}
+    d=d||SMALL[k].d*(1+(Math.random()-.5)*.08);
+    if(this.rowLen(S)+d>140){wToast('Ряд больше не помещается на линейке.','err');return false}
+    S.row.push(d);S.kind=k;return true},
+  handles:[{hit:(S,x,y)=>cur.lastHit(S,x,y)||!!cur.dishAt(x,y),
+    start:(S,x,y)=>{S.used=true;if(cur.lastHit(S,x,y)){const d=S.row.pop();S.dragB={kind:S.kind,d,x,y,from:'row'};if(!S.row.length)S.kind=null}
+      else S.dragB={kind:cur.dishAt(x,y),d:null,x,y,from:'dish'}},
+    move:(S,x,y)=>{if(S.dragB){S.dragB.x=x;S.dragB.y=y}},
+    end:S=>{const b=S.dragB;S.dragB=null;if(!b)return;const tap=!S.pd||!S.pd.mv;
+      if(b.from==='dish'){if(tap||cur.inRow(b.x,b.y))cur.addBead(S,b.kind)}
+      else if(!tap&&cur.inRow(b.x,b.y))cur.addBead(S,b.kind,b.d)}}],
+  scene(g,S){deskTop(g,DESK,240);
+    for(const k in this.DISH){const[cx,cy]=this.DISH[k];dishDraw(g,cx,cy,S.pile[k],SMALL[k].col,SMALL[k].name)}
+    if(!S.used){const p=(Math.sin(S.time*4)+1)/2;g.strokeStyle=rgba(C.lime,.4+.5*p);g.lineWidth=3;for(const k in this.DISH){const[cx,cy]=this.DISH[k];g.beginPath();g.ellipse(cx,cy-8,76+p*4,24+p*2,0,0,7);g.stroke()}}
+    // линейка с желобком
+    const RY=this.RY,X0=this.X0,k=this.PXMM;
+    box3(g,26,RY,594,18,C.dark?'#4a4258':'#F1E7C8',40);
+    {const P=z=>[26+z*DX,RY+z*DY],a=P(22),b=P(34);g.fillStyle=rgba(C.dark?'#000000':'#8A6A3A',.18);g.beginPath();g.moveTo(a[0],a[1]);g.lineTo(a[0]+594,a[1]);g.lineTo(b[0]+594,b[1]);g.lineTo(b[0],b[1]);g.closePath();g.fill()}
+    for(let m=0;m<=140;m++){const x=X0+m*k,len=m%10===0?12:m%5===0?8:5;g.strokeStyle=m%10===0?C.ink:rgba(C.ink,.55);g.lineWidth=m%10===0?1.4:.8;
+      g.beginPath();g.moveTo(x+2*DX,RY+2*DY);g.lineTo(x+(2+len)*DX,RY+(2+len)*DY);g.stroke()}
+    for(let c=0;c<=14;c++)txt(g,String(c),X0+c*40,RY+14,{a:'center',s:11,w:700});
+    txt(g,'см',X0+7,RY+14,{s:9,c:C.muted,w:600});
+    // ряд
+    S.row.forEach((d,i)=>sph(g,this.beadX(S,i),this.beadY(d),d*k/2,SMALL[S.kind].col));
+    const b=S.dragB;if(b){const r=(b.d||SMALL[b.kind].d)*k/2;shadow(g,b.x,b.y+r+14,r,.2);sph(g,b.x,b.y,r,SMALL[b.kind].col);sph(g,b.x+r+6,b.y-r-4,7,'#99CC42')}
+    if(S.row.length)badge(g,S.row.length+' '+plural(S.row.length,SMALL[S.kind].name==='Горох'?'горошина':'дробинка',SMALL[S.kind].name==='Горох'?'горошины':'дробинки',SMALL[S.kind].gen)+' в ряду',16,16,LABC(this))},
+  read(S){const n=S.row.length;if(!n)return{err:'Выложите тела в ряд вдоль линейки: коснитесь чашки.'};
+    if(n<10)return{err:'В ряду только '+n+'. Выложите не меньше 10 — так ошибка измерения меньше.'};
+    return{key:S.kind+'|'+n,k:{name:SMALL[S.kind].name},m:{n,L:Math.round(this.rowLen(S))}}},
+  hint(S){const n=S.row.length;if(!n)return'Коснитесь чашки с горохом или дробью — тело ляжет в желобок линейки.';
+    if(n<10)return'В ряду '+n+'. Выложите не меньше 10 тел.';
+    return recd(S.kind+'|'+n)?'Опыт записан. Измените число тел в ряду или ссыпьте ряд и возьмите другие тела.':'Определите по линейке длину ряда L и нажмите «Записать измерение».'},
+  outs(S){return[['Тела в ряду',S.kind?SMALL[S.kind].name:'—'],['Число тел n',String(S.row.length)]]}
+});
+
+/* 10. Условия плавания тела */
+function drawTube(g,x,y,sand,noSh){const r=14,L=140,top=y-L,k=3;
+  if(!noSh)shadow(g,x,y+1,18,.22);
+  const shape=()=>{g.beginPath();g.moveTo(x-r,top);g.lineTo(x-r,y-r);g.arc(x,y-r,r,Math.PI,0,true);g.lineTo(x+r,top);g.closePath()};
+  g.save();shape();g.fillStyle=C.dark?'rgba(255,255,255,.1)':'rgba(205,222,240,.45)';g.fill();g.clip();
+  if(sand>0){const hs=6+sand*11,gr=g.createLinearGradient(x-r,0,x+r,0);gr.addColorStop(0,'#B8913F');gr.addColorStop(.35,'#EBCB82');gr.addColorStop(1,'#A47F35');
+    g.fillStyle=gr;g.fillRect(x-r,y-hs,2*r,hs);g.fillStyle='rgba(120,90,30,.35)';for(let i=0;i<sand*9;i++){const px=x-r+((i*37)%28),py=y-2-((i*53)%(hs-2));g.fillRect(px,py,1.6,1.6)}
+    g.fillStyle='#F2D798';g.beginPath();g.ellipse(x,y-hs,r,3.5,0,0,7);g.fill()}
+  g.restore();
+  g.strokeStyle=C.ink;g.lineWidth=2;shape();g.stroke();
+  g.fillStyle='rgba(255,255,255,.5)';g.fillRect(x-r+4,top+8,2.5,L-22);
+  for(let v=0;v<=40;v+=2){const yy=y-8-v*k,big=v%10===0;g.strokeStyle=rgba(C.ink,big?.9:.55);g.lineWidth=big?1.3:.8;g.beginPath();g.moveTo(x+r-1,yy);g.lineTo(x+r-(big?9:5),yy);g.stroke();
+    if(big&&v)txt(g,String(v),x+r+3,yy+4,{s:9,w:700})}
+  cyl(g,x,top-12,top+3,r-1.5,'#B07A45',{ry:3.6})}
+function spoonDraw(g,x,y,full){g.strokeStyle=C.dark?'#C9C5D8':'#6B6F85';g.lineWidth=4;g.lineCap='round';g.beginPath();g.moveTo(x+10,y-2);g.lineTo(x+46,y-20);g.stroke();
+  cyl(g,x,y-3,y+3,11,'#A8AEBC',{ry:4,top:!full});if(full){g.fillStyle='#E3C27A';g.beginPath();g.ellipse(x,y-4,10,4,0,0,7);g.fill()}}
+mkWork({
+  id:'floatw',num:10,title:'Выяснение условий плавания тела в жидкости',color:'#2F7A8C',
+  goal:'Выяснить, при каком условии тело плавает в жидкости, а при каком тонет.',
+  equip:'пробирка с пробкой и шкалой объёма до 40 см³, сухой песок и ложка, электронные весы, стакан с водой',
+  steps:['Насыпьте в пробирку ложку песка: перетащите ложку из ящика на пробирку или просто коснитесь ящика.','Поставьте пробирку на весы и узнайте её массу m.','Опустите пробирку в стакан с водой. Если она плавает, определите по шкале на пробирке объём погружённой части V. Если тонет — она погружена целиком, V = 40 см³.','Нажмите «Записать измерение». Выньте пробирку, досыпьте песка и повторите — добейтесь, чтобы пробирка утонула.','Вычислите силу тяжести и архимедову силу и сравните их в каждом опыте.'],
+  rows:4,need:3,tip:'Fтяж = m · g, массу переведите в килограммы (1 г = 0,001 кг). Fₐ = ρ · g · V, ρ воды = 1000 кг/м³, 1 см³ = 0,000001 м³.',
+  cols:[{id:'st',label:'Пробирка',src:'k'},{id:'m',label:'Масса m, г',src:'m',d:0},{id:'V',label:'Объём погружённой части V, см³',src:'m',d:0},{id:'Ft',label:'Fтяж = m · g, Н',src:'c',d:2,f:v=>v.m*G/1000,tol:.006},{id:'Fa',label:'Fₐ = ρ · g · V, Н',src:'c',d:2,f:v=>1000*G*v.V*1e-6,tol:.006}],
+  quiz:{q:'При каком условии тело тонет в жидкости?',opts:['Сила тяжести больше архимедовой силы при полном погружении','Архимедова сила больше силы тяжести','Тело тонет всегда, если оно тяжёлое'],a:0},
+  concl:'Плавающее тело погружается ровно настолько, чтобы архимедова сила уравновесила силу тяжести: Fₐ = Fтяж. Если сила тяжести больше архимедовой силы даже при полном погружении, тело тонет. Поэтому чем тяжелее пробирка, тем глубже она сидит в воде, а слишком тяжёлая идёт ко дну.',
+  actions:[['Высыпать песок',S=>{if(S.items[0].loc==='beaker'){wToast('Сначала выньте пробирку из воды.','err');return}if(!S.sand){wToast('Пробирка и так пустая.','err');return}S.sand=0;wToast('Песок высыпан: пробирка пустая.','ok')}]],
+  BX:370,BR:52,BB:330,WH:150,PXV:3,VMAX:40,Q:(14/52)**2*3,SX:158.6,SY:301,
+  mass(S){return 12+8*S.sand},
+  init(S){S.sand=0;S.weighed={};S.spoon=null;S.used=false;S.sub=0;S.yw=this.BB-this.WH;
+    S.items=[{id:'tube',type:'tube',name:'пробирка с песком',w:28,h:154,hx:252,hy:318,sand:0}];initItems(S)},
+  phys(S){const it=S.items[0];it.sand=S.sand;let sub=0,yw=this.BB-this.WH;
+    if(it.loc==='beaker'||(it.loc==='drag'&&Math.abs(it.x-this.BX)<this.BR-12))for(let i=0;i<3;i++){yw=this.BB-this.WH-sub*this.Q;sub=clamp((it.y-8-yw)/this.PXV,0,this.VMAX)}
+    S.sub=sub;S.yw=this.BB-this.WH-sub*this.Q;
+    if(it.loc==='scale'&&!it.fly)S.weighed[S.sand]=this.mass(S)},
+  layout(S){const it=S.items[0];if(it.loc!=='beaker')it.slow=false;
+    if(it.loc==='scale'){it.tx=this.SX;it.ty=this.SY}
+    else if(it.loc==='beaker'){const rim=this.BB-200-6,m=this.mass(S);
+      if(Math.abs(it.x-this.BX)>1.5){it.slow=false;it.hold=true;it.fly=true;it.tx=this.BX;it.ty=Math.min(it.y,rim);if(it.y>rim+1&&Math.abs(it.x-this.BX)>this.BR-14)it.tx=it.x}
+      else{it.slow=true;it.tx=this.BX;it.ty=m<=this.VMAX?S.yw+8+m*this.PXV:this.BB-2}}},
+  zones(S){return[{id:'scale',r:[86,150,232,334],ok:()=>true},{id:'beaker',r:[this.BX-this.BR-26,96,this.BX+this.BR+26,this.BB+14],ok:()=>true}]},
+  addSand(S){const it=S.items[0];if(it.loc==='beaker'){wToast('Сначала выньте пробирку из воды — мокрый песок не насыпать.','err');return}
+    if(S.sand>=6){wToast('Пробирка уже заполнена песком.','err');return}
+    S.sand++;wToast('Насыпали ложку песка: в пробирке '+S.sand+' '+plural(S.sand,'ложка','ложки','ложек')+'. Взвесьте её заново.','ok')},
+  handles:[{hit:(S,x,y)=>x>466&&x<634&&y>268&&y<350,
+    start:(S,x,y)=>{S.used=true;S.spoon={x,y}},
+    move:(S,x,y)=>{if(S.spoon){S.spoon.x=x;S.spoon.y=y}},
+    end:S=>{const sp=S.spoon;S.spoon=null;if(!sp)return;const tap=!S.pd||!S.pd.mv,r=itRect(S.items[0]);
+      if(tap||(sp.x>r[0]-24&&sp.x<r[2]+24&&sp.y>r[1]-30&&sp.y<r[3]+10))cur.addSand(S)}}],
+  state(S){return this.mass(S)<=this.VMAX?'плавает':'тонет'},
+  scene(g,S){deskTop(g,DESK);const it=S.items[0],BX=this.BX,BB=this.BB,BR=this.BR,top=BB-200,m=this.mass(S),onScale=it.loc==='scale'&&!it.fly;
+    // электронные весы
+    box3(g,70,318,140,26,C.dark?'#4b4660':'#D7DAE3',60);
+    g.fillStyle='#1F2340';g.beginPath();g.roundRect(94,322,92,18,4);g.fill();
+    txt(g,(onScale?f1(m,1):'0,0')+' г',181,336,{a:'right',s:12,c:'#99CC42',w:700});
+    cyl(g,this.SX,this.SY-4,this.SY+2,44,'#B9BDCB',{ry:12});
+    // штатив для пробирок
+    box3(g,226,316,60,22,WOODC,36);
+    // ящик с песком и ложка
+    box3(g,470,318,140,26,'#7A4A28',50,{wood:true});
+    {const P=(u,f)=>[470+u+f*50*DX,318+f*50*DY];const q=[P(6,.12),P(134,.12),P(134,.9),P(6,.9)];g.fillStyle='#E3C27A';g.beginPath();q.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();g.fill();
+     g.fillStyle='rgba(150,110,40,.35)';for(let i=0;i<60;i++){const u=10+((i*41)%118),f=.18+((i*29)%64)/100,p=P(u,f);g.fillRect(p[0],p[1],1.6,1.6)}}
+    txt(g,'песок',540,336,{a:'center',s:11,c:'rgba(255,255,255,.85)',w:700});
+    if(!S.spoon)spoonDraw(g,520,302,false);
+    if(!S.used){const p=(Math.sin(S.time*4)+1)/2;g.strokeStyle=rgba(C.lime,.4+.5*p);g.lineWidth=3;g.beginPath();g.roundRect(462-p*3,264-p*3,176+p*6,90+p*6,16);g.stroke()}
+    // стакан с водой
+    glassBack(g,BX,BB,BR,top,0);
+    if(it.loc==='beaker')drawIt(g,it,true);
+    glassLiquid(g,BX,BB,BR,S.yw,'#4F86C6');
+    glassFront(g,BX,BB,BR,top);
+    if(it.loc==='tray'||it.loc==='scale')drawIt(g,it);
+    if(S.spoon){spoonDraw(g,S.spoon.x,S.spoon.y,true);sph(g,S.spoon.x+50,S.spoon.y-22,7,'#99CC42')}
+    if(it.loc==='beaker')badge(g,it.fly?'Погружается…':this.state(S)==='плавает'?'Плавает':'Тонет',16,16,it.fly?C.muted:this.state(S)==='плавает'?C.green:C.plum)},
+  read(S){const it=S.items[0];if(it.loc!=='beaker')return{err:'Опустите пробирку в стакан с водой.'};
+    if(it.fly)return{err:'Подождите, пока пробирка успокоится.'};
+    const m=S.weighed[S.sand];if(m===undefined)return{err:'Сначала взвесьте пробирку с этим количеством песка: поставьте её на весы.'};
+    const fl=m<=this.VMAX;return{key:'s'+S.sand,k:{st:fl?'плавает':'тонет'},m:{m,V:fl?Math.round(S.sub):this.VMAX}}},
+  hint(S){const it=S.items[0],w=S.weighed[S.sand]!==undefined;
+    if(!S.used&&!S.sand)return'Насыпьте в пробирку песок: перетащите ложку из ящика на пробирку или коснитесь ящика.';
+    if(it.loc==='beaker'){if(it.fly)return'Пробирка погружается…';if(!w)return'Масса с этим количеством песка не измерена — выньте пробирку и поставьте на весы.';
+      if(recd('s'+S.sand))return'Опыт записан. Выньте пробирку, досыпьте песка и повторите опыт.';
+      return this.state(S)==='плавает'?'Пробирка плавает. Определите по шкале объём погружённой части V и нажмите «Записать измерение».':'Пробирка утонула и погружена целиком: V = 40 см³. Нажмите «Записать измерение».'}
+    if(it.loc==='scale')return it.fly?'Ставим на весы…':'Масса измерена. Опустите пробирку в стакан с водой.';
+    return w?'Масса известна. Опустите пробирку в стакан с водой.':'Поставьте пробирку на весы, чтобы узнать её массу.'},
+  outs(S){const it=S.items[0];return[['Песок в пробирке',S.sand+' '+plural(S.sand,'ложка','ложки','ложек')],['Весы',it.loc==='scale'&&!it.fly?f1(this.mass(S),1)+' г':'—'],['Пробирка',it.loc==='beaker'?(it.fly?'погружается':this.state(S)):'вне воды']]}
+});
+
 function LABC(lab){return lab.color}
 
 /* ===================== APP ===================== */
@@ -2144,6 +2341,22 @@ function saveVisited(){try{localStorage.setItem('lab-sirius-visited',JSON.string
 let doneW=new Set();
 try{doneW=new Set(JSON.parse(localStorage.getItem('lab-sirius-works')||'[]').filter(id=>WORKS.some(w=>w.id===id)))}catch(e){}
 function saveDone(){try{localStorage.setItem('lab-sirius-works',JSON.stringify([...doneW]))}catch(e){}}
+/* ученик, задание от учителя и код результата (сайт без сервера: данные живут в ссылке и в коде) */
+let SNAME='',TASK=null,lastRes=null;
+try{SNAME=localStorage.getItem('lab-sirius-name')||''}catch(_){}
+try{TASK=JSON.parse(localStorage.getItem('lab-sirius-task')||'null')}catch(_){}
+function setTask(t){TASK=t;try{t?localStorage.setItem('lab-sirius-task',JSON.stringify(t)):localStorage.removeItem('lab-sirius-task')}catch(_){}}
+const esc=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const b64e=v=>{const b=new TextEncoder().encode(v);let t='';b.forEach(x=>t+=String.fromCharCode(x));return btoa(t).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+const b64d=v=>{v=v.replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const t=atob(v),b=new Uint8Array(t.length);for(let i=0;i<t.length;i++)b[i]=t.charCodeAt(i);return new TextDecoder().decode(b)};
+function fnv(v){let h=0x811c9dc5;for(let i=0;i<v.length;i++){h^=v.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}return h.toString(36)}
+const SALT='lab-sirius-7';
+function makeCode(w,name,rows){const p=b64e(JSON.stringify({v:1,n:name,w:w.id,t:Math.round(Date.now()/60000),r:rows}));return'LS-'+p+'-'+fnv(p+SALT)}
+function readCode(c){const m=String(c).trim().match(/^LS-([A-Za-z0-9_-]+)-([0-9a-z]+)$/);if(!m)return null;let o;try{o=JSON.parse(b64d(m[1]))}catch(_){return null}
+  if(!o||typeof o!=='object')return null;return{o,ok:fnv(m[1]+SALT)===m[2]}}
+function copyText(v,btn){const done=()=>{if(!btn)return;const o=btn.textContent;btn.textContent='Скопировано ✓';setTimeout(()=>{btn.textContent=o},1600)};
+  const fb=()=>{const ta=document.createElement('textarea');ta.value=v;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,v.length);try{document.execCommand('copy');done()}catch(_){}ta.remove()};
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(v).then(done,fb);else fb()}
 
 const CATS=['Все',...Array.from(new Set(LABS.map(l=>l.cat)))];
 let filter='Все',cur=null,P={},S={},paused=false,raf=0,last=0,outT=0,cv=null,g=null,homeScroll=0,worksScroll=0,fromHome=false,outEls=[],T=[];
@@ -2164,6 +2377,9 @@ const ICON={
   close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
   lines:'<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square" aria-hidden="true"><path d="M3 6h22M3 11h22M3 16h22M3 21h12"/></svg>',
   flask:'<svg viewBox="0 0 30 30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="15" r="13"/><path d="M12 8h6M13 8v5l-4.5 7.5a1.5 1.5 0 0 0 1.3 2.3h10.4a1.5 1.5 0 0 0 1.3-2.3L17 13V8"/><path d="M10.6 18h8.8"/></svg>',
+  doc:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 2H5a1.5 1.5 0 0 0-1.5 1.5v11A1.5 1.5 0 0 0 5 16h8a1.5 1.5 0 0 0 1.5-1.5V6z"/><path d="M10.5 2v4h4M6.5 10h5M6.5 13h3"/></svg>',
+  link:'<svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 10.5a3 3 0 0 0 4.2 0l2.6-2.6a3 3 0 0 0-4.2-4.2L9 4.8"/><path d="M10.5 7.5a3 3 0 0 0-4.2 0L3.7 10.1a3 3 0 0 0 4.2 4.2L9 13.2"/></svg>',
+  teacher:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4M21 9v5"/></svg>',
   hand:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10V4.5a1.5 1.5 0 0 1 3 0V9m0-1.5a1.5 1.5 0 0 1 3 0V9m0-.5a1.5 1.5 0 0 1 3 0V12a6 6 0 0 1-6 6h-.6a5 5 0 0 1-4-2L3 12.6a1.5 1.5 0 0 1 2.3-1.9L7 12.5"/></svg>'
 };
 const logoSVG='<svg viewBox="0 0 50 36" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" style="color:var(--brand)" aria-hidden="true"><path d="M3 4h16c3 0 6 2 6 5v23c0-3-3-5-6-5H3z"/><path d="M47 4H31c-3 0-6 2-6 5v23c0-3 3-5 6-5h16z"/></svg>';
@@ -2175,7 +2391,8 @@ function openMenu(){
   const h=location.hash,inWorks=h.startsWith('#work'),cnt=c=>LABS.filter(l=>l.cat===c).length;
   const items=[['#','Все явления',LABS.length+' '+plural(LABS.length,'модель','модели','моделей'),'Все',!inWorks&&filter==='Все']]
     .concat(CATS.slice(1).map((c,i)=>['#','Глава '+(i+1)+'. '+c,cnt(c)+' '+plural(cnt(c),'модель','модели','моделей'),c,!inWorks&&filter===c]))
-    .concat([['#works','Лабораторные работы',WORKS.length+' работ · выполнено '+WORKS.filter(w=>doneW.has(w.id)).length,'',inWorks]]);
+    .concat([['#works','Лабораторные работы',WORKS.length+' работ · выполнено '+WORKS.filter(w=>doneW.has(w.id)).length,'',inWorks]])
+    .concat([['#teacher','Для учителя','Задание по ссылке и проверка результатов','',h==='#teacher']]);
   menuEl.innerHTML=`<div class="menu-sheet" role="dialog" aria-modal="true" aria-label="Разделы"><button class="menu-x" data-m="close" aria-label="Закрыть меню">${ICON.close}</button><nav>${items.map(it=>`<a href="${it[0]}" data-cat="${it[3]}"${it[4]?' aria-current="page"':''}>${ICON.lines}<span>${it[1]}<small>${it[2]}</small></span></a>`).join('')}</nav></div>`;
   menuFocus=document.activeElement;menuEl.hidden=false;document.body.style.overflow='hidden';const a=menuEl.querySelector('[aria-current]')||menuEl.querySelector('a');if(a)a.focus();
 }
@@ -2184,6 +2401,7 @@ menuEl.addEventListener('click',e=>{
   if(e.target===menuEl||e.target.closest('[data-m="close"]')){closeMenu();return}
   const a=e.target.closest('a');if(!a)return;e.preventDefault();closeMenu();fromHome=false;
   if(a.getAttribute('href')==='#works'){location.hash='works';return}
+  if(a.getAttribute('href')==='#teacher'){location.hash='teacher';return}
   filter=a.dataset.cat;try{sessionStorage.setItem('lab-sirius-filter',filter)}catch(_){}
   homeScroll=0;if(location.hash&&location.hash!=='#')location.hash='';else{setFilter(filter);window.scrollTo({top:0,behavior:'smooth'})}
 });
@@ -2216,20 +2434,56 @@ function home(){
 }
 function worksHome(){
   const back=cur&&cur.kind==='work';stop();cur=null;document.title='Лабораторные работы — Лаборатория Сириус';
-  const done=WORKS.filter(w=>doneW.has(w.id)).length;
+  const done=WORKS.filter(w=>doneW.has(w.id)).length,inT=id=>!!TASK&&TASK.w.includes(id);
+  const list=TASK?WORKS.filter(w=>inT(w.id)).concat(WORKS.filter(w=>!inT(w.id))):WORKS;
+  const tdone=TASK?TASK.w.filter(id=>doneW.has(id)).length:0;
   app.innerHTML=`<div class="view">`+header()+`
+  ${TASK?`<div class="taskbar"><div><small>Задание от учителя</small><b>${esc(TASK.t)}</b><span>Выполнено ${tdone} из ${TASK.w.length}. После проверки каждой работы появится код — отправьте его учителю.</span></div><button class="btn" data-act="taskoff">Скрыть</button></div>`:''}
   <section class="hero"><h1>Лабораторные работы</h1><p>Берите приборы руками: взвешивайте, погружайте, подвешивайте грузы. Записывайте измерения в таблицу, считайте и делайте вывод.</p></section>
   <div class="progress"><span>Выполнено ${done} из ${WORKS.length}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${WORKS.length}" aria-valuenow="${done}"><i data-w="${done/WORKS.length*100}"></i></div></div>
-  <div class="cards" id="cards">${WORKS.map(w=>`
+  <div class="cards" id="cards">${list.map(w=>`
     <a class="card ${doneW.has(w.id)?'seen':''}" style="--c:${w.color}" href="#work/${w.id}">
       <div class="pb"><i></i></div>
-      <span class="tag">Лабораторная работа № ${w.num}</span>
+      <span class="tags"><span class="tag">Лабораторная работа № ${w.num}</span>${inT(w.id)?'<span class="tag task">В задании</span>':''}</span>
       <h2>${w.title}</h2><p>${w.goal}</p>
       <div class="foot"><span class="meta"><span class="mrow">${ICON.flask}<span>${w.need||w.rows} ${plural(w.need||w.rows,'опыт','опыта','опытов')}</span></span><span>${doneW.has(w.id)?'✓ Выполнена':'Не выполнена'}</span></span><span class="go">${doneW.has(w.id)?'Повторить':'Начать'}</span></div>
-    </a>`).join('')}</div></div>`;
+    </a>`).join('')}</div>
+  <a class="tlinkfoot" href="#teacher"><span>Для учителя<small>Выдать работы классу по ссылке и проверить коды результатов</small></span>${ICON.next}</a></div>`;
   window.scrollTo(0,back?worksScroll:0);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
 }
+function teacherHome(){
+  stop();cur=null;document.title='Для учителя — Лаборатория Сириус';
+  app.innerHTML=`<div class="view">`+header()+`
+  <section class="hero"><h1>Для учителя</h1><p>Выдайте лабораторные работы классу по ссылке и проверьте результаты учеников.</p></section>
+  <main class="sheet tsheet">
+    <div class="note f"><b>1. Задание по ссылке</b>
+      <label class="tfield">Название задания<input id="ttitle" maxlength="80" value="Лабораторные работы"></label>
+      <div class="tchecks" role="group" aria-label="Работы в задании">${WORKS.map(w=>`<label><input type="checkbox" value="${w.id}" checked><span>№ ${w.num}. ${w.title}</span></label>`).join('')}</div>
+      <div class="tools"><button class="btn main" data-act="tlink">${ICON.link}Создать ссылку</button></div>
+      <div class="tlink" id="tlinkbox" hidden><input id="tlinkout" readonly aria-label="Ссылка на задание"><button class="btn" data-act="tcopy">Копировать</button></div>
+      <p class="tmsg" id="tlinkmsg">Ученик откроет ссылку, увидит задание и отметку «В задании» на нужных работах.</p>
+    </div>
+    <div class="note f"><b>2. Проверка результатов</b>
+      <p class="tmsg">Выполнив работу, ученик получает код результата. Попросите прислать коды — например, в чат класса — и вставьте их сюда, каждый с новой строки.</p>
+      <textarea id="tcodes" rows="5" placeholder="LS-…" aria-label="Коды результатов"></textarea>
+      <div class="tools"><button class="btn main" data-act="tverify">${ICON.check}Проверить коды</button></div>
+      <div id="tres"></div>
+    </div>
+    <p class="hint">${ICON.teacher}<span>Сайт работает без сервера и не хранит данные учеников. Код защищает от ошибок при копировании и случайных изменений, но не от целенаправленной подделки.</span></p>
+  </main></div>`;
+  window.scrollTo(0,0);
+}
+function tLink(){const ids=[...document.querySelectorAll('.tchecks input:checked')].map(x=>x.value);
+  if(!ids.length){$('#tlinkmsg').textContent='Отметьте хотя бы одну работу.';return}
+  $('#tlinkout').value=location.href.split('#')[0]+'#task/'+b64e(JSON.stringify({t:$('#ttitle').value.trim()||'Лабораторные работы',w:ids}));
+  $('#tlinkbox').hidden=false;$('#tlinkmsg').textContent='Ссылка готова: '+ids.length+' '+plural(ids.length,'работа','работы','работ')+'. Отправьте её ученикам.'}
+function tVerify(){const codes=$('#tcodes').value.split(/\s+/).filter(Boolean),out=$('#tres');
+  if(!codes.length){out.innerHTML='<p class="tmsg">Вставьте хотя бы один код.</p>';return}
+  const rows=codes.map(c=>{const r=readCode(c);if(!r)return`<tr><td colspan="4">Это не код результата: ${esc(c.slice(0,24))}${c.length>24?'…':''}</td><td>✗ ошибка</td></tr>`;
+    const w=WORKS.find(x=>x.id===r.o.w),d=new Date((+r.o.t||0)*60000),n=+r.o.r||0;
+    return`<tr><td>${esc(r.o.n||'—')}</td><td>${w?'№ '+w.num+'. '+w.title:'неизвестная работа'}</td><td>${d.toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>${n} ${plural(n,'опыт','опыта','опытов')}</td><td>${r.ok?'✓ верный':'✗ изменён'}</td></tr>`});
+  out.innerHTML=`<div class="tblwrap"><table class="res"><thead><tr><th>Ученик</th><th>Работа</th><th>Когда</th><th>Опытов</th><th>Код</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`}
 function setFilter(c){
   filter=c;try{sessionStorage.setItem('lab-sirius-filter',c)}catch(e){}
   document.querySelectorAll('.chips .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cat===c));
@@ -2277,7 +2531,7 @@ function tableHTML(w){
 }
 function openWork(id){
   if(!cur)worksScroll=window.scrollY;
-  stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};cur.init(S);wSnap();
+  stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};lastRes=null;cur.init(S);wSnap();
   T=Array.from({length:cur.rows},()=>({key:null,k:{}}));
   const w=cur,idx=WORKS.indexOf(w),nx=WORKS[(idx+1)%WORKS.length];
   document.title=w.title+' — Лаборатория Сириус';
@@ -2303,8 +2557,10 @@ function openWork(id){
     <div class="tblwrap"><table class="res" id="wtab">${tableHTML(w)}</table></div>
     <h2>Вывод</h2>
     <div class="note f quiz" role="radiogroup" aria-label="${w.quiz.q}"><b>${w.quiz.q}</b>${shuffled(w.quiz.opts.length).map(i=>`<label><input type="radio" name="wq" value="${i}"><span>${w.quiz.opts[i]}</span></label>`).join('')}</div>
+    <label class="sname">Ученик<input id="sname" maxlength="60" autocomplete="name" placeholder="Фамилия Имя, класс" value="${esc(SNAME)}"><small>Попадёт в отчёт и в код результата для учителя</small></label>
     <div class="tools">
       <button class="btn main" data-act="check">${ICON.check}Проверить работу</button>
+      <button class="btn" data-act="report">${ICON.doc}Отчёт (PDF)</button>
       <button class="btn" data-act="tclear">Очистить таблицу</button>
     </div>
     <div class="note" id="verdict" role="status" hidden></div>
@@ -2351,9 +2607,30 @@ function wCheck(){
   if(bad)msgs.push(`Ошибок в вычислениях: ${bad}. Проверьте клетки, отмеченные красным. ${w.tip||''}`);
   if(!q)msgs.push('Выберите ответ в разделе «Вывод».');else if(!qok)msgs.push('Ответ в разделе «Вывод» неверный — подумайте ещё.');
   const el=$('#verdict');el.hidden=false;
-  if(!msgs.length){el.className='note ok';el.innerHTML=`<b>Работа выполнена!</b> ${w.concl}`;doneW.add(w.id);saveDone()}
-  else{el.className='note';el.innerHTML='<b>Почти готово.</b><ul>'+msgs.map(m=>`<li>${m}</li>`).join('')+'</ul>'}
+  if(!msgs.length){doneW.add(w.id);saveDone();lastRes={w:w.id,rows,code:SNAME.trim()?makeCode(w,SNAME.trim(),rows):null};el.className='note ok';
+    el.innerHTML=`<b>Работа выполнена!</b> ${w.concl}`+(lastRes.code?`<div class="rescode"><small>Код результата для учителя</small><code>${lastRes.code}</code><button class="btn" data-act="copycode">Копировать</button></div>`
+      :`<div class="rescode"><small>Впишите фамилию и имя в поле «Ученик» и нажмите «Проверить работу» ещё раз — появится код результата для учителя.</small></div>`)}
+  else{lastRes=null;el.className='note';el.innerHTML='<b>Почти готово.</b><ul>'+msgs.map(m=>`<li>${m}</li>`).join('')+'</ul>'}
   el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function printReport(){
+  const w=cur,rows=[];
+  T.forEach((r,i)=>{const tr=wRow(i),cells=w.cols.map(c=>{const el=tr.querySelector(`[data-c="${c.id}"]`);
+      if(c.src==='k')return{t:el.textContent==='—'?'':el.textContent};return{t:el.value.trim(),ok:el.classList.contains('ok'),bad:el.classList.contains('bad')}});
+    if(cells.some(x=>x.t))rows.push(cells)});
+  const q=document.querySelector('input[name="wq"]:checked'),done=!!lastRes&&lastRes.w===w.id;
+  let el=$('#print');if(!el){el=document.createElement('div');el.id='print';document.body.appendChild(el)}
+  el.innerHTML=`<h1>Лабораторная работа № ${w.num}</h1><h2>${w.title}</h2>
+    <p><b>Ученик:</b> ${SNAME.trim()?esc(SNAME.trim()):'______________________________'}&nbsp;&nbsp; <b>Дата:</b> ${new Date().toLocaleDateString('ru-RU')}</p>
+    <p><b>Цель работы:</b> ${w.goal}</p><p><b>Оборудование:</b> ${w.equip}.</p>
+    <h3>Результаты измерений и вычислений</h3>
+    <table><tr><th>№</th>${w.cols.map(c=>`<th>${c.label}</th>`).join('')}</tr>${rows.length?rows.map((r,i)=>`<tr><td>${i+1}</td>${r.map(x=>`<td>${esc(x.t)}${x.ok?' ✓':x.bad?' ✗':''}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${w.cols.length+1}">Измерения не записаны</td></tr>`}</table>
+    <h3>Вывод</h3><p><i>${w.quiz.q}</i><br>${q?esc(w.quiz.opts[+q.value]):'Ответ не выбран.'}</p>
+    ${done?`<p>${w.concl}</p><p class="pv"><b>Работа выполнена и проверена на сайте.</b>${lastRes.code?`<br>Код результата: <code>${lastRes.code}</code>`:''}</p>`:'<p class="pv">Работа ещё не проверена на сайте.</p>'}
+    <p class="pf">Лаборатория Сириус · ${esc(location.href.split('#')[0])}</p>`;
+  document.body.classList.add('printing');
+  const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);
+  setTimeout(()=>window.print(),60);
 }
 function wRestart(){cur.init(S);wSnap();updateOuts();statusUntil=0;wHintTick()}
 function controlHTML(p){
@@ -2421,12 +2698,16 @@ app.addEventListener('click',e=>{
   if(t.dataset.act==='menu'){openMenu();return}
   if(t.dataset.act==='theme'){const th=C.dark?'light':'dark';document.documentElement.dataset.theme=th;try{localStorage.setItem('lab-sirius-theme',th)}catch(_){}
     t.innerHTML=th==='dark'?ICON.sun:ICON.moon;t.setAttribute('aria-label',th==='dark'?'Светлая тема':'Тёмная тема');return}
-  if(t.dataset.act==='home'){if(cur)goHome();else if(location.hash==='#works')location.hash='';else window.scrollTo({top:0,behavior:'smooth'});return}
+  if(t.dataset.act==='home'){if(cur)goHome();else if(location.hash&&location.hash!=='#')location.hash='';else window.scrollTo({top:0,behavior:'smooth'});return}
+  {const ac=t.dataset.act;
+   if(ac==='tlink'){tLink();return}if(ac==='tcopy'){copyText($('#tlinkout').value,t);return}if(ac==='tverify'){tVerify();return}
+   if(ac==='taskoff'){setTask(null);worksHome();return}}
   if(t.dataset.act==='back'){goHome();return}
   if(t.dataset.cat){setFilter(t.dataset.cat);return}
   if(!cur)return;
   if(cur.kind==='work'){const a=t.dataset.act;
     if(a==='rec')wRecord();else if(a==='wreset')wRestart();else if(a==='check')wCheck();
+    else if(a==='report')printReport();else if(a==='copycode'){if(lastRes&&lastRes.code)copyText(lastRes.code,t)}
     else if(a==='tclear'){T.forEach((r,i)=>wClearRow(i));$('#verdict').hidden=true}
     else if(a==='rowclr')wClearRow(+t.dataset.r);
     else if(t.dataset.wact!==undefined){cur.actions[+t.dataset.wact][1](S);updateOuts()}
@@ -2440,6 +2721,7 @@ app.addEventListener('click',e=>{
 });
 app.addEventListener('input',e=>{
   const el=e.target;if(el.closest&&el.closest('#wtab')){el.classList.remove('ok','bad');return}
+  if(el.id==='sname'){SNAME=el.value;try{localStorage.setItem('lab-sirius-name',SNAME)}catch(_){}return}
   if(!el.dataset.p||!cur)return;
   const p=cur.params.find(x=>x.id===el.dataset.p);P[p.id]=parseFloat(el.value);setFill(el);
   const v=$('#v_'+p.id);v.textContent=fmtVal(p,P[p.id]);bump(v);clearPresets();changed(p.id);updateOuts();
@@ -2454,6 +2736,10 @@ function route(){
   const h=location.hash;let m;
   if((m=h.match(/^#lab\/([\w-]+)$/))&&LABS.some(l=>l.id===m[1]))openLab(m[1]);
   else if((m=h.match(/^#work\/([\w-]+)$/))&&WORKS.some(w=>w.id===m[1]))openWork(m[1]);
+  else if((m=h.match(/^#task\/([A-Za-z0-9_-]+)$/))){let o=null;try{o=JSON.parse(b64d(m[1]))}catch(_){}
+    if(o&&Array.isArray(o.w)){const w=o.w.filter(id=>WORKS.some(x=>x.id===id));if(w.length)setTask({t:String(o.t||'Лабораторные работы').slice(0,80),w})}
+    location.replace('#works');return}
+  else if(h==='#teacher'){fromHome=false;teacherHome()}
   else if(h==='#works'){fromHome=false;worksHome()}
   else{fromHome=false;home()}
 }
