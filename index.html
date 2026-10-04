@@ -387,6 +387,11 @@ table.jtab td.jx{color:#C4245F;font-weight:800;text-align:center}td.jfl{color:#B
 .teqh{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}.teqh b{font-size:16px}.teqh .tact{margin-left:auto}
 .teopts{display:grid;gap:8px;margin-top:10px}.teo{display:flex;gap:8px;align-items:center}.teo input:not([type]){flex:1;width:0}.teo .mini{margin:0;flex:none}@media(max-width:560px){.teq{padding:10px}.tedit .note{padding:12px}}.teo input[type]{width:20px;height:20px;accent-color:var(--green);flex:none}
 .tenum .trow .tfield{flex:1 1 160px;margin:6px 0}.tevars{display:grid;gap:8px;margin-top:10px}.tev{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;color:var(--muted);font-weight:600}.tev input{width:72px}
+.lbar span{font-size:14px}
+.stiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}@media(max-width:560px){.stiles{grid-template-columns:1fr 1fr}}
+.stile{background:var(--surf);border-radius:16px;padding:12px 14px}.stile b{display:block;font-size:30px;font-variant-numeric:tabular-nums;color:var(--ink)}.stile span{color:var(--muted);font-size:13px;font-weight:600}
+.schart{background:var(--surf);border-radius:16px;padding:12px 14px 6px;margin:6px 0}.schart svg{display:block;width:100%;height:auto}
+.sbar{fill:var(--brand)}.schart g:hover .sbar{fill:var(--plum)}
 #print{display:none}
 @media print{
   body.printing{background:#fff}
@@ -2792,14 +2797,14 @@ function home(){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
 }
 function worksHome(){
-  if(gated()){if(SRV==='?'&&!ACC){waitHome();return}worksGated();return}
+  if(gated()){worksGated();return}
   const back=cur&&cur.kind==='work';stop();cur=null;document.title='Лабораторные работы — Лаборатория Сириус';
   const inT=inTask,only=!!TASK&&!showAllW;
   const list=only?TASK.w.map(id=>WORKS.find(w=>w.id===id)):TASK?WORKS.filter(w=>inT(w.id)).concat(WORKS.filter(w=>!inT(w.id))):WORKS;
   const isDone=id=>only?TASK.done.includes(id):doneW.has(id);
   const done=list.filter(w=>isDone(w.id)).length,tdone=TASK?TASK.w.filter(id=>TASK.done.includes(id)).length:0;
   const codes=TASK?TASK.w.filter(id=>TASK.codes[id]).map(id=>TASK.codes[id]):[];
-  app.innerHTML=`<div class="view">`+header()+`
+  app.innerHTML=`<div class="view">`+header()+loginBar()+`
   ${TASK?`<div class="taskbar"><div><small>Задание от учителя</small><b>${esc(TASK.t)}</b><span>${tdone===TASK.w.length?'Все работы задания выполнены. Отправьте коды учителю.':`Выполнено ${tdone} из ${TASK.w.length}. После проверки каждой работы появится код — отправьте его учителю.`}</span></div>
     <div class="tbtns">${tdone<TASK.w.length?`<a class="btn main" href="#work/${taskNext(null)}">${tdone?'Продолжить':'Начать'}</a>`:''}<button class="btn" data-act="taskoff">Выйти из задания</button></div></div>
     ${codes.length?`<div class="taskcodes"><small>Коды для учителя</small><code id="tcodesall">${codes.join('<br>')}</code><button class="btn" data-act="copyall">Копировать все коды</button></div>`:''}`:''}
@@ -2923,7 +2928,7 @@ function openWork(id){
   <section class="labhead" style="--lab:${w.color}">
     <button class="back" data-act="back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg>Все работы</button>
     <h1>${w.title}</h1><p>${w.goal}</p><span class="tag">Лабораторная работа № ${w.num}</span>
-    ${gated()&&ACC&&ACC.kind==='s'?`<a class="taskline" href="#works"><span><small>Задание учителя · ${esc(ACC.cls)}</small><b>${wDeadline(w.id)?'Сдать до '+fmtDT(wDeadline(w.id)):'Без срока сдачи'}</b></span><span class="tgo">Все мои работы</span></a>`:''}
+    ${ACC&&ACC.kind==='s'&&wAssigned(w.id)!=='no'?`<a class="taskline" href="#works"><span><small>Задание учителя · ${esc(ACC.cls)}</small><b>${wDeadline(w.id)?'Сдать до '+fmtDT(wDeadline(w.id)):'Без срока сдачи'}</b></span><span class="tgo">Все мои работы</span></a>`:''}
     ${tw?`<a class="taskline" href="#works"><span><small>Задание от учителя · работа ${TASK.w.indexOf(w.id)+1} из ${TASK.w.length}</small><b>${esc(TASK.t)}</b></span><span class="tgo">Все работы задания</span></a>`:''}
   </section>
   <main class="sheet" style="--lab:${w.color}">
@@ -3033,9 +3038,9 @@ function wCheck(){
   const el=$('#verdict');el.hidden=false;wGraph();
   if(!msgs.length){doneW.add(w.id);saveDone();const data=T.map((r,i)=>[r,i]).filter(([r])=>r.key!==null&&r.m).map(([r,i])=>{const o=rowM(w,i);return w.cols.filter(c=>c.src==='m').map(c=>Math.round(o[c.id]*10**c.d)/10**c.d)});
     lastRes={w:w.id,rows,test:ex.test||null,prec:ex.prec||null,code:!gated()&&SNAME.trim()?makeCode(w,SNAME.trim(),rows,data,ex.test):null};el.className='note ok';
-    if(gated()&&ACC){const sv=ACC.kind==='s';
+    if(gated()&&ACC){const as=ACC.kind==='s'?wAssigned(w.id):'',sv=as==='yes';
       el.innerHTML=`<b>Работа выполнена!</b> ${w.concl}`+(ex.prec||ex.test?`<p class="vextra">${ex.prec?`Результат с погрешностью (опыт 1): <b>${ex.prec}</b>.`:''}${ex.test?` Мини-тест: <b>${ex.test[0]} из ${ex.test[1]}</b>.`:''}</p>`:'')
-        +`<div class="rescode" id="wsend"><small>${sv?'Отправляем результат учителю…':ACC.kind==='d'?'Демо-режим: результат не сохраняется.':'Вы вошли как учитель: результат не сохраняется.'}</small>${sv?'':`<a class="btn main" href="#works">К списку работ${ICON.next}</a>`}</div>`;
+        +`<div class="rescode" id="wsend"><small>${sv?'Отправляем результат учителю…':as==='late'?'Срок сдачи прошёл — результат учителю не отправлен.':as==='no'?'Эту работу учитель не задавал — результат не отправлялся.':ACC.kind==='d'?'Демо-режим: результат не сохраняется.':'Вы вошли как учитель: результат не сохраняется.'}</small>${sv?'':`<a class="btn main" href="#works">К списку работ${ICON.next}</a>`}</div>`;
       if(sv)wSend(w.id,{r:data,n:rows,t:ex.test||null,p:ex.prec||null,a:WATT,sec:Math.round((Date.now()-WSTART)/1000)});
       el.scrollIntoView({behavior:'smooth',block:'nearest'});return}
     const tw=inTask(w.id);let tn=null;
@@ -3225,11 +3230,13 @@ const ERRS={slow:'Слишком много попыток. Подождите 1
   closed:'Эта работа сейчас закрыта.',late:'Срок сдачи этой работы прошёл.',limit:'Достигнут предел: не больше 40 классов и 60 учеников в классе.',self:'Нельзя заблокировать свой аккаунт.',
   work:'Неизвестная работа.',data:'Слишком большой результат.',net:'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.'};
 const errText=e=>ERRS[e]||ERRS.net;
-function gated(){return SRV==='on'||!!ACC}
+function gated(){return!!accLive()}
 function accLive(){if(ACC&&ACC.kind==='d'&&Date.parse(ACC.expires)<=srvNow()){ACC=null;saveAcc()}return ACC}
 /* 'open' — можно открыть, 'locked' — закрыта учителем, 'late' — срок сдачи прошёл */
-function wAccess(id){if(!gated())return'open';const a=accLive();if(!a)return'locked';if(a.kind!=='s')return'open';
-  const w=(a.works||[]).find(x=>x.work===id);if(!w)return'locked';return w.deadline&&Date.parse(w.deadline)<srvNow()?'late':'open'}
+function wAccess(id){return'open'}
+/* задана ли работа ученику: 'yes' — задана, 'late' — срок прошёл, 'no' — не задана (можно тренироваться) */
+function wAssigned(id){const a=accLive();if(!a||a.kind!=='s')return'no';const w=(a.works||[]).find(x=>x.work===id);if(!w)return'no';
+  return w.deadline&&Date.parse(w.deadline)<srvNow()?'late':'yes'}
 const wDeadline=id=>{const w=ACC&&ACC.kind==='s'&&(ACC.works||[]).find(x=>x.work===id);return w?w.deadline:null};
 async function accRefresh(){if(!ACC)return false;const before=JSON.stringify([ACC.works,ACC.done,ACC.name]);
   try{if(ACC.kind==='t'){const r=await rpc('t_me',{p_token:ACC.token});if(!r.err){ACC.name=r.me.name;ACC.me=r.me}}
@@ -3240,9 +3247,7 @@ async function srvInit(){
   else{try{const p=await rpc('ping',{},6000);SRV=p&&p.ok?'on':'off'}catch(_){SRV='off'}}
   if(SRV==='on'&&ACC){await accRefresh();qFlush()}
   srvReady()}
-function srvReady(){const h=location.hash;
-  if(h.startsWith('#work/')&&cur&&cur.kind==='work'){if(wAccess(cur.id)!=='open'){FLASH=lockText(wAccess(cur.id));location.replace('#works')}}
-  else if(h==='#works'||h==='#teacher'||h.startsWith('#work/')||h.startsWith('#task/'))route()}
+function srvReady(){const h=location.hash;if(h==='#works'||h==='#teacher')route()}
 window.addEventListener('online',()=>{if(SRV!=='on')srvInit();else qFlush()});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&SRV==='on'&&ACC&&ACC.kind!=='t'&&location.hash==='#works')accRefresh().then(ch=>{if(ch&&location.hash==='#works')worksHome()})});
 const lockText=a=>a==='late'?'Срок сдачи этой работы прошёл.':'Эта работа пока закрыта — её откроет учитель.';
@@ -3262,7 +3267,7 @@ async function wSend(id,d){const say=(t,ok)=>{const b=$('#wsend');if(b&&cur&&cur
     if(ACC&&!ACC.done.includes(id)){ACC.done.push(id);saveAcc()}say('✓ Результат отправлен учителю — он уже в журнале класса.',true)}
   catch(_){const q=qGet();q.push({token:tok,work:id,data:d});qSet(q);say('Нет связи с сервером. Результат сохранён на этом устройстве и отправится сам, когда появится интернет.')}}
 function accLine(){const a=accLive();if(!a)return'';
-  if(a.kind==='s')return`<p class="sacc">${ICON.teacher}<span>Ученик: <b>${esc(a.name)}</b> · ${esc(a.cls)}. После проверки результат сам уйдёт учителю.</span></p>`;
+  if(a.kind==='s'){const as=cur?wAssigned(cur.id):'no';return`<p class="sacc">${ICON.teacher}<span>Ученик: <b>${esc(a.name)}</b> · ${esc(a.cls)}. ${as==='yes'?'После проверки результат сам уйдёт учителю.':as==='late'?'Срок сдачи прошёл — результат учителю не отправится.':'Эту работу учитель не задавал: можно потренироваться, результат не отправляется.'}</span></p>`}
   return`<p class="sacc">${ICON.teacher}<span>${a.kind==='d'?'Демо-режим':'Вы вошли как учитель'}: результаты не сохраняются.</span></p>`}
 
 /* ----- список работ при входе через сервер */
@@ -3271,27 +3276,31 @@ function accBar(){const a=accLive(),fl=FLASH?`<span class="aflash" role="alert">
   if(!a)return`<div class="taskbar accbar"><div><small>Вход для ученика</small><b>Работы открывает учитель</b><span>Введите личный код из 6 знаков, который выдал учитель, или демо-код.</span>${fl}
     <form class="acode" data-form="slogin"><input id="scode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Код, например K7M2QX" aria-label="Личный код ученика"><button class="btn main" type="submit">Войти</button></form>
     <span class="aerr" id="aerr" role="alert"></span></div></div><p class="ateach"><a href="#teacher">Я учитель — войти в кабинет</a></p>`;
-  if(a.kind==='s'){const open=WORKS.filter(w=>wAccess(w.id)==='open').length,dn=WORKS.filter(w=>a.done.includes(w.id)).length;
-    return`<div class="taskbar accbar"><div><small>Ученик · ${esc(a.cls)}</small><b>${esc(a.name)}</b><span>${open?`Открыто работ: ${open}. Отправлено учителю: ${dn}.`:'Учитель пока не открыл ни одной работы. Загляните позже.'}</span>${off}${fl}</div>
+  if(a.kind==='s'){const open=WORKS.filter(w=>wAssigned(w.id)!=='no').length,dn=WORKS.filter(w=>a.done.includes(w.id)).length;
+    return`<div class="taskbar accbar"><div><small>Ученик · ${esc(a.cls)}</small><b>${esc(a.name)}</b><span>${open?`Заданий от учителя: ${open}. Отправлено: ${dn}.`:'Учитель пока ничего не задал — все работы можно делать для тренировки.'}</span>${off}${fl}</div>
       <div class="tbtns"><button class="btn" data-k="slogout">Выйти</button></div></div>`}
   if(a.kind==='d')return`<div class="taskbar accbar"><div><small>Демо-режим</small><b>Все работы открыты до ${fmtT(a.expires)}</b><span>Результаты в демо-режиме не сохраняются.</span>${fl}</div><div class="tbtns"><button class="btn" data-k="slogout">Выйти</button></div></div>`;
-  return`<div class="taskbar accbar"><div><small>Учитель</small><b>${esc(a.name||'')}</b><span>Все работы открыты для проверки. Результаты не сохраняются.</span>${fl}</div><div class="tbtns"><a class="btn" href="#teacher">Кабинет учителя</a></div></div>`}
+  return`<div class="taskbar accbar"><div><small>Учитель</small><b>${esc(a.name||'')}</b><span>Вы вошли как учитель: результаты работ не сохраняются.</span>${fl}</div><div class="tbtns"><a class="btn" href="#teacher">Кабинет учителя</a></div></div>`}
 let accTick=0;
+function loginBar(){if(SRV==='off')return'';const fl=FLASH?`<span class="aflash" role="alert">${FLASH}</span>`:'';FLASH='';
+  return`<div class="taskbar accbar lbar"><div><small>Есть личный код от учителя?</small><span>Войдите — и результаты заданных работ сами придут учителю. Без кода все работы тоже открыты.</span>${fl}
+    <form class="acode" data-form="slogin"><input id="scode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Код, например K7M2QX" aria-label="Личный код ученика"><button class="btn main" type="submit">Войти</button></form>
+    <span class="aerr" id="aerr" role="alert"></span></div></div>`}
 function worksGated(){
   const back=cur&&cur.kind==='work';stop();cur=null;document.title='Лабораторные работы — Лаборатория Сириус';
   const a=accLive(),st=a&&a.kind==='s',isDone=id=>st?a.done.includes(id):doneW.has(id);
-  const list=WORKS.map(w=>[w,wAccess(w.id)]).sort((x,y)=>(x[1]==='open'?0:1)-(y[1]==='open'?0:1));
-  const open=list.filter(x=>x[1]==='open').length,done=list.filter(x=>x[1]==='open'&&isDone(x[0].id)).length;
+  const list=WORKS.map(w=>[w,wAssigned(w.id)]).sort((x,y)=>(x[1]==='no'?1:0)-(y[1]==='no'?1:0));
+  const asg=list.filter(x=>x[1]!=='no'),open=st?asg.length:WORKS.length,done=(st?asg:list).filter(x=>isDone(x[0].id)).length;
   app.innerHTML=`<div class="view">`+header()+accBar()+`
-  <section class="hero"><h1>Лабораторные работы</h1><p>${a?'Берите приборы руками: взвешивайте, погружайте, подвешивайте грузы. Записывайте измерения в таблицу, считайте и делайте вывод.':'Работы откроются, когда вы войдёте по коду. Модели явлений на главной странице открыты всем.'}</p></section>
-  ${a?`<div class="progress"><span>Выполнено ${done} из ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div>`:''}
+  <section class="hero"><h1>Лабораторные работы</h1><p>${st&&asg.length?'Сверху — работы, которые задал учитель: их результаты уйдут в журнал. Остальные можно делать для тренировки.':'Берите приборы руками: взвешивайте, погружайте, подвешивайте грузы. Записывайте измерения в таблицу, считайте и делайте вывод.'}</p></section>
+  ${open?`<div class="progress"><span>Выполнено ${done} из ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div>`:''}
   ${st?'<div id="stests"></div>':''}
-  <div class="cards" id="cards">${list.map(([w,ac])=>{const lk=ac!=='open',dl=wDeadline(w.id),dn=isDone(w.id);return`
-    <a class="card ${dn&&!lk?'seen':''}${lk?' locked':''}" style="--c:${w.color}" href="${lk?'#works':'#work/'+w.id}"${lk?` data-locked="${ac}" aria-disabled="true"`:''}>
+  <div class="cards" id="cards">${list.map(([w,ac])=>{const dl=wDeadline(w.id),dn=isDone(w.id);return`
+    <a class="card ${dn?'seen':''}" style="--c:${w.color}" href="#work/${w.id}">
       <div class="pb"><i></i></div>
-      <span class="tags"><span class="tag">Лабораторная работа № ${w.num}</span>${st&&!lk?'<span class="tag task">Открыта учителем</span>':''}</span>
+      <span class="tags"><span class="tag">Лабораторная работа № ${w.num}</span>${ac!=='no'?'<span class="tag task">Задание учителя</span>':''}</span>
       <h2>${w.title}</h2><p>${w.goal}</p>
-      <div class="foot"><span class="meta"><span class="mrow">${lk?ICON.lock:ICON.flask}<span>${lk?(ac==='late'?'Срок сдачи прошёл':'Откроет учитель'):dl?'Сдать до '+fmtDT(dl):(w.need||w.rows)+' '+plural(w.need||w.rows,'опыт','опыта','опытов')}</span></span><span>${dn?(st?'✓ Отправлена учителю':'✓ Выполнена'):'Не выполнена'}</span></span><span class="go">${lk?'Закрыта':dn?'Повторить':'Начать'}</span></div>
+      <div class="foot"><span class="meta"><span class="mrow">${ICON.flask}<span>${ac==='late'?'Срок сдачи прошёл':ac==='yes'?(dl?'Сдать до '+fmtDT(dl):'Без срока сдачи'):st?'Для тренировки':(w.need||w.rows)+' '+plural(w.need||w.rows,'опыт','опыта','опытов')}</span></span><span>${dn?(st?'✓ Отправлена учителю':'✓ Выполнена'):'Не выполнена'}</span></span><span class="go">${dn?'Повторить':'Начать'}</span></div>
     </a>`}).join('')}</div>
   <a class="tlinkfoot" href="#teacher"><span>Для учителя<small>Кабинет: классы, личные коды учеников, открытие работ и журнал результатов</small></span>${ICON.next}</a></div>`;
   window.scrollTo(0,back?worksScroll:0);
@@ -3317,13 +3326,13 @@ function toast(t){let el=$('#toast');if(!el){el=document.createElement('div');el
 async function tcCall(fn,args){try{const r=await rpc(fn,Object.assign({p_token:ACC&&ACC.token},args));
     if(r.err==='session'){ACC=null;saveAcc();toast(errText('session'));teacherHome();return null}
     if(r.err){toast(errText(r.err));return null}return r}catch(_){toast(errText('net'));return null}}
-function offlineHTML(open){return`<details class="offl"${open?' open':''}><summary>Без интернета: задание по ссылке и проверка кодов</summary>
+function offlineHTML(open){return`<details class="offl"${open?' open':''}><summary>Без входа: задание по ссылке и проверка кодов</summary>
     <div class="note f"><b>1. Задание по ссылке</b>
       <label class="tfield">Название задания<input id="ttitle" maxlength="80" value="Лабораторные работы"></label>
       <div class="tchecks" role="group" aria-label="Работы в задании">${WORKS.map(w=>`<label><input type="checkbox" value="${w.id}" checked><span>№ ${w.num}. ${w.title}</span></label>`).join('')}</div>
       <div class="tools"><button class="btn main" data-act="tlink">${ICON.link}Создать ссылку</button></div>
       <div class="tlink" id="tlinkbox" hidden><input id="tlinkout" readonly aria-label="Ссылка на задание"><button class="btn" data-act="tcopy">Копировать</button></div>
-      <p class="tmsg" id="tlinkmsg">Ссылка работает, когда сервер недоступен: по ней ученик сразу попадёт в первую работу задания.</p>
+      <p class="tmsg" id="tlinkmsg">Подходит, если ученики работают без личных кодов: по ссылке ученик сразу попадёт в первую работу задания, а после проверки получит код результата.</p>
     </div>
     <div class="note f"><b>2. Проверка кодов результатов</b>
       <p class="tmsg">Без сервера ученик получает код результата. Вставьте коды сюда, каждый с новой строки. Одинаковые показания приборов у разных учеников будут отмечены.</p>
@@ -3389,7 +3398,6 @@ function tcRender(){const m=TC.me,box=$('#tc');if(!box)return;
       <div class="trow"><input id="tclassn" maxlength="40" placeholder="Например, 7Б" aria-label="Название класса" required><button class="btn main" type="submit">Создать класс</button></div></form>
     <div id="tcclass">${TC.cls?'<p class="gempty">Загружаем класс…</p>':''}</div>
     <h2 class="th2">Конструктор тестов</h2><div class="note f" id="tcte">${TE?teHTML():TC.tests?tcTLHTML():'<p class="gempty">Загружаем…</p>'}</div>
-    <h2 class="th2">Демо-код</h2><div class="note f" id="tcdemo">${tcDemoHTML()}</div>
     ${m.admin?'<h2 class="th2">Администрирование</h2><div id="tcadm"><p class="gempty">Загружаем…</p></div>':''}
     ${offlineHTML()}`;
   jRender()}
@@ -3401,7 +3409,7 @@ async function tcClass(){const r=await tcCall('t_class',{p_class:TC.cls});if(!r)
   tcClassRender();await tcPoll(true);await tcCTests()}
 function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=TC.cd,ws=c.works;
   box.innerHTML=`<div class="note f tclass"><div class="tchead"><b>${esc(c.class.name)}</b><span class="tbtns"><button class="btn" data-k="ren">Переименовать</button><button class="btn" data-k="delcls">Удалить класс</button></span></div>
-    <h3>Работы для класса</h3><p class="tmsg">Отметьте работы, которые ученики смогут открыть. Срок сдачи можно не ставить: после срока работа закроется сама. Модели явлений открыты всегда.</p>
+    <h3>Задания для класса</h3><p class="tmsg">Отметьте работы, которые задаёте классу: результаты по ним придут в журнал. Срок сдачи можно не ставить. Все работы и модели открыты всем и без входа — остальные ученики могут делать для тренировки.</p>
     <div class="twork">${WORKS.map(w=>{const o=ws.find(x=>x.work===w.id);return`<div class="twrow${o?' on':''}"><label class="twk"><input type="checkbox" data-wk="${w.id}"${o?' checked':''}><span>№ ${w.num}. ${w.title}</span></label>
       <label class="tdl"><span>Срок</span><input type="datetime-local" data-wd="${w.id}" value="${o&&o.deadline?toLocalInput(o.deadline):''}"${o?'':' disabled'} aria-label="Срок сдачи: ${esc(w.title)}"></label></div>`}).join('')}</div>
     <h3>Тесты для класса</h3><p class="tmsg">Отметьте тест, чтобы ученики увидели его на странице работ. У каждого ученика одна попытка, время считает сервер.</p>
@@ -3462,7 +3470,7 @@ async function tcWork(id){const box=$(`.twrow input[data-wk="${id}"]`),dl=$(`.tw
   if(!r){box.checked=!open;return}
   TC.cd.works=r.works;if(TC.jr)TC.jr.works=r.works;
   const row=box.closest('.twrow');row.classList.toggle('on',open);dl.disabled=!open;if(!open)dl.value='';
-  const w=WORKS.find(x=>x.id===id);toast(open?`Работа № ${w.num} открыта${dv?' до '+fmtDT(dv):''}`:`Работа № ${w.num} закрыта`);
+  const w=WORKS.find(x=>x.id===id);toast(open?`Работа № ${w.num} задана${dv?' до '+fmtDT(dv):''}`:`Работа № ${w.num} снята с задания`);
   const j=$('#tcj');if(j)j.innerHTML=tcJHTML()}
 function printCodes(){const c=TC.cd;if(!c||!c.students.length)return;const url=location.href.split('#')[0];
   let el=$('#print');if(!el){el=document.createElement('div');el.id='print';document.body.appendChild(el)}
@@ -3479,9 +3487,27 @@ function jCSV2(){const jr=TC.jr;if(!jr||!jr.res.length){toast('В журнале
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='zhurnal-'+(TC.cd?TC.cd.class.name:'klass').replace(/[^\wА-Яа-яЁё-]+/g,'_')+'.csv';
   document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 /* администраторы: приглашения для учителей и список учителей */
-async function tcAdmin(){const r=await tcCall('a_overview',{});if(!r)return;TC.adm=r;tcAdminRender()}
+async function tcAdmin(){const r=await tcCall('a_overview',{});if(!r)return;TC.adm=r;tcAdminRender();tcStats()}
+async function tcStats(){const r=await tcCall('a_stats',{});const b=$('#tcstat');if(!r||!b)return;TC.st=r;b.innerHTML=tcStatHTML(r)}
+function pageName(pg){let m;if(pg==='home')return'Главная';if(pg==='works')return'Список лабораторных работ';if(pg==='teacher')return'Для учителя';if(pg==='install')return'Установить на телефон';if(pg==='test')return'Тест';if(pg==='task')return'Задание по ссылке';
+  if((m=pg.match(/^work\/(.+)$/))){const w=WORKS.find(x=>x.id===m[1]);return w?'№ '+w.num+'. '+w.title:pg}
+  if((m=pg.match(/^lab\/(.+)$/))){const l=LABS.find(x=>x.id===m[1]);return l?'Модель: '+l.title:pg}return pg}
+function tcStatHTML(r){const ds=r.days||[],mx=Math.max(1,...ds.map(d=>d.visitors)),W=600,H=150,bw=W/ds.length;
+  const tile=(n,l)=>`<div class="stile"><b>${n}</b><span>${l}</span></div>`;
+  return`<b>Посещения сайта</b>
+    <div class="stiles">${tile(r.today.visitors,'сегодня')}${tile(r.week.visitors,'за 7 дней')}${tile(r.month.visitors,'за 30 дней')}${tile(r.total.visitors,'всего'+(r.total.since?' с '+new Date(r.total.since).toLocaleDateString(LOC,{day:'numeric',month:'short'}):''))}</div>
+    <p class="tmsg">Посетители по дням за 30 дней</p>
+    <div class="schart"><svg viewBox="0 0 ${W} ${H+22}" role="img" aria-label="Посетители по дням за 30 дней, больше всего — ${mx}">
+      <line x1="0" y1="${H}" x2="${W}" y2="${H}" class="gaxis"/>
+      ${ds.map((d,i)=>{const h=d.visitors?Math.max(3,d.visitors/mx*(H-18)):0,x=i*bw+1.5;return`<g><title>${new Date(d.day).toLocaleDateString(LOC,{day:'numeric',month:'short'})}: ${d.visitors}</title><rect x="${x}" y="${H-h}" width="${bw-3}" height="${h}" rx="3" class="sbar"/><rect x="${i*bw}" y="0" width="${bw}" height="${H}" fill="transparent"/></g>`}).join('')}
+      <text x="0" y="${H+17}" class="gtick">${ds.length?new Date(ds[0].day).toLocaleDateString(LOC,{day:'numeric',month:'short'}):''}</text>
+      <text x="${W}" y="${H+17}" text-anchor="end" class="gtick">сегодня</text>
+      <text x="0" y="11" class="gtick">макс. ${mx}</text></svg></div>
+    <p class="tmsg">Просмотров страниц за 30 дней: ${r.month.views}. С телефона: ${r.mobile||0} %. Английская версия: ${r.en||0} %.</p>
+    ${(r.pages||[]).length?`<div class="tblwrap"><table class="res"><thead><tr><th>Раздел (30 дней)</th><th>Открытий</th></tr></thead><tbody>${r.pages.map(p=>`<tr><td>${esc(pageName(p.page))}</td><td><b>${p.n}</b></td></tr>`).join('')}</tbody></table></div>`:''}
+    <p class="tmsg">Считаются браузеры, а не люди: один ученик с телефона и компьютера — два посетителя. Имена, адреса и другие личные данные не собираются.</p>`}
 function tcAdminRender(){const box=$('#tcadm'),a=TC.adm;if(!box||!a)return;const now=srvNow();
-  box.innerHTML=`<div class="note f"><b>Приглашения для учителей</b>
+  box.innerHTML=`<div class="note f" id="tcstat">${TC.st?tcStatHTML(TC.st):'<b>Посещения сайта</b><p class="gempty">Загружаем…</p>'}</div><div class="note f"><b>Приглашения для учителей</b>
     <p class="tmsg">Учителем можно зарегистрироваться только по приглашению. Создайте код и передайте его учителю лично или в мессенджере. Один код — одна регистрация.</p>
     <form data-form="ainv" class="tinv"><input id="ainote" maxlength="80" placeholder="Кому: например, Мария Ивановна, школа № 5" aria-label="Кому выдаётся приглашение">
       <select id="aidays" aria-label="Срок действия"><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="30">30 дней</option></select>
@@ -3694,19 +3720,23 @@ async function teAct(k,t){const qe=t.closest('.teq'),i=qe?+qe.dataset.q:-1,q=i>=
 async function tcTestOpen(id,copy){const r=await tcCall('t_test_get',{p_test:id});if(!r)return;
   TE={id:copy?null:r.id,used:!copy&&r.used,title:copy?r.title+' (копия)':r.title,minutes:r.minutes,pick:r.pick||'',qs:r.qs.map(qFromSrv)};teRender();$('#tcte').scrollIntoView({behavior:'smooth',block:'start'})}
 
+/* счётчик посещений: случайный номер браузера, без личных данных; автотесты не считаются */
+let hitLast='';
+function hitPage(h){const pg=(h||'#').slice(1).replace(/^task\/.*/,'task').replace(/^test\/.*/,'test')||'home';if(pg===hitLast||navigator.webdriver)return;hitLast=pg;
+  let vid='';try{vid=localStorage.getItem('lab-sirius-vid')||''}catch(_){}
+  if(!/^[0-9a-f]{16,64}$/.test(vid)){vid=Array.from(crypto.getRandomValues(new Uint8Array(12)),x=>x.toString(16).padStart(2,'0')).join('');try{localStorage.setItem('lab-sirius-vid',vid)}catch(_){}}
+  rpc('hit',{p_vid:vid,p_page:pg,p_mobile:!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches),p_lang:LANG.code},6000).catch(()=>{})}
 function route(){
-  const h=location.hash;let m;bigOff();
+  const h=location.hash;let m;bigOff();hitPage(h);
   if((m=h.match(/^#lab\/([\w-]+)$/))&&LABS.some(l=>l.id===m[1]))openLab(m[1]);
   else if((m=h.match(/^#work\/([\w-]+)$/))&&WORKS.some(w=>w.id===m[1])){
-    if(SRV==='?'&&!ACC){waitHome();return}
-    const ac=wAccess(m[1]);if(ac!=='open'){FLASH=lockText(ac);location.replace('#works');return}
     openWork(m[1])}
   else if((m=h.match(/^#task\/([A-Za-z0-9_-]+)$/))){let o=null;try{o=JSON.parse(b64d(m[1]))}catch(_){}
     const w=o&&Array.isArray(o.w)?o.w.filter((id,i,a)=>WORKS.some(x=>x.id===id)&&a.indexOf(id)===i):[];
     if(!w.length){location.replace('#works');return}
     if(!TASK||TASK.k!==m[1])setTask({k:m[1],t:String(o.t||'Лабораторные работы').slice(0,80),w,done:[],codes:{}});
     showAllW=false;location.replace('#work/'+(taskNext(null)||w[0]));return}
-  else if((m=h.match(/^#test\/([0-9a-f-]{36})$/))){fromHome=false;if(SRV==='?'&&!ACC){waitHome();return}testHome(m[1])}
+  else if((m=h.match(/^#test\/([0-9a-f-]{36})$/))){fromHome=false;testHome(m[1])}
   else if(h==='#teacher'){fromHome=false;teacherHome()}
   else if(h==='#install'){fromHome=false;installHome()}
   else if(h==='#works'){fromHome=false;worksHome()}
