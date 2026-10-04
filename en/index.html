@@ -387,6 +387,11 @@ table.jtab td.jx{color:#C4245F;font-weight:800;text-align:center}td.jfl{color:#B
 .teqh{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}.teqh b{font-size:16px}.teqh .tact{margin-left:auto}
 .teopts{display:grid;gap:8px;margin-top:10px}.teo{display:flex;gap:8px;align-items:center}.teo input:not([type]){flex:1;width:0}.teo .mini{margin:0;flex:none}@media(max-width:560px){.teq{padding:10px}.tedit .note{padding:12px}}.teo input[type]{width:20px;height:20px;accent-color:var(--green);flex:none}
 .tenum .trow .tfield{flex:1 1 160px;margin:6px 0}.tevars{display:grid;gap:8px;margin-top:10px}.tev{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px;color:var(--muted);font-weight:600}.tev input{width:72px}
+.lbar span{font-size:14px}
+.stiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}@media(max-width:560px){.stiles{grid-template-columns:1fr 1fr}}
+.stile{background:var(--surf);border-radius:16px;padding:12px 14px}.stile b{display:block;font-size:30px;font-variant-numeric:tabular-nums;color:var(--ink)}.stile span{color:var(--muted);font-size:13px;font-weight:600}
+.schart{background:var(--surf);border-radius:16px;padding:12px 14px 6px;margin:6px 0}.schart svg{display:block;width:100%;height:auto}
+.sbar{fill:var(--brand)}.schart g:hover .sbar{fill:var(--plum)}
 #print{display:none}
 @media print{
   body.printing{background:#fff}
@@ -2792,14 +2797,14 @@ function home(){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
 }
 function worksHome(){
-  if(gated()){if(SRV==='?'&&!ACC){waitHome();return}worksGated();return}
+  if(gated()){worksGated();return}
   const back=cur&&cur.kind==='work';stop();cur=null;document.title='Lab works — Sirius Lab';
   const inT=inTask,only=!!TASK&&!showAllW;
   const list=only?TASK.w.map(id=>WORKS.find(w=>w.id===id)):TASK?WORKS.filter(w=>inT(w.id)).concat(WORKS.filter(w=>!inT(w.id))):WORKS;
   const isDone=id=>only?TASK.done.includes(id):doneW.has(id);
   const done=list.filter(w=>isDone(w.id)).length,tdone=TASK?TASK.w.filter(id=>TASK.done.includes(id)).length:0;
   const codes=TASK?TASK.w.filter(id=>TASK.codes[id]).map(id=>TASK.codes[id]):[];
-  app.innerHTML=`<div class="view">`+header()+`
+  app.innerHTML=`<div class="view">`+header()+loginBar()+`
   ${TASK?`<div class="taskbar"><div><small>Assignment from the teacher</small><b>${esc(TASK.t)}</b><span>${tdone===TASK.w.length?'All works of the assignment are done. Send the codes to your teacher.':`Done ${tdone} of ${TASK.w.length}. After each work is checked, a code appears — send it to your teacher.`}</span></div>
     <div class="tbtns">${tdone<TASK.w.length?`<a class="btn main" href="#work/${taskNext(null)}">${tdone?'Continue':'Start'}</a>`:''}<button class="btn" data-act="taskoff">Leave the assignment</button></div></div>
     ${codes.length?`<div class="taskcodes"><small>Codes for the teacher</small><code id="tcodesall">${codes.join('<br>')}</code><button class="btn" data-act="copyall">Copy all codes</button></div>`:''}`:''}
@@ -2923,7 +2928,7 @@ function openWork(id){
   <section class="labhead" style="--lab:${w.color}">
     <button class="back" data-act="back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg>All works</button>
     <h1>${w.title}</h1><p>${w.goal}</p><span class="tag">Lab work No. ${w.num}</span>
-    ${gated()&&ACC&&ACC.kind==='s'?`<a class="taskline" href="#works"><span><small>Teacher’s assignment · ${esc(ACC.cls)}</small><b>${wDeadline(w.id)?'Due '+fmtDT(wDeadline(w.id)):'No due date'}</b></span><span class="tgo">All my labs</span></a>`:''}
+    ${ACC&&ACC.kind==='s'&&wAssigned(w.id)!=='no'?`<a class="taskline" href="#works"><span><small>Teacher’s assignment · ${esc(ACC.cls)}</small><b>${wDeadline(w.id)?'Due '+fmtDT(wDeadline(w.id)):'No due date'}</b></span><span class="tgo">All my labs</span></a>`:''}
     ${tw?`<a class="taskline" href="#works"><span><small>Assignment from the teacher · work ${TASK.w.indexOf(w.id)+1} of ${TASK.w.length}</small><b>${esc(TASK.t)}</b></span><span class="tgo">All assignment works</span></a>`:''}
   </section>
   <main class="sheet" style="--lab:${w.color}">
@@ -3033,9 +3038,9 @@ function wCheck(){
   const el=$('#verdict');el.hidden=false;wGraph();
   if(!msgs.length){doneW.add(w.id);saveDone();const data=T.map((r,i)=>[r,i]).filter(([r])=>r.key!==null&&r.m).map(([r,i])=>{const o=rowM(w,i);return w.cols.filter(c=>c.src==='m').map(c=>Math.round(o[c.id]*10**c.d)/10**c.d)});
     lastRes={w:w.id,rows,test:ex.test||null,prec:ex.prec||null,code:!gated()&&SNAME.trim()?makeCode(w,SNAME.trim(),rows,data,ex.test):null};el.className='note ok';
-    if(gated()&&ACC){const sv=ACC.kind==='s';
+    if(gated()&&ACC){const as=ACC.kind==='s'?wAssigned(w.id):'',sv=as==='yes';
       el.innerHTML=`<b>Work completed!</b> ${w.concl}`+(ex.prec||ex.test?`<p class="vextra">${ex.prec?`Result with error (experiment 1): <b>${ex.prec}</b>.`:''}${ex.test?` Mini-test: <b>${ex.test[0]} of ${ex.test[1]}</b>.`:''}</p>`:'')
-        +`<div class="rescode" id="wsend"><small>${sv?'Sending the result to your teacher…':ACC.kind==='d'?'Demo mode: the result is not saved.':'You are signed in as a teacher: the result is not saved.'}</small>${sv?'':`<a class="btn main" href="#works">Back to the labs${ICON.next}</a>`}</div>`;
+        +`<div class="rescode" id="wsend"><small>${sv?'Sending the result to your teacher…':as==='late'?'The due date has passed — the result was not sent to the teacher.':as==='no'?'Your teacher did not assign this lab — the result was not sent.':ACC.kind==='d'?'Demo mode: the result is not saved.':'You are signed in as a teacher: the result is not saved.'}</small>${sv?'':`<a class="btn main" href="#works">Back to the labs${ICON.next}</a>`}</div>`;
       if(sv)wSend(w.id,{r:data,n:rows,t:ex.test||null,p:ex.prec||null,a:WATT,sec:Math.round((Date.now()-WSTART)/1000)});
       el.scrollIntoView({behavior:'smooth',block:'nearest'});return}
     const tw=inTask(w.id);let tn=null;
@@ -3225,11 +3230,13 @@ const ERRS={slow:'Too many attempts. Wait 15 minutes and try again.',invite:'The
   closed:'This lab is closed now.',late:'The due date for this lab has passed.',limit:'Limit reached: up to 40 classes and 60 students per class.',self:'You cannot block your own account.',
   work:'Unknown lab.',data:'The result is too large.',net:'No connection to the server. Check the internet and try again.'};
 const errText=e=>ERRS[e]||ERRS.net;
-function gated(){return SRV==='on'||!!ACC}
+function gated(){return!!accLive()}
 function accLive(){if(ACC&&ACC.kind==='d'&&Date.parse(ACC.expires)<=srvNow()){ACC=null;saveAcc()}return ACC}
 /* 'open' — можно открыть, 'locked' — закрыта учителем, 'late' — срок сдачи прошёл */
-function wAccess(id){if(!gated())return'open';const a=accLive();if(!a)return'locked';if(a.kind!=='s')return'open';
-  const w=(a.works||[]).find(x=>x.work===id);if(!w)return'locked';return w.deadline&&Date.parse(w.deadline)<srvNow()?'late':'open'}
+function wAccess(id){return'open'}
+/* задана ли работа ученику: 'yes' — задана, 'late' — срок прошёл, 'no' — не задана (можно тренироваться) */
+function wAssigned(id){const a=accLive();if(!a||a.kind!=='s')return'no';const w=(a.works||[]).find(x=>x.work===id);if(!w)return'no';
+  return w.deadline&&Date.parse(w.deadline)<srvNow()?'late':'yes'}
 const wDeadline=id=>{const w=ACC&&ACC.kind==='s'&&(ACC.works||[]).find(x=>x.work===id);return w?w.deadline:null};
 async function accRefresh(){if(!ACC)return false;const before=JSON.stringify([ACC.works,ACC.done,ACC.name]);
   try{if(ACC.kind==='t'){const r=await rpc('t_me',{p_token:ACC.token});if(!r.err){ACC.name=r.me.name;ACC.me=r.me}}
@@ -3240,9 +3247,7 @@ async function srvInit(){
   else{try{const p=await rpc('ping',{},6000);SRV=p&&p.ok?'on':'off'}catch(_){SRV='off'}}
   if(SRV==='on'&&ACC){await accRefresh();qFlush()}
   srvReady()}
-function srvReady(){const h=location.hash;
-  if(h.startsWith('#work/')&&cur&&cur.kind==='work'){if(wAccess(cur.id)!=='open'){FLASH=lockText(wAccess(cur.id));location.replace('#works')}}
-  else if(h==='#works'||h==='#teacher'||h.startsWith('#work/')||h.startsWith('#task/'))route()}
+function srvReady(){const h=location.hash;if(h==='#works'||h==='#teacher')route()}
 window.addEventListener('online',()=>{if(SRV!=='on')srvInit();else qFlush()});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&SRV==='on'&&ACC&&ACC.kind!=='t'&&location.hash==='#works')accRefresh().then(ch=>{if(ch&&location.hash==='#works')worksHome()})});
 const lockText=a=>a==='late'?'The due date for this lab has passed.':'This lab is closed for now — your teacher will open it.';
@@ -3262,7 +3267,7 @@ async function wSend(id,d){const say=(t,ok)=>{const b=$('#wsend');if(b&&cur&&cur
     if(ACC&&!ACC.done.includes(id)){ACC.done.push(id);saveAcc()}say('✓ The result has been sent — it is already in the class journal.',true)}
   catch(_){const q=qGet();q.push({token:tok,work:id,data:d});qSet(q);say('No connection to the server. The result is saved on this device and will be sent automatically when the internet is back.')}}
 function accLine(){const a=accLive();if(!a)return'';
-  if(a.kind==='s')return`<p class="sacc">${ICON.teacher}<span>Student: <b>${esc(a.name)}</b> · ${esc(a.cls)}. After the check the result goes to your teacher automatically.</span></p>`;
+  if(a.kind==='s'){const as=cur?wAssigned(cur.id):'no';return`<p class="sacc">${ICON.teacher}<span>Student: <b>${esc(a.name)}</b> · ${esc(a.cls)}. ${as==='yes'?'After the check the result goes to your teacher automatically.':as==='late'?'The due date has passed — the result will not be sent to the teacher.':'Your teacher did not assign this lab: you can practise, the result is not sent.'}</span></p>`}
   return`<p class="sacc">${ICON.teacher}<span>${a.kind==='d'?'Demo mode':'You are signed in as a teacher'}: results are not saved.</span></p>`}
 
 /* ----- список работ при входе через сервер */
@@ -3271,27 +3276,31 @@ function accBar(){const a=accLive(),fl=FLASH?`<span class="aflash" role="alert">
   if(!a)return`<div class="taskbar accbar"><div><small>Student sign-in</small><b>Your teacher opens the labs</b><span>Enter the 6-character personal code from your teacher, or a demo code.</span>${fl}
     <form class="acode" data-form="slogin"><input id="scode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Code, e.g. K7M2QX" aria-label="Student’s personal code"><button class="btn main" type="submit">Sign in</button></form>
     <span class="aerr" id="aerr" role="alert"></span></div></div><p class="ateach"><a href="#teacher">I am a teacher — open the dashboard</a></p>`;
-  if(a.kind==='s'){const open=WORKS.filter(w=>wAccess(w.id)==='open').length,dn=WORKS.filter(w=>a.done.includes(w.id)).length;
-    return`<div class="taskbar accbar"><div><small>Student · ${esc(a.cls)}</small><b>${esc(a.name)}</b><span>${open?`Labs open: ${open}. Sent to the teacher: ${dn}.`:'Your teacher has not opened any labs yet. Check back later.'}</span>${off}${fl}</div>
+  if(a.kind==='s'){const open=WORKS.filter(w=>wAssigned(w.id)!=='no').length,dn=WORKS.filter(w=>a.done.includes(w.id)).length;
+    return`<div class="taskbar accbar"><div><small>Student · ${esc(a.cls)}</small><b>${esc(a.name)}</b><span>${open?`Assigned by the teacher: ${open}. Sent: ${dn}.`:'Your teacher has not assigned anything yet — you can do any lab for practice.'}</span>${off}${fl}</div>
       <div class="tbtns"><button class="btn" data-k="slogout">Sign out</button></div></div>`}
   if(a.kind==='d')return`<div class="taskbar accbar"><div><small>Demo mode</small><b>All labs are open until ${fmtT(a.expires)}</b><span>Results are not saved in demo mode.</span>${fl}</div><div class="tbtns"><button class="btn" data-k="slogout">Sign out</button></div></div>`;
-  return`<div class="taskbar accbar"><div><small>Teacher</small><b>${esc(a.name||'')}</b><span>All labs are open for you to try. Results are not saved.</span>${fl}</div><div class="tbtns"><a class="btn" href="#teacher">Teacher dashboard</a></div></div>`}
+  return`<div class="taskbar accbar"><div><small>Teacher</small><b>${esc(a.name||'')}</b><span>You are signed in as a teacher: lab results are not saved.</span>${fl}</div><div class="tbtns"><a class="btn" href="#teacher">Teacher dashboard</a></div></div>`}
 let accTick=0;
+function loginBar(){if(SRV==='off')return'';const fl=FLASH?`<span class="aflash" role="alert">${FLASH}</span>`:'';FLASH='';
+  return`<div class="taskbar accbar lbar"><div><small>Have a personal code from your teacher?</small><span>Sign in and the results of assigned labs will reach your teacher automatically. All labs are open without a code too.</span>${fl}
+    <form class="acode" data-form="slogin"><input id="scode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Code, e.g. K7M2QX" aria-label="Student’s personal code"><button class="btn main" type="submit">Sign in</button></form>
+    <span class="aerr" id="aerr" role="alert"></span></div></div>`}
 function worksGated(){
   const back=cur&&cur.kind==='work';stop();cur=null;document.title='Lab works — Sirius Lab';
   const a=accLive(),st=a&&a.kind==='s',isDone=id=>st?a.done.includes(id):doneW.has(id);
-  const list=WORKS.map(w=>[w,wAccess(w.id)]).sort((x,y)=>(x[1]==='open'?0:1)-(y[1]==='open'?0:1));
-  const open=list.filter(x=>x[1]==='open').length,done=list.filter(x=>x[1]==='open'&&isDone(x[0].id)).length;
+  const list=WORKS.map(w=>[w,wAssigned(w.id)]).sort((x,y)=>(x[1]==='no'?1:0)-(y[1]==='no'?1:0));
+  const asg=list.filter(x=>x[1]!=='no'),open=st?asg.length:WORKS.length,done=(st?asg:list).filter(x=>isDone(x[0].id)).length;
   app.innerHTML=`<div class="view">`+header()+accBar()+`
-  <section class="hero"><h1>Lab works</h1><p>${a?'Handle the equipment yourself: weigh, immerse, hang loads. Record your measurements in the table, calculate and draw a conclusion.':'The labs open once you sign in with your code. The phenomena models on the home page are open to everyone.'}</p></section>
-  ${a?`<div class="progress"><span>Done ${done} of ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div>`:''}
+  <section class="hero"><h1>Lab works</h1><p>${st&&asg.length?'At the top are the labs your teacher assigned: their results go to the journal. You can do the rest for practice.':'Handle the equipment yourself: weigh, immerse, hang loads. Record your measurements in the table, calculate and draw a conclusion.'}</p></section>
+  ${open?`<div class="progress"><span>Done ${done} of ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div>`:''}
   ${st?'<div id="stests"></div>':''}
-  <div class="cards" id="cards">${list.map(([w,ac])=>{const lk=ac!=='open',dl=wDeadline(w.id),dn=isDone(w.id);return`
-    <a class="card ${dn&&!lk?'seen':''}${lk?' locked':''}" style="--c:${w.color}" href="${lk?'#works':'#work/'+w.id}"${lk?` data-locked="${ac}" aria-disabled="true"`:''}>
+  <div class="cards" id="cards">${list.map(([w,ac])=>{const dl=wDeadline(w.id),dn=isDone(w.id);return`
+    <a class="card ${dn?'seen':''}" style="--c:${w.color}" href="#work/${w.id}">
       <div class="pb"><i></i></div>
-      <span class="tags"><span class="tag">Lab work No. ${w.num}</span>${st&&!lk?'<span class="tag task">Opened by the teacher</span>':''}</span>
+      <span class="tags"><span class="tag">Lab work No. ${w.num}</span>${ac!=='no'?'<span class="tag task">Assigned</span>':''}</span>
       <h2>${w.title}</h2><p>${w.goal}</p>
-      <div class="foot"><span class="meta"><span class="mrow">${lk?ICON.lock:ICON.flask}<span>${lk?(ac==='late'?'Due date passed':'Teacher will open it'):dl?'Due '+fmtDT(dl):(w.need||w.rows)+' '+plural(w.need||w.rows,'experiment','experiments','experiments')}</span></span><span>${dn?(st?'✓ Sent to the teacher':'✓ Done'):'Not done'}</span></span><span class="go">${lk?'Closed':dn?'Repeat':'Start'}</span></div>
+      <div class="foot"><span class="meta"><span class="mrow">${ICON.flask}<span>${ac==='late'?'Due date passed':ac==='yes'?(dl?'Due '+fmtDT(dl):'No due date'):st?'For practice':(w.need||w.rows)+' '+plural(w.need||w.rows,'experiment','experiments','experiments')}</span></span><span>${dn?(st?'✓ Sent to the teacher':'✓ Done'):'Not done'}</span></span><span class="go">${dn?'Repeat':'Start'}</span></div>
     </a>`}).join('')}</div>
   <a class="tlinkfoot" href="#teacher"><span>For teachers<small>Dashboard: classes, personal student codes, opening labs and the results journal</small></span>${ICON.next}</a></div>`;
   window.scrollTo(0,back?worksScroll:0);
@@ -3317,13 +3326,13 @@ function toast(t){let el=$('#toast');if(!el){el=document.createElement('div');el
 async function tcCall(fn,args){try{const r=await rpc(fn,Object.assign({p_token:ACC&&ACC.token},args));
     if(r.err==='session'){ACC=null;saveAcc();toast(errText('session'));teacherHome();return null}
     if(r.err){toast(errText(r.err));return null}return r}catch(_){toast(errText('net'));return null}}
-function offlineHTML(open){return`<details class="offl"${open?' open':''}><summary>Without internet: assignment link and result codes</summary>
+function offlineHTML(open){return`<details class="offl"${open?' open':''}><summary>Without sign-in: assignment link and result codes</summary>
     <div class="note f"><b>1. Assignment by link</b>
       <label class="tfield">Assignment title<input id="ttitle" maxlength="80" value="Lab works"></label>
       <div class="tchecks" role="group" aria-label="Works in the assignment">${WORKS.map(w=>`<label><input type="checkbox" value="${w.id}" checked><span>No. ${w.num}. ${w.title}</span></label>`).join('')}</div>
       <div class="tools"><button class="btn main" data-act="tlink">${ICON.link}Create link</button></div>
       <div class="tlink" id="tlinkbox" hidden><input id="tlinkout" readonly aria-label="Assignment link"><button class="btn" data-act="tcopy">Copy</button></div>
-      <p class="tmsg" id="tlinkmsg">The link works when the server is unavailable: it takes the student straight to the first lab of the assignment.</p>
+      <p class="tmsg" id="tlinkmsg">For students working without personal codes: the link takes a student straight to the first lab of the assignment, and after the check they get a result code.</p>
     </div>
     <div class="note f"><b>2. Checking result codes</b>
       <p class="tmsg">Without the server, a student gets a result code. Paste the codes here, one per line. Identical instrument readings from different students will be flagged.</p>
@@ -3389,7 +3398,6 @@ function tcRender(){const m=TC.me,box=$('#tc');if(!box)return;
       <div class="trow"><input id="tclassn" maxlength="40" placeholder="For example, 7B" aria-label="Class name" required><button class="btn main" type="submit">Create class</button></div></form>
     <div id="tcclass">${TC.cls?'<p class="gempty">Loading the class…</p>':''}</div>
     <h2 class="th2">Test builder</h2><div class="note f" id="tcte">${TE?teHTML():TC.tests?tcTLHTML():'<p class="gempty">Loading…</p>'}</div>
-    <h2 class="th2">Demo code</h2><div class="note f" id="tcdemo">${tcDemoHTML()}</div>
     ${m.admin?'<h2 class="th2">Administration</h2><div id="tcadm"><p class="gempty">Loading…</p></div>':''}
     ${offlineHTML()}`;
   jRender()}
@@ -3401,7 +3409,7 @@ async function tcClass(){const r=await tcCall('t_class',{p_class:TC.cls});if(!r)
   tcClassRender();await tcPoll(true);await tcCTests()}
 function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=TC.cd,ws=c.works;
   box.innerHTML=`<div class="note f tclass"><div class="tchead"><b>${esc(c.class.name)}</b><span class="tbtns"><button class="btn" data-k="ren">Rename</button><button class="btn" data-k="delcls">Delete class</button></span></div>
-    <h3>Labs for the class</h3><p class="tmsg">Tick the labs students can open. The due date is optional: after it the lab closes by itself. Phenomena models are always open.</p>
+    <h3>Assignments for the class</h3><p class="tmsg">Tick the labs you assign to the class: their results will arrive in the journal. The due date is optional. All labs and models are open to everyone without sign-in — students can do the rest for practice.</p>
     <div class="twork">${WORKS.map(w=>{const o=ws.find(x=>x.work===w.id);return`<div class="twrow${o?' on':''}"><label class="twk"><input type="checkbox" data-wk="${w.id}"${o?' checked':''}><span>No. ${w.num}. ${w.title}</span></label>
       <label class="tdl"><span>Due</span><input type="datetime-local" data-wd="${w.id}" value="${o&&o.deadline?toLocalInput(o.deadline):''}"${o?'':' disabled'} aria-label="Due date: ${esc(w.title)}"></label></div>`}).join('')}</div>
     <h3>Tests for the class</h3><p class="tmsg">Tick a test so students see it on the labs page. Each student has one attempt; the server keeps the time.</p>
@@ -3462,7 +3470,7 @@ async function tcWork(id){const box=$(`.twrow input[data-wk="${id}"]`),dl=$(`.tw
   if(!r){box.checked=!open;return}
   TC.cd.works=r.works;if(TC.jr)TC.jr.works=r.works;
   const row=box.closest('.twrow');row.classList.toggle('on',open);dl.disabled=!open;if(!open)dl.value='';
-  const w=WORKS.find(x=>x.id===id);toast(open?`Lab No. ${w.num} opened${dv?' until '+fmtDT(dv):''}`:`Lab No. ${w.num} closed`);
+  const w=WORKS.find(x=>x.id===id);toast(open?`Lab No. ${w.num} assigned${dv?' until '+fmtDT(dv):''}`:`Lab No. ${w.num} unassigned`);
   const j=$('#tcj');if(j)j.innerHTML=tcJHTML()}
 function printCodes(){const c=TC.cd;if(!c||!c.students.length)return;const url=location.href.split('#')[0];
   let el=$('#print');if(!el){el=document.createElement('div');el.id='print';document.body.appendChild(el)}
@@ -3479,9 +3487,27 @@ function jCSV2(){const jr=TC.jr;if(!jr||!jr.res.length){toast('There are no resu
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='zhurnal-'+(TC.cd?TC.cd.class.name:'klass').replace(/[^\wА-Яа-яЁё-]+/g,'_')+'.csv';
   document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 /* администраторы: приглашения для учителей и список учителей */
-async function tcAdmin(){const r=await tcCall('a_overview',{});if(!r)return;TC.adm=r;tcAdminRender()}
+async function tcAdmin(){const r=await tcCall('a_overview',{});if(!r)return;TC.adm=r;tcAdminRender();tcStats()}
+async function tcStats(){const r=await tcCall('a_stats',{});const b=$('#tcstat');if(!r||!b)return;TC.st=r;b.innerHTML=tcStatHTML(r)}
+function pageName(pg){let m;if(pg==='home')return'Home';if(pg==='works')return'Lab list';if(pg==='teacher')return'For teachers';if(pg==='install')return'Install on your phone';if(pg==='test')return'Test';if(pg==='task')return'Assignment link';
+  if((m=pg.match(/^work\/(.+)$/))){const w=WORKS.find(x=>x.id===m[1]);return w?'No. '+w.num+'. '+w.title:pg}
+  if((m=pg.match(/^lab\/(.+)$/))){const l=LABS.find(x=>x.id===m[1]);return l?'Model: '+l.title:pg}return pg}
+function tcStatHTML(r){const ds=r.days||[],mx=Math.max(1,...ds.map(d=>d.visitors)),W=600,H=150,bw=W/ds.length;
+  const tile=(n,l)=>`<div class="stile"><b>${n}</b><span>${l}</span></div>`;
+  return`<b>Site visits</b>
+    <div class="stiles">${tile(r.today.visitors,'today')}${tile(r.week.visitors,'last 7 days')}${tile(r.month.visitors,'last 30 days')}${tile(r.total.visitors,'total'+(r.total.since?' since '+new Date(r.total.since).toLocaleDateString(LOC,{day:'numeric',month:'short'}):''))}</div>
+    <p class="tmsg">Visitors per day, last 30 days</p>
+    <div class="schart"><svg viewBox="0 0 ${W} ${H+22}" role="img" aria-label="Visitors per day, last 30 days, maximum ${mx}">
+      <line x1="0" y1="${H}" x2="${W}" y2="${H}" class="gaxis"/>
+      ${ds.map((d,i)=>{const h=d.visitors?Math.max(3,d.visitors/mx*(H-18)):0,x=i*bw+1.5;return`<g><title>${new Date(d.day).toLocaleDateString(LOC,{day:'numeric',month:'short'})}: ${d.visitors}</title><rect x="${x}" y="${H-h}" width="${bw-3}" height="${h}" rx="3" class="sbar"/><rect x="${i*bw}" y="0" width="${bw}" height="${H}" fill="transparent"/></g>`}).join('')}
+      <text x="0" y="${H+17}" class="gtick">${ds.length?new Date(ds[0].day).toLocaleDateString(LOC,{day:'numeric',month:'short'}):''}</text>
+      <text x="${W}" y="${H+17}" text-anchor="end" class="gtick">today</text>
+      <text x="0" y="11" class="gtick">max ${mx}</text></svg></div>
+    <p class="tmsg">Page views in 30 days: ${r.month.views}. From phones: ${r.mobile||0} %. English version: ${r.en||0} %.</p>
+    ${(r.pages||[]).length?`<div class="tblwrap"><table class="res"><thead><tr><th>Section (30 days)</th><th>Opens</th></tr></thead><tbody>${r.pages.map(p=>`<tr><td>${esc(pageName(p.page))}</td><td><b>${p.n}</b></td></tr>`).join('')}</tbody></table></div>`:''}
+    <p class="tmsg">Browsers are counted, not people: one student on a phone and a computer counts as two visitors. Names, addresses and other personal data are not collected.</p>`}
 function tcAdminRender(){const box=$('#tcadm'),a=TC.adm;if(!box||!a)return;const now=srvNow();
-  box.innerHTML=`<div class="note f"><b>Invitations for teachers</b>
+  box.innerHTML=`<div class="note f" id="tcstat">${TC.st?tcStatHTML(TC.st):'<b>Site visits</b><p class="gempty">Loading…</p>'}</div><div class="note f"><b>Invitations for teachers</b>
     <p class="tmsg">Teachers can register only by invitation. Create a code and give it to the teacher in person or by messenger. One code — one registration.</p>
     <form data-form="ainv" class="tinv"><input id="ainote" maxlength="80" placeholder="For: e.g. Ms Smith, School No. 5" aria-label="Who the invitation is for">
       <select id="aidays" aria-label="Valid for"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option></select>
@@ -3694,19 +3720,23 @@ async function teAct(k,t){const qe=t.closest('.teq'),i=qe?+qe.dataset.q:-1,q=i>=
 async function tcTestOpen(id,copy){const r=await tcCall('t_test_get',{p_test:id});if(!r)return;
   TE={id:copy?null:r.id,used:!copy&&r.used,title:copy?r.title+' (copy)':r.title,minutes:r.minutes,pick:r.pick||'',qs:r.qs.map(qFromSrv)};teRender();$('#tcte').scrollIntoView({behavior:'smooth',block:'start'})}
 
+/* счётчик посещений: случайный номер браузера, без личных данных; автотесты не считаются */
+let hitLast='';
+function hitPage(h){const pg=(h||'#').slice(1).replace(/^task\/.*/,'task').replace(/^test\/.*/,'test')||'home';if(pg===hitLast||navigator.webdriver)return;hitLast=pg;
+  let vid='';try{vid=localStorage.getItem('lab-sirius-vid')||''}catch(_){}
+  if(!/^[0-9a-f]{16,64}$/.test(vid)){vid=Array.from(crypto.getRandomValues(new Uint8Array(12)),x=>x.toString(16).padStart(2,'0')).join('');try{localStorage.setItem('lab-sirius-vid',vid)}catch(_){}}
+  rpc('hit',{p_vid:vid,p_page:pg,p_mobile:!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches),p_lang:LANG.code},6000).catch(()=>{})}
 function route(){
-  const h=location.hash;let m;bigOff();
+  const h=location.hash;let m;bigOff();hitPage(h);
   if((m=h.match(/^#lab\/([\w-]+)$/))&&LABS.some(l=>l.id===m[1]))openLab(m[1]);
   else if((m=h.match(/^#work\/([\w-]+)$/))&&WORKS.some(w=>w.id===m[1])){
-    if(SRV==='?'&&!ACC){waitHome();return}
-    const ac=wAccess(m[1]);if(ac!=='open'){FLASH=lockText(ac);location.replace('#works');return}
     openWork(m[1])}
   else if((m=h.match(/^#task\/([A-Za-z0-9_-]+)$/))){let o=null;try{o=JSON.parse(b64d(m[1]))}catch(_){}
     const w=o&&Array.isArray(o.w)?o.w.filter((id,i,a)=>WORKS.some(x=>x.id===id)&&a.indexOf(id)===i):[];
     if(!w.length){location.replace('#works');return}
     if(!TASK||TASK.k!==m[1])setTask({k:m[1],t:String(o.t||'Lab works').slice(0,80),w,done:[],codes:{}});
     showAllW=false;location.replace('#work/'+(taskNext(null)||w[0]));return}
-  else if((m=h.match(/^#test\/([0-9a-f-]{36})$/))){fromHome=false;if(SRV==='?'&&!ACC){waitHome();return}testHome(m[1])}
+  else if((m=h.match(/^#test\/([0-9a-f-]{36})$/))){fromHome=false;testHome(m[1])}
   else if(h==='#teacher'){fromHome=false;teacherHome()}
   else if(h==='#install'){fromHome=false;installHome()}
   else if(h==='#works'){fromHome=false;worksHome()}
