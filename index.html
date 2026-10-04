@@ -392,6 +392,16 @@ table.jtab td.jx{color:#C4245F;font-weight:800;text-align:center}td.jfl{color:#B
 .stile{background:var(--surf);border-radius:16px;padding:12px 14px}.stile b{display:block;font-size:30px;font-variant-numeric:tabular-nums;color:var(--ink)}.stile span{color:var(--muted);font-size:13px;font-weight:600}
 .schart{background:var(--surf);border-radius:16px;padding:12px 14px 6px;margin:6px 0}.schart svg{display:block;width:100%;height:auto}
 .sbar{fill:var(--brand)}.schart g:hover .sbar{fill:var(--plum)}
+.tapply{grid-column:1/-1}.tagrid{display:grid;gap:0 16px}@media(min-width:640px){.tagrid{grid-template-columns:1fr 1fr}}
+.tapply .tfield input,.tapply textarea{font:inherit;font-weight:500;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
+.tapply textarea{resize:vertical}.tapply .tfield input:focus,.tapply textarea:focus{border-color:var(--brand);outline:none}
+.hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+.anew{display:inline-block;margin-left:8px;padding:2px 10px;border-radius:999px;background:var(--plum);color:#fff;font-size:13px}
+.aapp{margin-top:12px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px solid var(--line)}.aapp.st-new{border-color:var(--brand)}
+.aapph{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px}.aapph span{color:var(--muted);font-size:13px}
+.aapp p{margin:6px 0 0;overflow-wrap:anywhere}.aapp .acom{color:var(--muted);font-style:italic}.aapp .ast{color:var(--muted);font-weight:600}.aapp .tools{margin:10px 0 0}
+.aletter{margin:12px 0;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--green)}
+.aletter textarea{display:block;width:100%;margin-top:8px;font:inherit;font-size:14px;color:var(--ink);background:var(--soft);border:0;border-radius:12px;padding:10px 12px;resize:vertical}.aletter a.btn{text-decoration:none}
 #print{display:none}
 @media print{
   body.printing{background:#fff}
@@ -3228,6 +3238,7 @@ const ERRS={slow:'Слишком много попыток. Подождите 1
   pass:'Пароль должен быть не короче 8 символов.',taken:'Учитель с такой почтой уже зарегистрирован — войдите.',login:'Неверная почта или пароль.',blocked:'Аккаунт заблокирован. Напишите авторам проекта.',
   session:'Вход устарел — войдите ещё раз.',code:'Такого кода нет. Проверьте буквы и цифры.',device:'Этот код уже открыт на другом устройстве. Попросите учителя нажать «Новое устройство» рядом с вашим именем.',
   closed:'Эта работа сейчас закрыта.',late:'Срок сдачи этой работы прошёл.',limit:'Достигнут предел: не больше 40 классов и 60 учеников в классе.',self:'Нельзя заблокировать свой аккаунт.',
+  school:'Укажите школу и город.',decided:'По этой заявке уже принято решение.',
   work:'Неизвестная работа.',data:'Слишком большой результат.',net:'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.'};
 const errText=e=>ERRS[e]||ERRS.net;
 function gated(){return!!accLive()}
@@ -3368,6 +3379,18 @@ function teacherHome(){
         <div class="tools"><button class="btn main" type="submit">Зарегистрироваться</button></div>
         <p class="tmsg terr" id="trerr" role="alert"></p></form>
     </div>
+    ${SRV==='off'?'':`<form class="note f tapply" data-form="tapply" id="tapplyf"><b>Нет кода-приглашения? Оставьте заявку</b>
+      <p class="tmsg">Авторы проекта проверят заявку и пришлют код-приглашение на вашу почту. Обычно это занимает один-два дня.</p>
+      <div class="tagrid">
+        <label class="tfield">Имя и отчество<input id="tan" maxlength="80" autocomplete="name" placeholder="Например, Мария Ивановна" required></label>
+        <label class="tfield">Почта<input type="email" id="tae" maxlength="120" autocomplete="email" required></label>
+        <label class="tfield">Школа и город<input id="tas" maxlength="120" placeholder="Например, школа № 5, Казань" required></label>
+        <label class="tfield">Классы<input id="tac" maxlength="60" placeholder="Например, 7А, 7Б"></label>
+      </div>
+      <label class="tfield">Комментарий — по желанию<textarea id="tam" maxlength="500" rows="2" placeholder="Как планируете использовать сайт"></textarea></label>
+      <input class="hp" id="tahp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div class="tools"><button class="btn main" type="submit">Отправить заявку</button></div>
+      <p class="tmsg terr" id="taerr" role="alert"></p></form>`}
     ${offlineHTML(SRV==='off')}
   </main></div>`;
   window.scrollTo(0,0);jRender();
@@ -3487,7 +3510,20 @@ function jCSV2(){const jr=TC.jr;if(!jr||!jr.res.length){toast('В журнале
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='zhurnal-'+(TC.cd?TC.cd.class.name:'klass').replace(/[^\wА-Яа-яЁё-]+/g,'_')+'.csv';
   document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 /* администраторы: приглашения для учителей и список учителей */
-async function tcAdmin(){const r=await tcCall('a_overview',{});if(!r)return;TC.adm=r;tcAdminRender();tcStats()}
+async function tcAdmin(){const r=await tcCall('a_overview',{});if(!r)return;TC.adm=r;tcAdminRender();tcStats();tcApps()}
+async function tcApps(){const r=await tcCall('a_apps',{});const b=$('#tcapps');if(!r||!b)return;TC.apps=r;b.innerHTML=tcAppsHTML()}
+function appLetter(a){const url=location.href.split('#')[0];
+  return`Здравствуйте, ${a.name}!\n\nВаша заявка на «Лабораторию Сириус» одобрена. Ваш код-приглашение: ${a.code}\nОн действует 30 дней.\n\nКак зарегистрироваться:\n1. Откройте ${url}#teacher\n2. В блоке «Регистрация учителя» введите код, своё имя, почту и пароль.\n3. В кабинете создайте класс, добавьте учеников и задайте им работы.\n\nЛаборатория Сириус`}
+function tcAppsHTML(){const r=TC.apps;if(!r)return'<b>Заявки учителей</b><p class="gempty">Загружаем…</p>';const ap=r.apps||[];
+  return`<b>Заявки учителей${r.new?` <span class="anew">новых: ${r.new}</span>`:''}</b>
+    ${TC.letter?`<div class="aletter"><p class="tmsg">Заявка одобрена. Отправьте учителю письмо с кодом — на почту <b>${esc(TC.letter.email)}</b>:</p>
+      <textarea readonly rows="9" id="aletter">${esc(appLetter(TC.letter))}</textarea>
+      <div class="tools"><a class="btn main" href="mailto:${encodeURIComponent(TC.letter.email)}?subject=${encodeURIComponent('Код-приглашение: Лаборатория Сириус')}&body=${encodeURIComponent(appLetter(TC.letter))}">Открыть в почте</a><button class="btn" data-k="copy" data-v="${esc(appLetter(TC.letter))}">Копировать письмо</button></div></div>`:''}
+    ${ap.length?ap.map(a=>`<div class="aapp st-${a.status}"><div class="aapph"><b>${esc(a.name)}</b><span>${fmtDT(a.at)}</span></div>
+      <p>${esc(a.email)} · ${esc(a.school)}${a.classes?' · '+esc(a.classes):''}</p>${a.comment?`<p class="acom">«${esc(a.comment)}»</p>`:''}
+      ${a.status==='new'?`<div class="tools"><button class="btn main" data-k="aok" data-id="${a.id}">Одобрить</button><button class="btn" data-k="ano" data-id="${a.id}">Отклонить</button></div>`
+        :a.status==='approved'?`<p class="ast">✓ Одобрена: код <code class="scode">${a.code}</code>${a.used?' · регистрация пройдена':' · регистрации пока не было'}</p>`
+        :`<p class="ast">Отклонена${a.reason?': '+esc(a.reason):''}</p>`}</div>`).join(''):'<p class="gempty">Заявок пока нет. Форма заявки — на странице «Для учителя».</p>'}`}
 async function tcStats(){const r=await tcCall('a_stats',{});const b=$('#tcstat');if(!r||!b)return;TC.st=r;b.innerHTML=tcStatHTML(r)}
 function pageName(pg){let m;if(pg==='home')return'Главная';if(pg==='works')return'Список лабораторных работ';if(pg==='teacher')return'Для учителя';if(pg==='install')return'Установить на телефон';if(pg==='test')return'Тест';if(pg==='task')return'Задание по ссылке';
   if((m=pg.match(/^work\/(.+)$/))){const w=WORKS.find(x=>x.id===m[1]);return w?'№ '+w.num+'. '+w.title:pg}
@@ -3507,7 +3543,7 @@ function tcStatHTML(r){const ds=r.days||[],mx=Math.max(1,...ds.map(d=>d.visitors
     ${(r.pages||[]).length?`<div class="tblwrap"><table class="res"><thead><tr><th>Раздел (30 дней)</th><th>Открытий</th></tr></thead><tbody>${r.pages.map(p=>`<tr><td>${esc(pageName(p.page))}</td><td><b>${p.n}</b></td></tr>`).join('')}</tbody></table></div>`:''}
     <p class="tmsg">Считаются браузеры, а не люди: один ученик с телефона и компьютера — два посетителя. Имена, адреса и другие личные данные не собираются.</p>`}
 function tcAdminRender(){const box=$('#tcadm'),a=TC.adm;if(!box||!a)return;const now=srvNow();
-  box.innerHTML=`<div class="note f" id="tcstat">${TC.st?tcStatHTML(TC.st):'<b>Посещения сайта</b><p class="gempty">Загружаем…</p>'}</div><div class="note f"><b>Приглашения для учителей</b>
+  box.innerHTML=`<div class="note f" id="tcapps">${tcAppsHTML()}</div><div class="note f" id="tcstat">${TC.st?tcStatHTML(TC.st):'<b>Посещения сайта</b><p class="gempty">Загружаем…</p>'}</div><div class="note f"><b>Приглашения для учителей</b>
     <p class="tmsg">Учителем можно зарегистрироваться только по приглашению. Создайте код и передайте его учителю лично или в мессенджере. Один код — одна регистрация.</p>
     <form data-form="ainv" class="tinv"><input id="ainote" maxlength="80" placeholder="Кому: например, Мария Ивановна, школа № 5" aria-label="Кому выдаётся приглашение">
       <select id="aidays" aria-label="Срок действия"><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="30">30 дней</option></select>
@@ -3548,6 +3584,8 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='demo'){const r=await tcCall('t_demo',{p_minutes:+$('#tdmin').value});if(r){TC.demo=r;$('#tcdemo').innerHTML=tcDemoHTML()}return}
   if(k==='demostop'){if(await tcCall('t_demo_stop',{})){TC.demo=null;$('#tcdemo').innerHTML=tcDemoHTML();toast('Демо-код остановлен')}return}
   if(k==='idel'){if(!confirm('Удалить неиспользованное приглашение '+id+'?'))return;if(await tcCall('a_invite_delete',{p_code:id})){TC.newInv=null;await tcAdmin()}return}
+  if(k==='aok'){const r=await tcCall('a_app_decide',{p_app:id,p_approve:true,p_reason:null});if(r){TC.letter=r;await tcApps();await tcAdmin();const l=$('#tcapps');if(l)l.scrollIntoView({behavior:'smooth',block:'start'})}return}
+  if(k==='ano'){const why=prompt('Почему отклоняете? Можно оставить пустым.','');if(why===null)return;if(await tcCall('a_app_decide',{p_app:id,p_approve:false,p_reason:why})){toast('Заявка отклонена');await tcApps()}return}
   if(k==='tblock'){const on=t.dataset.v==='1';if(on&&!confirm('Заблокировать учителя? Учитель не сможет войти, а демо-код учителя перестанет действовать.'))return;if(await tcCall('a_teacher_block',{p_teacher:id,p_blocked:on}))await tcAdmin();return}
   if(k==='treset'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!confirm(`Выдать временный пароль для ${tt.name}? Старый пароль перестанет работать.`))return;const r=await tcCall('a_teacher_reset',{p_teacher:id});if(r){TC.newPw=[tt.name,r.pass];tcAdminRender()}return}
 }
@@ -3555,6 +3593,11 @@ async function formAct(kind,f){
   if(kind==='slogin'){sLogin();return}
   if(kind==='tlogin'){tLogin(false);return}
   if(kind==='treg'){tLogin(true);return}
+  if(kind==='tapply'){const er=$('#taerr');er.textContent='Отправляем…';
+    try{const r=await rpc('apply_teacher',{p_name:$('#tan').value,p_email:$('#tae').value,p_school:$('#tas').value,p_classes:$('#tac').value,p_comment:$('#tam').value,p_hp:$('#tahp').value});
+      if(r.err){er.textContent=r.err==='taken'?'Учитель с такой почтой уже зарегистрирован — войдите в блоке «Вход».':errText(r.err);return}
+      f.innerHTML=`<b>Заявка отправлена ✓</b><p class="tmsg">${r.again?'Заявка с этой почтой уже ждёт решения — мы ответим на неё.':'Авторы проекта проверят её и пришлют код-приглашение на почту '+esc($('#tae')?$('#tae').value:'')+'.'} Потом вернитесь сюда и зарегистрируйтесь по коду.</p>`}
+    catch(_){er.textContent=errText('net')}return}
   if(!ACC||ACC.kind!=='t')return;
   if(kind==='tpass'){const r=await tcCall('t_password',{p_old:$('#tpo').value,p_new:$('#tpn').value});if(r){f.hidden=true;f.reset();toast('Пароль изменён')}return}
   if(kind==='tclass'){const r=await tcCall('t_class_create',{p_name:$('#tclassn').value});if(r){TC.cls=r.id;TC.cd=null;toast('Класс создан');await tcLoad()}return}
