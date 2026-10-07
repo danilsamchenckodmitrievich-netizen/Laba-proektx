@@ -370,9 +370,6 @@ table.jtab td.jw{color:#B5531A}
 .snotice{border:2px solid var(--brand);margin:12px 8px}.snotice p{margin:6px 0 4px;font-size:17px;font-weight:600}.snotice small{color:var(--muted)}
 #tntext{width:100%;font:inherit;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;resize:vertical}
 .tsum td,.tsum th{text-align:center}.tsum td:first-child,.tsum th:first-child{text-align:left}
-.ftgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:0 8px}@media(max-width:640px){.ftgrid{grid-template-columns:1fr}}
-.ftcard{margin:0}.ftcard p{margin:6px 0 0;color:var(--muted);font-size:15px;line-height:1.45}.ftsteps{margin:0 8px 0 28px;padding:0;line-height:1.55}.ftsteps li{margin:6px 0}
-.ftvid{max-width:300px;margin:10px 8px}.ftvid video{width:100%;aspect-ratio:9/16;border-radius:18px;background:#1F2340;display:block}
 .jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
@@ -2852,7 +2849,6 @@ function openMenu(){
   const items=[['#','All phenomena',LABS.length+' '+plural(LABS.length,'model','models','models'),'All',!inWorks&&filter==='All']]
     .concat(CATS.slice(1).map((c,i)=>['#','Chapter '+(i+1)+'. '+c,cnt(c)+' '+plural(cnt(c),'model','models','models'),c,!inWorks&&filter===c]))
     .concat([['#works','Lab works',WORKS.length+' works · done '+WORKS.filter(w=>doneW.has(w.id)).length,'',inWorks]])
-    .concat([['#forteachers','For teachers','What the site offers and how to start','',h==='#forteachers']])
     .concat([['#teacher','Teacher dashboard','Classes, student codes, journal, tests','',h==='#teacher']])
     .concat([['#install','Install on your phone','Home screen icon and offline use','',h==='#install']]);
   menuEl.innerHTML=`<div class="menu-sheet" role="dialog" aria-modal="true" aria-label="Sections"><button class="menu-x" data-m="close" aria-label="Close menu">${ICON.close}</button><nav>${items.map(it=>`<a href="${it[0]}" data-cat="${it[3]}"${it[4]?' aria-current="page"':''}>${ICON.lines}<span>${it[1]}<small>${it[2]}</small></span></a>`).join('')}</nav></div>`;
@@ -2915,36 +2911,13 @@ function worksHome(){
       <div class="foot"><span class="meta"><span class="mrow">${ICON.flask}<span>${w.need||w.rows} ${plural(w.need||w.rows,'experiment','experiments','experiments')}</span></span><span>${isDone(w.id)?'✓ Done':'Not done'}</span></span><span class="go">${isDone(w.id)?'Repeat':'Start'}</span></div>
     </a>`).join('')}</div>
   ${TASK?`<button class="showall" data-act="showall">${only?'Show all lab works':'Show only the assignment works'}</button>`:''}
-  <a class="tlinkfoot" href="#forteachers"><span>For teachers<small>Class journal, grades, tests and learning materials — free. How to start</small></span>${ICON.next}</a></div>`;
+  <a class="tlinkfoot" href="#teacher"><span>For teachers<small>Cabinet: classes, student codes, journal, tests and learning materials</small></span>${ICON.next}</a></div>`;
   window.scrollTo(0,back?worksScroll:0);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
 }
 /* установка на телефон и работа без интернета */
 let instEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;const b=$('#instbtn');if(b)b.hidden=false});
 const standalone=()=>(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
-/* страница для учителей: что даёт сайт и как начать */
-function forTeachersHome(){stop();cur=null;document.title='For teachers — Sirius Lab';
-  const root=location.pathname.replace(/[^/]*$/,'').replace(/en\/$/,''),F=[
-    ['10 lab works and 19 models','Students handle the instruments themselves, read the scales, record experiments and calculate. Everyone gets their own numbers.'],
-    ['Grades and mistake review','There are no hints while a student works. At the first check the site gives a grade and explains every mistake.'],
-    ['Class journal','Results arrive automatically: grades, attempts, instrument readings. The site flags identical numbers and suspiciously fast work.'],
-    ['Tests','An editor and 8 ready-made Year 7 tests. Own numbers for each student, answers checked by the server, leaving the page is recorded.'],
-    ['Learning materials','Presentations, PDFs, videos and links — for a work, a test or the whole class.'],
-    ['Summary sheet and announcements','A summary table of grades for Excel and printing, short messages to the class.'],
-    ['No unnecessary data','Students sign in with a personal code: just a first name, no email or passwords.'],
-    ['Works offline','Models and works open offline, and the site installs on a phone as an icon.']];
-  app.innerHTML=`<div class="view">`+header()+`
-  <section class="hero"><h1>For teachers</h1><p>Year 7 physics lab works with a journal, grades, tests and learning materials. Free, on phones and computers.</p></section>
-  <main class="sheet tsheet ftpage">
-    <div class="ftgrid">${F.map(f=>`<div class="note f ftcard"><b>${f[0]}</b><p>${f[1]}</p></div>`).join('')}</div>
-    <h2 class="th2">How to start</h2>
-    <ol class="ftsteps"><li><b>Send an application</b> on the cabinet page: name, email, school.</li><li><b>Get an invitation code</b> by email and register.</li>
-      <li><b>Create a class</b> and add students — each gets a personal code.</li><li><b>Assign works and tests</b>, attach materials — results will arrive in the journal by themselves.</li></ol>
-    <div class="tools"><button class="btn main" data-k="ftapply">Send an application</button><a class="btn" href="#teacher">Sign in to the cabinet</a><a class="btn" href="#works">See the works</a></div>
-    <h2 class="th2">Video about the site</h2>
-    <div class="ftvid"><video controls playsinline preload="none" src="${root}docs/video/sirius_tiktok2_music.mp4" aria-label="Sirius Lab promo video"></video></div>
-    <p class="tmsg">You can also do without registering: the cabinet has a “Without sign-in” section — an assignment by link and checking result codes.</p>
-  </main></div>`;window.scrollTo(0,0)}
 /* мой прогресс: оценки по работам и тестам, что осталось сдать */
 async function progressHome(){stop();cur=null;document.title='My progress — Sirius Lab';
   const a=accLive(),st=a&&a.kind==='s';
@@ -3473,7 +3446,7 @@ function worksGated(){
       <h2>${w.title}</h2><p>${w.goal}</p>
       <div class="foot"><span class="meta"><span class="mrow">${ICON.flask}<span>${ac==='late'?'Due date passed':ac==='yes'?(dl?'Due '+fmtDT(dl):'No due date'):st?'For practice':(w.need||w.rows)+' '+plural(w.need||w.rows,'experiment','experiments','experiments')}</span></span><span>${dn?(st?'✓ Sent to the teacher':'✓ Done'):'Not done'}</span></span><span class="go">${dn?'Repeat':'Start'}</span></div>
     </a>`}).join('')}</div>
-  <a class="tlinkfoot" href="#forteachers"><span>For teachers<small>Class journal, grades, tests and learning materials — free. How to start</small></span>${ICON.next}</a></div>`;
+  <a class="tlinkfoot" href="#teacher"><span>For teachers<small>Cabinet: classes, student codes, journal, tests and learning materials</small></span>${ICON.next}</a></div>`;
   window.scrollTo(0,back?worksScroll:0);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
   if(st){stTestsLoad();stMatsLoad()}
@@ -3516,7 +3489,6 @@ function offlineHTML(open){return`<details class="offl"${open?' open':''}><summa
       <div id="tjournal"></div>
       <div class="tools"><button class="btn" data-act="jcsv">${ICON.dl}Download for Excel</button><button class="btn" data-act="jclear">Clear journal</button></div>
     </div></details>`}
-let GOAPPLY=false;
 function teacherHome(){
   stop();cur=null;document.title='For teachers — Sirius Lab';
   if(ACC&&ACC.kind==='t'&&SRV!=='off'){tcHome();return}
@@ -3554,7 +3526,7 @@ function teacherHome(){
       <p class="tmsg terr" id="taerr" role="alert"></p></form>`}
     ${offlineHTML(SRV==='off')}
   </main></div>`;
-  window.scrollTo(0,0);jRender();if(GOAPPLY){const f=$('#tapplyf');if(f){GOAPPLY=false;$('#tan').focus({preventScroll:true});window.scrollTo(0,f.getBoundingClientRect().top+scrollY-80)}}
+  window.scrollTo(0,0);jRender();
 }
 async function tLogin(reg){const er=$(reg?'#trerr':'#tlerr');er.textContent=reg?'Registering…':'Signing in…';
   try{const r=reg?await rpc('t_register',{p_invite:$('#tri').value,p_email:$('#tre').value,p_name:$('#trn').value,p_pass:$('#trp').value})
@@ -3765,7 +3737,7 @@ function tcAppsHTML(){const r=TC.apps;if(!r)return'<b>Teacher applications</b><p
         :a.status==='approved'?`<p class="ast">✓ Approved: code <code class="scode">${a.code}</code>${a.used?' · registered':' · not registered yet'}</p>`
         :`<p class="ast">Declined${a.reason?': '+esc(a.reason):''}</p>`}</div>`).join(''):'<p class="gempty">No applications yet. The application form is on the “For teachers” page.</p>'}`}
 async function tcStats(){const r=await tcCall('a_stats',{});const b=$('#tcstat');if(!r||!b)return;TC.st=r;b.innerHTML=tcStatHTML(r)}
-function pageName(pg){let m;if(pg==='home')return'Home';if(pg==='works')return'Lab list';if(pg==='teacher')return'For teachers';if(pg==='install')return'Install on your phone';if(pg==='forteachers')return'Page for teachers';if(pg==='progress')return'My progress';if(pg==='test')return'Test';if(pg==='task')return'Assignment link';
+function pageName(pg){let m;if(pg==='home')return'Home';if(pg==='works')return'Lab list';if(pg==='teacher')return'For teachers';if(pg==='install')return'Install on your phone';if(pg==='progress')return'My progress';if(pg==='test')return'Test';if(pg==='task')return'Assignment link';
   if((m=pg.match(/^work\/(.+)$/))){const w=WORKS.find(x=>x.id===m[1]);return w?'No. '+w.num+'. '+w.title:pg}
   if((m=pg.match(/^lab\/(.+)$/))){const l=LABS.find(x=>x.id===m[1]);return l?'Model: '+l.title:pg}return pg}
 function tcStatHTML(r){const ds=r.days||[],mx=Math.max(1,...ds.map(d=>d.visitors)),W=600,H=150,bw=W/ds.length;
@@ -3818,7 +3790,6 @@ function tcViewHTML(){const v=TC.view;if(!v)return'';if(!v.d)return'<div class="
     ${body}</div>`}
 function tcOut(){ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null,tests:null,ct:null,tres:null,view:null});TE=null;teacherHome()}
 async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
-  if(k==='ftapply'){GOAPPLY=true;if(location.hash==='#teacher')teacherHome();else location.hash='#teacher';return}
   if(k==='slogout'){sLogout();return}
   if(k==='copy'){copyText(t.dataset.v,t);return}
   if(k==='tstart'){if(confirm('Start the test? You have one attempt and the timer starts right away. Do not leave the page during the test.'))location.hash='#test/'+id;return}
@@ -4137,7 +4108,6 @@ function route(){
   else if(h==='#install'){fromHome=false;installHome()}
   else if(h==='#works'){fromHome=false;worksHome()}
   else if(h==='#progress'){fromHome=false;progressHome()}
-  else if(h==='#forteachers'){fromHome=false;forTeachersHome()}
   else{fromHome=false;home()}
 }
 const tiltOK=()=>window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches;

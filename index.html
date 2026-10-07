@@ -370,9 +370,6 @@ table.jtab td.jw{color:#B5531A}
 .snotice{border:2px solid var(--brand);margin:12px 8px}.snotice p{margin:6px 0 4px;font-size:17px;font-weight:600}.snotice small{color:var(--muted)}
 #tntext{width:100%;font:inherit;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;resize:vertical}
 .tsum td,.tsum th{text-align:center}.tsum td:first-child,.tsum th:first-child{text-align:left}
-.ftgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:0 8px}@media(max-width:640px){.ftgrid{grid-template-columns:1fr}}
-.ftcard{margin:0}.ftcard p{margin:6px 0 0;color:var(--muted);font-size:15px;line-height:1.45}.ftsteps{margin:0 8px 0 28px;padding:0;line-height:1.55}.ftsteps li{margin:6px 0}
-.ftvid{max-width:300px;margin:10px 8px}.ftvid video{width:100%;aspect-ratio:9/16;border-radius:18px;background:#1F2340;display:block}
 .jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
@@ -2852,7 +2849,6 @@ function openMenu(){
   const items=[['#','Все явления',LABS.length+' '+plural(LABS.length,'модель','модели','моделей'),'Все',!inWorks&&filter==='Все']]
     .concat(CATS.slice(1).map((c,i)=>['#','Глава '+(i+1)+'. '+c,cnt(c)+' '+plural(cnt(c),'модель','модели','моделей'),c,!inWorks&&filter===c]))
     .concat([['#works','Лабораторные работы',WORKS.length+' работ · выполнено '+WORKS.filter(w=>doneW.has(w.id)).length,'',inWorks]])
-    .concat([['#forteachers','Учителям','Что даёт сайт и как начать','',h==='#forteachers']])
     .concat([['#teacher','Кабинет учителя','Классы, коды учеников, журнал, тесты','',h==='#teacher']])
     .concat([['#install','Установить на телефон','Значок на экране и работа без интернета','',h==='#install']]);
   menuEl.innerHTML=`<div class="menu-sheet" role="dialog" aria-modal="true" aria-label="Разделы"><button class="menu-x" data-m="close" aria-label="Закрыть меню">${ICON.close}</button><nav>${items.map(it=>`<a href="${it[0]}" data-cat="${it[3]}"${it[4]?' aria-current="page"':''}>${ICON.lines}<span>${it[1]}<small>${it[2]}</small></span></a>`).join('')}</nav></div>`;
@@ -2915,36 +2911,13 @@ function worksHome(){
       <div class="foot"><span class="meta"><span class="mrow">${ICON.flask}<span>${w.need||w.rows} ${plural(w.need||w.rows,'опыт','опыта','опытов')}</span></span><span>${isDone(w.id)?'✓ Выполнена':'Не выполнена'}</span></span><span class="go">${isDone(w.id)?'Повторить':'Начать'}</span></div>
     </a>`).join('')}</div>
   ${TASK?`<button class="showall" data-act="showall">${only?'Показать все лабораторные работы':'Показать только работы задания'}</button>`:''}
-  <a class="tlinkfoot" href="#forteachers"><span>Учителям<small>Журнал класса, оценки, тесты и учебные материалы — бесплатно. Как начать</small></span>${ICON.next}</a></div>`;
+  <a class="tlinkfoot" href="#teacher"><span>Для учителя<small>Кабинет: классы, коды учеников, журнал, тесты и учебные материалы</small></span>${ICON.next}</a></div>`;
   window.scrollTo(0,back?worksScroll:0);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
 }
 /* установка на телефон и работа без интернета */
 let instEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;const b=$('#instbtn');if(b)b.hidden=false});
 const standalone=()=>(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
-/* страница для учителей: что даёт сайт и как начать */
-function forTeachersHome(){stop();cur=null;document.title='Учителям — Лаборатория Сириус';
-  const root=location.pathname.replace(/[^/]*$/,'').replace(/en\/$/,''),F=[
-    ['10 лабораторных и 19 моделей','Ученики сами берут приборы, читают шкалы, записывают опыты и считают. У каждого свой вариант чисел.'],
-    ['Оценка и разбор ошибок','Пока ученик работает, подсказок нет. При первой проверке сайт ставит оценку и объясняет каждую ошибку.'],
-    ['Журнал класса','Результаты приходят сами: оценки, попытки, показания приборов. Сайт отмечает одинаковые числа и слишком быструю работу.'],
-    ['Тесты','Конструктор и 8 готовых тестов по темам 7 класса. Свои числа у каждого ученика, ответы проверяет сервер, видно уходы со страницы.'],
-    ['Учебные материалы','Презентации, PDF, видео и ссылки — к работе, к тесту или для всего класса.'],
-    ['Ведомость и объявления','Итоговая таблица оценок для Excel и печати, короткие сообщения классу.'],
-    ['Без лишних данных','Ученики входят по личному коду: только имя, без почты и паролей.'],
-    ['Работает без интернета','Модели и работы открываются офлайн, сайт ставится на телефон значком.']];
-  app.innerHTML=`<div class="view">`+header()+`
-  <section class="hero"><h1>Учителям</h1><p>Лабораторные работы по физике 7 класса с журналом, оценками, тестами и учебными материалами. Бесплатно, на телефоне и компьютере.</p></section>
-  <main class="sheet tsheet ftpage">
-    <div class="ftgrid">${F.map(f=>`<div class="note f ftcard"><b>${f[0]}</b><p>${f[1]}</p></div>`).join('')}</div>
-    <h2 class="th2">Как начать</h2>
-    <ol class="ftsteps"><li><b>Оставьте заявку</b> на странице кабинета: имя, почта, школа.</li><li><b>Получите код-приглашение</b> на почту и зарегистрируйтесь.</li>
-      <li><b>Создайте класс</b> и впишите учеников — каждый получит личный код.</li><li><b>Откройте работы и тесты</b>, прикрепите материалы — результаты сами придут в журнал.</li></ol>
-    <div class="tools"><button class="btn main" data-k="ftapply">Оставить заявку</button><a class="btn" href="#teacher">Войти в кабинет</a><a class="btn" href="#works">Посмотреть работы</a></div>
-    <h2 class="th2">Ролик о сайте</h2>
-    <div class="ftvid"><video controls playsinline preload="none" src="${root}docs/video/sirius_tiktok2_music.mp4" aria-label="Рекламный ролик Лаборатории Сириус"></video></div>
-    <p class="tmsg">Без регистрации тоже можно: в кабинете есть раздел «Без входа» — задание классу по ссылке и проверка кодов результатов.</p>
-  </main></div>`;window.scrollTo(0,0)}
 /* мой прогресс: оценки по работам и тестам, что осталось сдать */
 async function progressHome(){stop();cur=null;document.title='Мой прогресс — Лаборатория Сириус';
   const a=accLive(),st=a&&a.kind==='s';
@@ -3473,7 +3446,7 @@ function worksGated(){
       <h2>${w.title}</h2><p>${w.goal}</p>
       <div class="foot"><span class="meta"><span class="mrow">${ICON.flask}<span>${ac==='late'?'Срок сдачи прошёл':ac==='yes'?(dl?'Сдать до '+fmtDT(dl):'Без срока сдачи'):st?'Для тренировки':(w.need||w.rows)+' '+plural(w.need||w.rows,'опыт','опыта','опытов')}</span></span><span>${dn?(st?'✓ Отправлена учителю':'✓ Выполнена'):'Не выполнена'}</span></span><span class="go">${dn?'Повторить':'Начать'}</span></div>
     </a>`}).join('')}</div>
-  <a class="tlinkfoot" href="#forteachers"><span>Учителям<small>Журнал класса, оценки, тесты и учебные материалы — бесплатно. Как начать</small></span>${ICON.next}</a></div>`;
+  <a class="tlinkfoot" href="#teacher"><span>Для учителя<small>Кабинет: классы, коды учеников, журнал, тесты и учебные материалы</small></span>${ICON.next}</a></div>`;
   window.scrollTo(0,back?worksScroll:0);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
   if(st){stTestsLoad();stMatsLoad()}
@@ -3516,7 +3489,6 @@ function offlineHTML(open){return`<details class="offl"${open?' open':''}><summa
       <div id="tjournal"></div>
       <div class="tools"><button class="btn" data-act="jcsv">${ICON.dl}Скачать для Excel</button><button class="btn" data-act="jclear">Очистить журнал</button></div>
     </div></details>`}
-let GOAPPLY=false;
 function teacherHome(){
   stop();cur=null;document.title='Для учителя — Лаборатория Сириус';
   if(ACC&&ACC.kind==='t'&&SRV!=='off'){tcHome();return}
@@ -3554,7 +3526,7 @@ function teacherHome(){
       <p class="tmsg terr" id="taerr" role="alert"></p></form>`}
     ${offlineHTML(SRV==='off')}
   </main></div>`;
-  window.scrollTo(0,0);jRender();if(GOAPPLY){const f=$('#tapplyf');if(f){GOAPPLY=false;$('#tan').focus({preventScroll:true});window.scrollTo(0,f.getBoundingClientRect().top+scrollY-80)}}
+  window.scrollTo(0,0);jRender();
 }
 async function tLogin(reg){const er=$(reg?'#trerr':'#tlerr');er.textContent=reg?'Регистрируем…':'Входим…';
   try{const r=reg?await rpc('t_register',{p_invite:$('#tri').value,p_email:$('#tre').value,p_name:$('#trn').value,p_pass:$('#trp').value})
@@ -3765,7 +3737,7 @@ function tcAppsHTML(){const r=TC.apps;if(!r)return'<b>Заявки учител�
         :a.status==='approved'?`<p class="ast">✓ Одобрена: код <code class="scode">${a.code}</code>${a.used?' · регистрация пройдена':' · регистрации пока не было'}</p>`
         :`<p class="ast">Отклонена${a.reason?': '+esc(a.reason):''}</p>`}</div>`).join(''):'<p class="gempty">Заявок пока нет. Форма заявки — на странице «Для учителя».</p>'}`}
 async function tcStats(){const r=await tcCall('a_stats',{});const b=$('#tcstat');if(!r||!b)return;TC.st=r;b.innerHTML=tcStatHTML(r)}
-function pageName(pg){let m;if(pg==='home')return'Главная';if(pg==='works')return'Список лабораторных работ';if(pg==='teacher')return'Для учителя';if(pg==='install')return'Установить на телефон';if(pg==='forteachers')return'Страница для учителей';if(pg==='progress')return'Мой прогресс';if(pg==='test')return'Тест';if(pg==='task')return'Задание по ссылке';
+function pageName(pg){let m;if(pg==='home')return'Главная';if(pg==='works')return'Список лабораторных работ';if(pg==='teacher')return'Для учителя';if(pg==='install')return'Установить на телефон';if(pg==='progress')return'Мой прогресс';if(pg==='test')return'Тест';if(pg==='task')return'Задание по ссылке';
   if((m=pg.match(/^work\/(.+)$/))){const w=WORKS.find(x=>x.id===m[1]);return w?'№ '+w.num+'. '+w.title:pg}
   if((m=pg.match(/^lab\/(.+)$/))){const l=LABS.find(x=>x.id===m[1]);return l?'Модель: '+l.title:pg}return pg}
 function tcStatHTML(r){const ds=r.days||[],mx=Math.max(1,...ds.map(d=>d.visitors)),W=600,H=150,bw=W/ds.length;
@@ -3818,7 +3790,6 @@ function tcViewHTML(){const v=TC.view;if(!v)return'';if(!v.d)return'<div class="
     ${body}</div>`}
 function tcOut(){ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null,tests:null,ct:null,tres:null,view:null});TE=null;teacherHome()}
 async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
-  if(k==='ftapply'){GOAPPLY=true;if(location.hash==='#teacher')teacherHome();else location.hash='#teacher';return}
   if(k==='slogout'){sLogout();return}
   if(k==='copy'){copyText(t.dataset.v,t);return}
   if(k==='tstart'){if(confirm('Начать тест? Попытка одна, время пойдёт сразу. Не уходите со страницы во время теста.'))location.hash='#test/'+id;return}
@@ -4137,7 +4108,6 @@ function route(){
   else if(h==='#install'){fromHome=false;installHome()}
   else if(h==='#works'){fromHome=false;worksHome()}
   else if(h==='#progress'){fromHome=false;progressHome()}
-  else if(h==='#forteachers'){fromHome=false;forTeachersHome()}
   else{fromHome=false;home()}
 }
 const tiltOK=()=>window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
