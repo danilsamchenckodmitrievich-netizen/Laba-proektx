@@ -1733,5 +1733,20 @@
  "Заявка отправлена ✓": "Application sent ✓",
  "Заявка с этой почтой уже ждёт решения — мы ответим на неё.": "An application with this email is already waiting — we will reply to it.",
  "Авторы проекта проверят её и пришлют код-приглашение на почту ": "The project authors will review it and send an invitation code to ",
- " Потом вернитесь сюда и зарегистрируйтесь по коду.": " Then come back here and register with the code."
+ " Потом вернитесь сюда и зарегистрируйтесь по коду.": " Then come back here and register with the code.",
+ "Свой аккаунт удаляется в блоке «Пароль и аккаунт».": "You can delete your own account in the “Password and account” section.",
+ "Вы единственный администратор. Сначала выдайте приглашение администратора другому человеку.": "You are the only administrator. First give an administrator invitation to someone else.",
+ "Пароль и аккаунт": "Password and account",
+ "Удалить аккаунт…": "Delete account…",
+ "Удаление аккаунта": "Delete account",
+ "Будут удалены ваш аккаунт, все классы, ученики, их результаты и тесты. Восстановить их будет нельзя.": "Your account, all classes, students, their results and tests will be deleted. They cannot be restored.",
+ "Пароль для подтверждения": "Password to confirm",
+ "Удалить навсегда": "Delete forever",
+ "Удалить аккаунт учителя ": "Delete the teacher account ",
+ ")?\\n\\nВместе с ним удалятся классы (": ")?\\n\\nThis will also delete classes (",
+ "), ученики (": "), students (",
+ "), их результаты и тесты. Восстановить их будет нельзя.": "), their results and tests. They cannot be restored.",
+ "Аккаунт учителя удалён": "Teacher account deleted",
+ "Удалить ваш аккаунт навсегда? Классы, ученики, результаты и тесты тоже будут удалены.": "Delete your account forever? Classes, students, results and tests will be deleted too.",
+ "Аккаунт удалён": "Account deleted"
 }
