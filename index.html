@@ -361,6 +361,12 @@ table.jtab td.jw{color:#B5531A}
 small.db{display:block;color:var(--muted);font-weight:500}
 .toast{position:fixed;left:50%;bottom:22px;z-index:60;transform:translate(-50%,20px);opacity:0;pointer-events:none;max-width:calc(100% - 32px);padding:12px 18px;border-radius:14px;background:var(--ink);color:var(--surf);font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:opacity .2s,transform .2s}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+table.tadm td{overflow-wrap:anywhere}
+@media(max-width:560px){table.tadm thead{display:none}table.tadm,table.tadm tbody{display:block}
+  table.tadm tr{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;padding:12px 14px;border-bottom:1px solid var(--line)}table.tadm tr:last-child{border-bottom:0}
+  table.tadm td{display:block;padding:0;border:0;min-width:0}table.tadm td:nth-child(3){grid-column:1/-1;font-size:14px;color:var(--muted)}
+  table.tadm td.tact{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;white-space:normal}table.tadm td.tact:empty{display:none}
+  table.tinvt td:nth-child(2){grid-column:1/-1}table.tinvt td:nth-child(4){grid-column:2;grid-row:1}table.tteach td:nth-child(2){font-size:14px;white-space:nowrap}}
 @media(max-width:560px){table.tst thead{display:none}table.tst,table.tst tbody{display:block}
   table.tst tr{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;padding:12px 14px;border-bottom:1px solid var(--line)}table.tst tr:last-child{border-bottom:0}
   table.tst td{display:block;padding:0;border:0;min-width:0!important}table.tst td:nth-child(1){font-weight:700}table.tst td:nth-child(3){grid-column:1/-1;font-size:14px}
@@ -3554,12 +3560,12 @@ function tcAdminRender(){const box=$('#tcadm'),a=TC.adm;if(!box||!a)return;const
       <select id="aidays" aria-label="Срок действия"><option value="7">7 дней</option><option value="14" selected>14 дней</option><option value="30">30 дней</option></select>
       <label class="chk"><input type="checkbox" id="aiadm"> тоже администратор</label><button class="btn main" type="submit">Создать приглашение</button></form>
     ${TC.newInv?`<div class="bigcode"><code>${TC.newInv}</code><span>новое приглашение</span><button class="btn" data-k="copy" data-v="${TC.newInv}">Копировать</button></div>`:''}
-    ${a.invites.length?`<div class="tblwrap"><table class="res"><thead><tr><th>Код</th><th>Кому</th><th>Статус</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${a.invites.map(i=>`<tr><td><code class="scode">${i.code}</code>${i.admin?'<small> админ</small>':''}</td><td>${esc(i.note||'—')}</td>
-      <td>${i.used?`✓ ${esc(i.by||'')}`:Date.parse(i.expires)<now?'истёк':'действует до '+fmtDT(i.expires)}</td><td>${i.used?'':`<button class="mini del" data-k="idel" data-id="${i.code}">Удалить</button>`}</td></tr>`).join('')}</tbody></table></div>`:''}</div>
+    ${a.invites.length?`<div class="tblwrap"><table class="res tadm tinvt"><thead><tr><th>Код</th><th>Кому</th><th>Статус</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${a.invites.map(i=>`<tr><td><code class="scode">${i.code}</code>${i.admin?'<small> админ</small>':''}</td><td>${esc(i.note||'—')}</td>
+      <td>${i.used?`✓ ${esc(i.by||'')}`:Date.parse(i.expires)<now?'истёк':'действует до '+fmtDT(i.expires)}</td><td class="tact">${i.used?'':`<button class="mini del" data-k="idel" data-id="${i.code}">Удалить</button>`}</td></tr>`).join('')}</tbody></table></div>`:''}</div>
     <div class="note f"><b>Учителя</b>
     ${TC.newPw?`<div class="bigcode"><code>${esc(TC.newPw[1])}</code><span>временный пароль для ${esc(TC.newPw[0])} — передайте его учителю: пароль можно сменить в кабинете</span><button class="btn" data-k="copy" data-v="${esc(TC.newPw[1])}">Копировать</button></div>`:''}
-    <div class="tblwrap"><table class="res"><thead><tr><th>Учитель</th><th>Классов / учеников</th><th>Статус</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${a.teachers.map(t=>`<tr><td><b>${esc(t.name)}</b><small class="db">${esc(t.email)}</small></td><td>${t.classes} / ${t.students}</td>
-      <td>${t.blocked?'заблокирован':t.admin?'администратор':'активен'}</td><td class="tact">${t.id===TC.me.id?'<small>это вы</small>':`<button class="mini" data-k="tblock" data-id="${t.id}" data-v="${t.blocked?0:1}">${t.blocked?'Разблокировать':'Заблокировать'}</button><button class="mini" data-k="treset" data-id="${t.id}">Временный пароль</button><button class="mini del" data-k="tkill" data-id="${t.id}">Удалить</button>`}</td></tr>`).join('')}</tbody></table></div></div>`}
+    <div class="tblwrap"><table class="res tadm tteach"><thead><tr><th>Учитель</th><th>Классов / учеников</th><th>Статус</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${a.teachers.map(t=>`<tr><td><b>${esc(t.name)}</b><small class="db">${esc(t.email)}</small></td><td>${t.classes} / ${t.students}</td>
+      <td>${t.blocked?'заблокирован':t.admin?'администратор':'активен'}</td><td class="tact">${t.id===TC.me.id?'<small>это вы</small>':`<button class="mini" data-k="treset" data-id="${t.id}">Временный пароль</button><button class="mini" data-k="tblock" data-id="${t.id}" data-v="${t.blocked?0:1}">${t.blocked?'Разблокировать':'Заблокировать'}</button><button class="mini del" data-k="tkill" data-id="${t.id}">Удалить</button>`}</td></tr>`).join('')}</tbody></table></div></div>`}
 function tcOut(){ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null,tests:null,ct:null,tres:null});TE=null;teacherHome()}
 async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='slogout'){sLogout();return}
