@@ -359,6 +359,14 @@ table.jtab td.jw{color:#B5531A}
 .tview{border:2px solid var(--brand)}.tvhead{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}.tvhead small{display:block;color:var(--muted);font-weight:700;font-size:13px}.tvhead b{display:block;font-size:18px}.tvhead span{color:var(--muted);font-size:14px;overflow-wrap:anywhere}
 .th3{font-size:16px;margin:18px 0 6px}.vlist{list-style:none;margin:0;padding:0}.vlist li{display:flex;flex-wrap:wrap;gap:2px 10px;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line)}.vlist small{color:var(--muted)}
 .vtest{margin:8px 0 14px}.vtest>small{color:var(--muted);margin-left:8px}
+.mgroup{margin:10px 0 12px}.mlist{list-style:none;margin:6px 0 0;padding:0}.mitem{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.mitem a{font-weight:700;color:var(--brand);overflow-wrap:anywhere}.mitem small{color:var(--muted)}.mitem .mini{margin-left:auto}
+.mic{font-size:12px;font-weight:800;padding:3px 8px;border-radius:8px;background:var(--grid);color:var(--ink)}
+.tmatf select{font:inherit;font-weight:500;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;width:100%}.mkind{margin:6px 0 10px}.mkind button{background:var(--surf);color:var(--ink)}.mkind button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.pgr .jg{margin:0 2px 2px 0}.plink{margin:4px 8px 0;text-align:right}.plink a{font-weight:700;color:var(--brand)}
+.mtask{padding:10px 0;border-top:1px solid var(--line)}.mtask p{margin:0 0 8px}.mtask.done>p:first-child{color:var(--muted)}
+.mtrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.mtin{display:flex;align-items:center;gap:6px}.mtin input{width:120px;font:inherit;font-weight:600;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:12px;padding:8px 10px}.mtin span{color:var(--muted);font-weight:600}
+.mtres{margin:8px 0 0!important;font-weight:600}.mtres.ok,.mtask.done .mtres{color:#367A55}.mtres.bad{color:#C4245F}
 .jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
@@ -2707,6 +2715,64 @@ function wCheckExtra(w,msgs){const out={};
       else{const ri=T.findIndex(x=>x.key!==null&&x.m);if(ri>=0){const k=p.k||1,v=rowM(w,ri)[p.col]*k;out.prec=`${p.sym} = ${String(+v.toFixed(2)).replace(',','.')} ± ${String(p.div/2).replace(',','.')} ${p.u}`}}}}
   return out}
 
+/* мини-задачи к моделям: “подберите параметры” (проверка по ползункам) и “посчитайте” (ответ по текущим значениям).
+   Подсказок нет: сайт отвечает только “верно” или “пока нет”; объяснение появляется после верного ответа. */
+const MRHO=id=>(MATS.find(m=>m[0]===id)||[])[2];
+const GASP=P=>P.N*(P.t+273)/(30+460*P.V/100-38)/(60*293/452)*100;
+const MTASKS={
+  states:[{q:'Melt the ice, but don’t bring the water to the boil.',ok:P=>P.t>=0&&P.t<100,why:'At 0 °C ice melts: the crystal lattice breaks down and the molecules start moving around while staying close to each other.'},
+    {q:'Turn the water into steam.',ok:P=>P.t>=100,why:'At 100 °C (at normal pressure) water boils: the molecules move so fast that they break away from each other and fly apart.'}],
+  diffusion:[{q:'Make diffusion as fast as possible: choose the substances and a temperature of at least 80 °C.',ok:P=>P.med==='g'&&P.t>=80,why:'Diffusion is fastest in gases and at high temperature: the molecules are far apart and move fast.'},
+    {q:'Show the slowest diffusion: temperature no higher than 20 °C.',ok:P=>P.med==='l'&&P.t<=20,why:'In liquids the molecules are packed closely, and at low temperature they move slowly — so diffusion is slow.'}],
+  motion:[{q:'Make the car’s speed exactly 3 times the cyclist’s speed.',ok:P=>P.v2===3*P.v1,why:'Then in the same time the car travels 3 times as far: s = v · t.'},
+    {q:'How many seconds does the car need to travel 300 m at its current speed?',ans:P=>300/P.v2,u:'s',why:'t = s / v.'}],
+  density:[{q:'What is the mass of the body with the current substance and volume? Answer in grams.',ans:P=>MRHO(P.mat)*P.V/1000,u:'g',why:'m = ρ · V. Divide the density in kg/m³ by 1000 to get g/cm³.'},
+    {q:'Choose the substance and volume so that the mass is 360 g.',ok:P=>Math.abs(MRHO(P.mat)*P.V/1000-360)<=3,why:'m = ρ · V: for example, 900 cm³ of pine or 400 cm³ of ice. The greater the density, the smaller the volume needed for the same mass.'}],
+  hooke:[{q:'How far is the spring stretched with the current settings? Answer in centimetres.',ans:P=>P.m*P.g/P.k*100,u:'cm',why:'Δl = F / k = m · g / k; convert metres to centimetres.'},
+    {q:'On Earth (g = 9.8 N/kg) choose the load and stiffness so that the spring stretches by 9.8 cm.',ok:P=>Math.abs(P.g-9.8)<.05&&Math.abs(P.m*P.g/P.k*100-9.8)<=.15,why:'Δl = m · g / k: for example, 0.5 kg on a 50 N/m spring or 1 kg on a 100 N/m spring.'}],
+  friction:[{q:'Get a 5 kg block moving on asphalt.',ok:P=>P.surf==='asph'&&P.m>=5&&P.F>SURF.asph[1]*P.m*G,why:'The block moves when the pulling force exceeds the maximum static friction μ · m · g ≈ 0.75 · 5 · 9.8 ≈ 37 N.'},
+    {q:'Find a surface on which a block of 2 kg (or heavier) moves with a force of no more than 1 N.',ok:P=>P.m>=2&&P.F<=1&&P.F>SURF[P.surf][1]*P.m*G,why:'The smaller the friction coefficient (ice, wheels), the smaller the force needed to move the body.'}],
+  resultant:[{q:'Make the resultant zero while neither force is zero.',ok:P=>P.mode==='opp'&&P.F1===P.F2&&P.F1>0,why:'Equal opposite forces balance each other: the body behaves as if there were no forces.'},
+    {q:'Get a resultant of 700 N.',ok:P=>P.mode==='same'&&P.F1+P.F2===700,why:'Forces in the same direction add up: R = F₁ + F₂. Opposite forces subtract and give no more than 500 N.'},
+    {q:'What is the resultant force now? Answer in newtons.',ans:P=>P.mode==='same'?P.F1+P.F2:Math.abs(P.F1-P.F2),u:'N',why:'Same direction: R = F₁ + F₂; opposite directions: R = |F₁ − F₂|.'}],
+  solidp:[{q:'What pressure does the body exert now? Answer in kilopascals (g = 9.8 N/kg).',ans:P=>P.m*G/P.S/1000,u:'kPa',why:'p = F / S = m · g / S; divide pascals by 1000.'},
+    {q:'For a body of at least 50 kg, get a pressure of no more than 1 kPa.',ok:P=>P.m>=50&&P.m*G/P.S<=1000.5,why:'p = F / S: the larger the support area, the lower the pressure — that is why skis don’t sink into snow.'}],
+  gas:[{q:'Increase the gas pressure at least 2 times without changing the 20 °C temperature.',ok:P=>P.t===20&&GASP(P)>=199.5,why:'The more often molecules hit the walls, the higher the pressure: more molecules or a smaller volume means more hits.'},
+    {q:'Make the pressure above 100 % while reducing the number of molecules below 60.',ok:P=>P.N<60&&GASP(P)>100.5,why:'When heated, molecules move faster and hit the walls harder and more often — the pressure rises even with fewer molecules.'}],
+  liquid:[{q:'What pressure does the liquid exert on the sensor now? Answer in kilopascals (g = 9.8 N/kg).',ans:P=>+P.liq*G*Math.min(P.d,P.h)/1000,u:'kPa',why:'p = ρ · g · h, where h is the depth of the sensor below the liquid surface.'},
+    {q:'Get a pressure on the sensor above 100 kPa.',ok:P=>+P.liq*G*Math.min(P.d,P.h)>100000,why:'p = ρ · g · h: mercury is 13.6 times denser than water, so already at 0.8 m it presses with more than 100 kPa.'}],
+  vessels:[{q:'How many centimetres does the column of the first liquid rise above the boundary between the liquids now?',ans:P=>PAIRS[P.pair][3]*P.hB/PAIRS[P.pair][2],u:'cm',why:'The pressures of the columns at the boundary level are equal: ρ₁ · h₁ = ρ₂ · h₂, so h₁ = ρ₂ · h₂ / ρ₁.'},
+    {q:'Choose the liquids and height so that the added column is exactly 2 cm higher than the other one.',ok:P=>Math.abs(P.hB-PAIRS[P.pair][3]*P.hB/PAIRS[P.pair][2]-2)<.01,why:'For example, water + oil: with h₂ = 20 cm the water column is 18 cm. The lower the density of the added liquid, the taller its column.'}],
+  atm:[{q:'Climb to a height where the pressure is below 380 mmHg — half the sea-level pressure.',ok:P=>LABS.find(l=>l.id==='atm').mm(P.alt)<380,why:'With height the air gets thinner and the pressure drops: at about 5.5 km it is half the sea-level pressure.'},
+    {q:'What is the pressure at the current height? Answer in mmHg.',ans:P=>LABS.find(l=>l.id==='atm').mm(P.alt),u:'mmHg',why:'The barometer shows the value; at sea level it is about 760 mmHg.'}],
+  press:[{q:'Get a force gain of exactly 50 times.',ok:P=>P.S2===50*P.S1,why:'F₂ / F₁ = S₂ / S₁: the force gain equals the ratio of the piston areas.'},
+    {q:'With what force does the large piston press now? Answer in newtons.',ans:P=>P.F1*P.S2/P.S1,u:'N',why:'F₂ = F₁ · S₂ / S₁ — pressure in a liquid is transmitted equally in all directions (Pascal’s law).'}],
+  archimedes:[{q:'Make the body float half submerged.',ok:P=>Math.abs(P.rho/P.rl-.5)<.005,why:'A floating body is submerged by the fraction ρbody / ρliquid. Half — when the liquid is twice as dense as the body.'},
+    {q:'What is the buoyant force if the body is fully submerged? Answer in newtons (g = 9.8 N/kg).',ans:P=>P.rl*G*P.V/1000,u:'N',why:'Fb = ρliquid · g · V; divide the volume in dm³ by 1000 to get m³.'}],
+  work:[{q:'How much work does the lift do now? Answer in kilojoules (g = 9.8 N/kg).',ans:P=>P.m*G*P.h/1000,u:'kJ',why:'A = F · s = m · g · h.'},
+    {q:'Get a power of at least 1 kW.',ok:P=>P.m*G*P.h/P.t>=1000,why:'P = W / t: the more work and the faster it is done, the greater the power.'}],
+  lever:[{q:'Balance the lever with a load on the right twice as heavy as on the left.',ok:P=>P.m2===2*P.m1&&Math.abs(P.m1*P.d1-P.m2*P.d2)<1e-6,why:'Rule of moments: m₁ · l₁ = m₂ · l₂. A load twice as heavy balances on an arm half as long.'},
+    {q:'Balance a 10 kg load with a 2 kg load.',ok:P=>((P.m1===10&&P.m2===2)||(P.m1===2&&P.m2===10))&&Math.abs(P.m1*P.d1-P.m2*P.d2)<1e-6,why:'The arm of the light load must be 5 times longer: for example, 0.4 m and 2 m.'}],
+  pulleys:[{q:'Lift a 30 kg load with a force of less than 150 N.',ok:P=>P.mode==='mov'&&P.m>=30&&P.m*G/2<150,why:'A movable pulley halves the force: F = m · g / 2 ≈ 147 N.'},
+    {q:'What force is needed now? Answer in newtons (g = 9.8 N/kg).',ans:P=>P.m*G/(P.mode==='mov'?2:1),u:'N',why:'A fixed pulley only changes the direction of the force: F = m · g; a movable one halves the force.'}],
+  incline:[{q:'Get an inclined plane efficiency above 80 %.',ok:P=>{const a=P.ang*Math.PI/180;return Math.sin(a)/(Math.sin(a)+P.mu*Math.cos(a))>.8},why:'η = Wuseful / Wtotal: the less friction and the steeper the plane, the less work goes into friction and the higher the efficiency.'},
+    {q:'What is the efficiency now? Answer in percent.',ans:P=>{const a=P.ang*Math.PI/180;return Math.sin(a)/(Math.sin(a)+P.mu*Math.cos(a))*100},u:'%',why:'η = Wuseful / Wtotal · 100 % = m · g · h / (F · l) · 100 %.'}],
+  energy:[{q:'What is the ball’s potential energy at the start? Answer in joules (g = 9.8 N/kg).',ans:P=>P.m*G*P.h,u:'J',why:'Ep = m · g · h.'},
+    {q:'Make the ball bounce to exactly half its starting height after the first impact.',ok:P=>P.loss===50,why:'After the impact (100 − losses) % of the energy remains, and the bounce height is proportional to the energy: 50 % losses — half the height.'}]};
+let MSOLVED=new Set();try{MSOLVED=new Set(JSON.parse(localStorage.getItem('lab-sirius-mtasks')||'[]'))}catch(_){}
+function mtHTML(l){const ts=MTASKS[l.id];if(!ts)return'';
+  return`<div class="note f mtasks" id="mtasks"><b>Tasks · solved ${ts.filter((t,i)=>MSOLVED.has(l.id+':'+i)).length} of ${ts.length}</b><p class="tmsg">Adjust the settings or calculate, then press “Check”. There are no hints — keep trying until it works.</p>
+    ${ts.map((t,i)=>{const sv=MSOLVED.has(l.id+':'+i);return`<div class="mtask${sv?' done':''}" data-i="${i}"><p><b>${i+1}.</b> ${t.q}</p>
+      <div class="mtrow">${t.ans?`<label class="mtin"><input inputmode="decimal" id="mta${i}" aria-label="Answer to task ${i+1}" placeholder="Answer"><span>${t.u}</span></label>`:''}<button class="btn" data-act="mt" data-i="${i}">Check</button></div>
+      <p class="mtres" id="mtr${i}" role="status">${sv?`✓ Solved. ${t.why}`:''}</p></div>`}).join('')}</div>`}
+function mtCheck(i){const l=cur,t=MTASKS[l.id][i],r=$('#mtr'+i);let ok;
+  if(t.ans){const v=num(($('#mta'+i)||{}).value||''),e=t.ans(P,S);if(isNaN(v)){r.className='mtres';r.textContent='Enter the answer as a number.';return}
+    ok=Math.abs(v-e)<=Math.max(Math.abs(e)*.03,.05)}else ok=!!t.ok(P,S);
+  r.className='mtres '+(ok?'ok':'bad');
+  if(ok){MSOLVED.add(l.id+':'+i);try{localStorage.setItem('lab-sirius-mtasks',JSON.stringify([...MSOLVED]))}catch(_){}
+    r.textContent=`✓ Correct! ${t.ans?'Answer: '+f1(t.ans(P,S),2).replace(/[,.]?0+$/,'')+' '+t.u+'. ':''}${t.why}`;r.closest('.mtask').classList.add('done');
+    const h=$('#mtasks>b');if(h){const ts=MTASKS[l.id];h.textContent=`Tasks · solved ${ts.filter((x,j)=>MSOLVED.has(l.id+':'+j)).length} of ${ts.length}`}}
+  else r.textContent=t.ans?'Not right yet — recalculate.':'Not yet — change the settings and check again.'}
 /* ===================== APP ===================== */
 const app=$('#app');
 let visited=new Set();
@@ -2835,7 +2901,7 @@ function worksHome(){
     <div class="tbtns">${tdone<TASK.w.length?`<a class="btn main" href="#work/${taskNext(null)}">${tdone?'Continue':'Start'}</a>`:''}<button class="btn" data-act="taskoff">Leave the assignment</button></div></div>
     ${codes.length?`<div class="taskcodes"><small>Codes for the teacher</small><code id="tcodesall">${codes.join('<br>')}</code><button class="btn" data-act="copyall">Copy all codes</button></div>`:''}`:''}
   <section class="hero"><h1>${only?'Assignment works':'Lab works'}</h1><p>${only?'Only the works set by your teacher are shown here. Do each one and press “Check the work”.':'Handle the equipment yourself: weigh, immerse, hang loads. Record your measurements in the table, calculate and draw a conclusion.'}</p></section>
-  <div class="progress"><span>Done ${done} of ${list.length}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${list.length}" aria-valuenow="${done}"><i data-w="${done/list.length*100}"></i></div></div>
+  <div class="progress"><span>Done ${done} of ${list.length}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${list.length}" aria-valuenow="${done}"><i data-w="${done/list.length*100}"></i></div></div><p class="plink"><a href="#progress">My grades and progress →</a></p>
   <div class="cards" id="cards">${list.map(w=>`
     <a class="card ${isDone(w.id)?'seen':''}" style="--c:${w.color}" href="#work/${w.id}">
       <div class="pb"><i></i></div>
@@ -2851,6 +2917,31 @@ function worksHome(){
 /* установка на телефон и работа без интернета */
 let instEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;const b=$('#instbtn');if(b)b.hidden=false});
 const standalone=()=>(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+/* мой прогресс: оценки по работам и тестам, что осталось сдать */
+async function progressHome(){stop();cur=null;document.title='My progress — Sirius Lab';
+  const a=accLive(),st=a&&a.kind==='s';
+  app.innerHTML=`<div class="view">`+header()+`<section class="hero"><h1>My progress</h1><p>${st?`${esc(a.name)} · ${esc(a.cls)}. Grades for works and tests and what is left to hand in.`:'Grades for works done on this device. Sign in with your personal code to see the teacher’s assignments too.'}</p></section><main class="sheet tsheet" id="prog"><p class="gempty">Loading…</p></main></div>`;window.scrollTo(0,0);
+  let res=null,tests=[];
+  if(st&&SRV==='on'){try{const[r,t]=await Promise.all([rpc('s_progress',{p_token:a.token}),rpc('s_tests',{p_token:a.token})]);if(r&&!r.err)res=r.res;if(t&&!t.err)tests=t.tests||[]}catch(_){}}
+  if(location.hash!=='#progress')return;const box=$('#prog');if(!box)return;
+  const tries=id=>res?res.filter(x=>x.work===id).map(x=>({g:+x.g||0,at:Date.parse(x.at)})):(GRADES[id]||[]).map(x=>({g:x.g,at:x.at}));
+  const asg=id=>st?wAssigned(id):'no';
+  const rows=WORKS.map(w=>{const tr=tries(w.id),as=asg(w.id),last=tr[tr.length-1],dn=st?a.done.includes(w.id)||!!tr.length:!!tr.length||doneW.has(w.id);return{w,tr,as,last,dn,dl:wDeadline(w.id)}});
+  const mine=st&&rows.some(r=>r.as!=='no')?rows.filter(r=>r.as!=='no'):rows;
+  const gs=rows.filter(r=>r.last&&r.last.g).map(r=>r.last.g),avg=gs.length?decRu(Math.round(gs.reduce((x,y)=>x+y,0)/gs.length*10)/10):'—';
+  const left=mine.filter(r=>!r.dn&&r.as!=='late');
+  const tile=(v,t)=>`<div class="stile"><b>${v}</b><span>${t}</span></div>`;
+  const gr=g=>g?`<span class="jg g${g}">${g}</span>`:'<span class="jy">✓</span>';
+  box.innerHTML=`<div class="stiles">${tile(avg,'average grade')}${tile(mine.filter(r=>r.dn).length+' / '+mine.length,st&&mine!==rows?'assignments handed in':'works done')}${tile(rows.reduce((n,r)=>n+r.tr.length,0),'attempts in total')}${tile(st?tests.filter(t=>t.state==='done').length+' / '+tests.length:'—','tests handed in')}</div>
+    ${left.length?`<div class="note f"><b>${st&&mine!==rows?'Still to hand in':'Not done yet'}</b><ul class="mlist">${left.map(r=>`<li class="mitem"><a href="#work/${r.w.id}">No. ${r.w.num}. ${r.w.title}</a>${r.dl?`<small>due ${fmtDT(r.dl)}</small>`:''}</li>`).join('')}</ul></div>`
+      :`<div class="note ok"><b>${st&&mine!==rows?'All the teacher’s assignments are handed in!':'All works are done!'}</b></div>`}
+    <h2 class="th2">Lab works</h2>
+    <div class="tblwrap"><table class="res tadm"><thead><tr><th>Work</th><th>Grades</th><th>Status</th></tr></thead><tbody>${rows.map(r=>`<tr><td><a href="#work/${r.w.id}">No. ${r.w.num}. ${r.w.title}</a></td>
+      <td class="pgr">${r.tr.length?r.tr.map(x=>gr(x.g)).join(' '):'—'}</td>
+      <td>${r.as==='yes'?(r.dn?'assignment · handed in':r.dl?'assignment · due '+fmtDT(r.dl):'assignment'):r.as==='late'?(r.dn?'assignment · handed in':'deadline passed'):r.tr.length?(r.tr.length>1?pl3(r.tr.length,'attempt','attempts','attempts'):'done'):'not done'}</td></tr>`).join('')}</tbody></table></div>
+    ${st?`<h2 class="th2">Tests</h2>${tests.length?`<div class="tblwrap"><table class="res tadm"><thead><tr><th>Test</th><th>Result</th><th>Status</th></tr></thead><tbody>${tests.map(t=>`<tr><td>${esc(t.title)}</td><td>${t.state==='done'&&t.max?`<b>${decRu(+t.score)} of ${t.max}</b>`:'—'}</td><td>${t.state==='done'?'handed in':t.state==='active'?`<a href="#test/${t.id}">in progress — continue</a>`:t.state==='new'?'not started'+(t.deadline?' · until '+fmtDT(t.deadline):''):'deadline passed'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="gempty">The teacher has not opened any tests yet.</p>'}`:''}
+    ${st&&SRV!=='on'?'<p class="tmsg">No connection to the server — showing grades from this device.</p>':''}
+    <div class="tools"><a class="btn main" href="#works">To the lab works${ICON.next}</a></div>`}
 function installHome(){stop();cur=null;document.title='Install — Sirius Lab';
   const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   app.innerHTML=`<div class="view">`+header()+`
@@ -2932,6 +3023,7 @@ function openLab(id){
     <div class="note"><b>Phenomenon.</b> ${l.def}</div>
     <div class="note f"><b>${l.fhead||'Formulas'}</b>${l.formulas.map(f=>`<div class="fm${l.fhead?' t':''}">${f}</div>`).join('')}</div>
     <div class="note f"><b>Try it yourself</b><ol>${l.tryit.map(t=>`<li>${t}</li>`).join('')}</ol></div>
+    ${mtHTML(l)}
     <a class="nextlab" href="#lab/${nx.id}" style="--c:${nx.color}"><span><small>Next phenomenon</small><b>${nx.title}</b></span>${ICON.next}</a>
   </main></div>`;
   cv=$('#cv');g=cv.getContext('2d');LIGHT=null;readColors();sizeCanvas();
@@ -2975,6 +3067,7 @@ function openWork(id){
       ${w.manual?'<p class="vnote">The “Record measurement” button saves the experiment, but you enter the instrument readings in the cells with a dashed border yourself. Read them from the scales; if the divisions are hard to see, turn on the magnifier or press “Measure” — the readings will appear below the setup.</p>':''}
       ${w.vary?'<p class="vnote">Every student has their own variant: the sizes of the bodies and the properties of the instruments differ slightly, so everyone’s numbers in the table are different.</p>':''}
       <ol>${w.steps.map(t=>`<li>${t}</li>`).join('')}</ol></details>
+    ${wMatsHTML(w.id)}
     <h2>Results table</h2>
     <div class="legend">${w.cols.some(c=>c.src==='m'&&!c.rt)?'<span><i class="lm"></i>recorded by the button</span>':''}${w.manual?'<span><i class="lr"></i>read from the scale and enter</span>':''}<span><i class="lc"></i>calculate and enter yourself</span></div>
     <div class="tblwrap"><table class="res" id="wtab">${tableHTML(w)}</table></div>
@@ -2999,7 +3092,7 @@ function openWork(id){
   cv.addEventListener('pointerdown',wDown);cv.addEventListener('pointermove',wMove);
   cv.addEventListener('pointerup',wUp);cv.addEventListener('pointercancel',wUp);
   cv.addEventListener('pointerleave',()=>{if(!S.drag){S.hov=null;cv.style.cursor=''}});
-  window.scrollTo(0,0);buildOuts();statusUntil=0;wHintTick();wGraph();
+  window.scrollTo(0,0);buildOuts();statusUntil=0;wHintTick();wGraph();if(ACC&&ACC.kind==='s')stMatsLoad();
   last=performance.now();raf=requestAnimationFrame(loop);
 }
 const wEquip=w=>typeof w.equip==='function'?w.equip(S):w.equip;
@@ -3029,7 +3122,9 @@ function wMeasure(){
   el.hidden=false;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}
 /* проверка работы. Пока работа не закончена, сайт говорит только, чего не хватает, — без подсказок о верности.
    Первая полная проверка ставит оценку, показывает ошибки и как их исправить и закрывает работу; дальше — только “Переделать работу”. */
-let WGR=null;
+let WGR=null,GRADES={};
+try{GRADES=JSON.parse(localStorage.getItem('lab-sirius-grades')||'{}')||{}}catch(_){}
+function gAdd(id,x){(GRADES[id]=GRADES[id]||[]).push(x);GRADES[id]=GRADES[id].slice(-20);try{localStorage.setItem('lab-sirius-grades',JSON.stringify(GRADES))}catch(_){}}
 const vli=a=>a.map(m=>`<li>${m}</li>`).join('');
 function wLock(on){document.querySelectorAll('#wtab input,#wtab select,.quiz input,.prec input,#mtest input').forEach(x=>x.disabled=on);
   document.querySelectorAll('[data-act="rec"],[data-act="tclear"],[data-act="rowclr"]').forEach(b=>b.disabled=on)}
@@ -3075,7 +3170,7 @@ function wGrade(){const w=cur;let tot=0,err=0;const fix=[],dg=t=>t>=1?0:t>=.1?1:
   const ex=wCheckExtra(w,fix);if(w.prec){tot+=2;err+=ex.perr||0}
   const g=err===0?5:err/tot<=.15?4:err/tot<=.4?3:2;
   const data=T.map((r,i)=>[r,i]).filter(([r])=>r.key!==null&&r.m).map(([r,i])=>{const o=rowM(w,i);return w.cols.filter(c=>c.src==='m').map(c=>Math.round(o[c.id]*10**c.d)/10**c.d)});
-  WATT++;WGR={g,err,tot,fix,ex,data,rows:data.length};doneW.add(w.id);saveDone();wLock(true);wGraph();
+  WATT++;WGR={g,err,tot,fix,ex,data,rows:data.length};gAdd(w.id,{g,e:err,q:tot,t:ex.test||null,at:Date.now()});doneW.add(w.id);saveDone();wLock(true);wGraph();
   if(gated()&&ACC&&ACC.kind==='s'&&wAssigned(w.id)==='yes')wSend(w.id,{r:data,n:data.length,t:ex.test||null,p:ex.prec||null,g,e:err,q:tot,x:fix.slice(0,20).map(s=>s.replace(/<[^>]+>/g,'')),a:WATT,sec:Math.round((Date.now()-WSTART)/1000)});
   wVerdict(true)}
 function wVerdict(sent){const w=cur,R=WGR,ex=R.ex,el=$('#verdict');el.hidden=false;el.className='note '+(R.g>=4?'ok':'');
@@ -3225,6 +3320,7 @@ app.addEventListener('click',e=>{
     else if(a==='rowclr')wClearRow(+t.dataset.r);
     else if(t.dataset.wact!==undefined){cur.actions[+t.dataset.wact][1](S);updateOuts()}
     return}
+  if(t.dataset.act==='mt'){mtCheck(+t.dataset.i);return}
   if(t.dataset.act==='pause'){setPaused(!paused);return}
   if(t.dataset.act==='restart'){cur.init(S,P);setPaused(false);updateOuts();return}
   if(t.dataset.act==='reset'){cur.params.forEach(p=>P[p.id]=p.val);cur.init(S,P);syncControls();clearPresets();updateOuts();return}
@@ -3272,7 +3368,9 @@ const ERRS={slow:'Too many attempts. Wait 15 minutes and try again.',invite:'The
   pass:'The password must be at least 8 characters long.',taken:'A teacher with this email is already registered — sign in.',login:'Wrong email or password.',blocked:'This account is blocked. Contact the project authors.',
   session:'Your session has expired — sign in again.',code:'There is no such code. Check the letters and digits.',device:'This code is already in use on another device. Ask your teacher to press “New device” next to your name.',
   closed:'This lab is closed now.',late:'The due date for this lab has passed.',limit:'Limit reached: up to 40 classes and 60 students per class.',self:'You cannot block your own account.',
-  school:'Enter your school and town.',selfdel:'You can delete your own account in the “Password and account” section.',lastadmin:'You are the only administrator. First give an administrator invitation to someone else.',decided:'This application has already been decided.',
+  school:'Enter your school and town.',target:'Choose what to attach the material to.',url:'The link must start with https:// or http://.',mlimit:'The class already has 100 materials — delete the ones you no longer need.',
+  ftype:'This file type can’t be attached. Allowed: presentation, PDF, document, spreadsheet, image, mp4 video or text.',fsize:'The file is larger than 20 MB. Compress it or attach a link to Google Drive or another cloud drive.',
+  quota:'File space is used up (200 MB per teacher). Delete old files or attach a link.',upload:'The file did not upload — try again.',selfdel:'You can delete your own account in the “Password and account” section.',lastadmin:'You are the only administrator. First give an administrator invitation to someone else.',decided:'This application has already been decided.',
   work:'Unknown lab.',data:'The result is too large.',net:'No connection to the server. Check the internet and try again.'};
 const errText=e=>ERRS[e]||ERRS.net;
 function gated(){return!!accLive()}
@@ -3290,7 +3388,7 @@ async function accRefresh(){if(!ACC)return false;const before=JSON.stringify([AC
 async function srvInit(){
   if(navigator.onLine===false)SRV='off';
   else{try{const p=await rpc('ping',{},6000);SRV=p&&p.ok?'on':'off'}catch(_){SRV='off'}}
-  if(SRV==='on'&&ACC){await accRefresh();qFlush()}
+  if(SRV==='on'&&ACC){await accRefresh();qFlush();if(ACC&&ACC.kind==='s')stMatsLoad()}
   srvReady()}
 function srvReady(){const h=location.hash;if(h==='#works'||h==='#teacher')route()}
 window.addEventListener('online',()=>{if(SRV!=='on')srvInit();else qFlush()});
@@ -3323,7 +3421,7 @@ function accBar(){const a=accLive(),fl=FLASH?`<span class="aflash" role="alert">
     <span class="aerr" id="aerr" role="alert"></span></div></div><p class="ateach"><a href="#teacher">I am a teacher — open the dashboard</a></p>`;
   if(a.kind==='s'){const open=WORKS.filter(w=>wAssigned(w.id)!=='no').length,dn=WORKS.filter(w=>a.done.includes(w.id)).length;
     return`<div class="taskbar accbar"><div><small>Student · ${esc(a.cls)}</small><b>${esc(a.name)}</b><span>${open?`Assigned by the teacher: ${open}. Sent: ${dn}.`:'Your teacher has not assigned anything yet — you can do any lab for practice.'}</span>${off}${fl}</div>
-      <div class="tbtns"><button class="btn" data-k="slogout">Sign out</button></div></div>`}
+      <div class="tbtns"><a class="btn" href="#progress">My progress</a><button class="btn" data-k="slogout">Sign out</button></div></div>`}
   if(a.kind==='d')return`<div class="taskbar accbar"><div><small>Demo mode</small><b>All labs are open until ${fmtT(a.expires)}</b><span>Results are not saved in demo mode.</span>${fl}</div><div class="tbtns"><button class="btn" data-k="slogout">Sign out</button></div></div>`;
   return`<div class="taskbar accbar"><div><small>Teacher</small><b>${esc(a.name||'')}</b><span>You are signed in as a teacher: lab results are not saved.</span>${fl}</div><div class="tbtns"><a class="btn" href="#teacher">Teacher dashboard</a></div></div>`}
 let accTick=0;
@@ -3338,8 +3436,8 @@ function worksGated(){
   const asg=list.filter(x=>x[1]!=='no'),open=st?asg.length:WORKS.length,done=(st?asg:list).filter(x=>isDone(x[0].id)).length;
   app.innerHTML=`<div class="view">`+header()+accBar()+`
   <section class="hero"><h1>Lab works</h1><p>${st&&asg.length?'At the top are the labs your teacher assigned: their results go to the journal. You can do the rest for practice.':'Handle the equipment yourself: weigh, immerse, hang loads. Record your measurements in the table, calculate and draw a conclusion.'}</p></section>
-  ${open?`<div class="progress"><span>Done ${done} of ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div>`:''}
-  ${st?'<div id="stests"></div>':''}
+  ${open?`<div class="progress"><span>Done ${done} of ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div><p class="plink"><a href="#progress">My grades and progress →</a></p>`:''}
+  ${st?`<div id="stests"></div><div id="smats">${stMatsHTML()}</div>`:''}
   <div class="cards" id="cards">${list.map(([w,ac])=>{const dl=wDeadline(w.id),dn=isDone(w.id);return`
     <a class="card ${dn?'seen':''}" style="--c:${w.color}" href="#work/${w.id}">
       <div class="pb"><i></i></div>
@@ -3350,7 +3448,7 @@ function worksGated(){
   <a class="tlinkfoot" href="#teacher"><span>For teachers<small>Dashboard: classes, personal student codes, opening labs and the results journal</small></span>${ICON.next}</a></div>`;
   window.scrollTo(0,back?worksScroll:0);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{const b=$('.bar i');if(b)b.style.width=b.dataset.w+'%';document.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}));
-  if(st)stTestsLoad();
+  if(st){stTestsLoad();stMatsLoad()}
   if(SRV==='on'&&a&&a.kind==='s'&&Date.now()-accTick>15000){accTick=Date.now();accRefresh().then(ch=>{if(ch&&location.hash==='#works')worksHome()})}
 }
 function lockedMsg(kind){const el=$('.accbar');if(!el)return;let f=el.querySelector('.aflash');if(!f){f=document.createElement('span');f.className='aflash';f.setAttribute('role','alert');el.firstElementChild.appendChild(f)}
@@ -3467,7 +3565,7 @@ function tcDemoHTML(){const d=TC.demo&&Date.parse(TC.demo.expires)>srvNow()?TC.d
     (d?`<div class="bigcode"><code>${d.code}</code><span>valid until ${fmtT(d.expires)}</span><button class="btn" data-k="copy" data-v="${d.code}">Copy</button><button class="btn" data-k="demostop">Stop</button></div>`
       :`<div class="trow"><select id="tdmin" aria-label="How long the demo code is valid"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="45" selected>45 minutes</option><option value="90">90 minutes</option></select><button class="btn main" data-k="demo">Create demo code</button></div>`)}
 async function tcClass(){const r=await tcCall('t_class',{p_class:TC.cls});if(!r)return;TC.cd=r;TC.jr={since:0,res:[],students:r.students,works:r.works};
-  tcClassRender();await tcPoll(true);await tcCTests()}
+  TC.mats=null;tcClassRender();await tcPoll(true);await tcCTests();await tcMatLoad()}
 function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=TC.cd,ws=c.works;
   box.innerHTML=`<div class="note f tclass"><div class="tchead"><b>${esc(c.class.name)}</b><span class="tbtns"><button class="btn" data-k="ren">Rename</button><button class="btn" data-k="delcls">Delete class</button></span></div>
     <h3>Assignments for the class</h3><p class="tmsg">Tick the labs you assign to the class: their results will arrive in the journal. The due date is optional. All labs and models are open to everyone without sign-in — students can do the rest for practice.</p>
@@ -3475,6 +3573,8 @@ function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=
       <label class="tdl"><span>Due</span><input type="datetime-local" data-wd="${w.id}" value="${o&&o.deadline?toLocalInput(o.deadline):''}"${o?'':' disabled'} aria-label="Due date: ${esc(w.title)}"></label></div>`}).join('')}</div>
     <h3>Tests for the class</h3><p class="tmsg">Tick a test so students see it on the labs page. Each student has one attempt; the server keeps the time.</p>
     <div id="tcct">${TC.ct?tcCTHTML():'<p class="gempty">Loading…</p>'}</div>
+    <h3>Learning materials</h3><p class="tmsg">Attach a presentation, PDF, document, image, video or link — to the whole class, a work or a test. Students will see the materials after signing in with their code.</p>
+    <div id="tcmat">${tcMatHTML()}</div>
     <h3>Students</h3>
     <p class="tmsg">Enter students one per line. A first name and the first letter of the surname are enough: the site does not need full surnames. Each student gets a personal sign-in code.</p>
     <form data-form="tadd"><textarea id="tnames" rows="3" placeholder="Anna K.&#10;Peter S." aria-label="Student names"></textarea><div class="tools"><button class="btn main" type="submit">Add students</button></div></form>
@@ -3487,6 +3587,44 @@ function tcStudHTML(){const ss=TC.jr?TC.jr.students:TC.cd.students,codes=Object.
     <td class="tact"><button class="mini" data-k="sreset" data-id="${s.id}" title="Allow signing in from another phone or computer">New device</button><button class="mini" data-k="sren" data-id="${s.id}">Rename</button><button class="mini del" data-k="sdel" data-id="${s.id}">Delete</button></td></tr>`).join('')}</tbody></table></div>
     <div class="tools"><button class="btn" data-k="copycodes">Copy codes</button><button class="btn" data-k="printcodes">${ICON.doc}Print code cards</button></div>
     <p class="tmsg">Students sign in on the “Lab works” page by entering their code once. One code works on one device only — if a student changes phone, press “New device”.</p>`}
+/* учебные материалы: ссылки и файлы в хранилище; ученики класса видят их после входа */
+const MIMES={pdf:'application/pdf',ppt:'application/vnd.ms-powerpoint',pptx:'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  doc:'application/msword',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',xls:'application/vnd.ms-excel',
+  xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',odp:'application/vnd.oasis.opendocument.presentation',odt:'application/vnd.oasis.opendocument.text',
+  png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp',mp4:'video/mp4',txt:'text/plain'};
+const MKIND=m=>m.kind==='link'?'Link':/presentation|powerpoint/.test(m.mime)?'Presentation':m.mime==='application/pdf'?'PDF':/word|opendocument.text|text\/plain/.test(m.mime)?'Document':/sheet|excel/.test(m.mime)?'Spreadsheet':/^image/.test(m.mime)?'Image':/^video/.test(m.mime)?'Video':'File';
+const mUrl=m=>m.kind==='link'?m.url:API.url+'/storage/v1/object/public/materials/'+m.path.split('/').map(encodeURIComponent).join('/');
+const mSize=b=>b>=1048576?decRu(Math.round(b/104857.6)/10)+' MB':Math.max(1,Math.round(b/1024))+' KB';
+const mHost=u=>{try{return new URL(u).hostname.replace(/^www\./,'')}catch(_){return''}};
+function mTarget(tg,tests,tt){if(tg==='class')return'For the whole class';if(tg.startsWith('work:')){const w=WORKS.find(x=>x.id===tg.slice(5));return w?'For work No. '+w.num+'. '+w.title:'For a work'}
+  const t=(tests||[]).find(x=>'test:'+x.id===tg),n=t?t.title:tt;return'For the test'+(n?' “'+n+'”':'')}
+function mItem(m,del){return`<li class="mitem"><span class="mic">${MKIND(m)}</span><a href="${esc(mUrl(m))}" target="_blank" rel="noopener noreferrer">${esc(m.title)}</a><small>${m.kind==='link'?esc(mHost(m.url)):mSize(m.size)}</small>${del?`<button class="mini del" data-k="mdel" data-id="${m.id}">Delete</button>`:''}</li>`}
+function mGroups(ms,tests,del){const order=[...new Set(ms.map(m=>m.target))].sort((a,b)=>(a==='class'?0:a.startsWith('work:')?1:2)-(b==='class'?0:b.startsWith('work:')?1:2));
+  return order.map(tg=>`<div class="mgroup"><b>${esc(mTarget(tg,tests,(ms.find(m=>m.target===tg)||{}).test))}</b><ul class="mlist">${ms.filter(m=>m.target===tg).map(m=>mItem(m,del)).join('')}</ul></div>`).join('')}
+async function tcMatLoad(){const cls=TC.cls,r=await tcCall('t_mat_list',{p_class:cls});if(!r||cls!==TC.cls)return;TC.mats=r;tcMatRender()}
+function tcMatRender(){const b=$('#tcmat');if(b&&!b.contains(document.activeElement))b.innerHTML=tcMatHTML();else if(b){const l=$('#tcmlist');if(l)l.innerHTML=tcMatListHTML()}}
+function tcMatListHTML(){const M=TC.mats;return M.mats.length?mGroups(M.mats,TC.tests,true):'<p class="gempty">No materials yet.</p>'}
+function tcMatHTML(){const M=TC.mats;if(!M)return'<p class="gempty">Loading…</p>';const link=TC.mk==='link';
+  return`<div id="tcmlist">${tcMatListHTML()}</div>
+    <form class="note f tline tmatf" data-form="tmat"><b>Add material</b>
+      <label class="tfield">Attach to<select id="mtg"><option value="class">For the whole class</option>${WORKS.map(w=>`<option value="work:${w.id}">Lab No. ${w.num}. ${w.title}</option>`).join('')}${(TC.tests||[]).map(t=>`<option value="test:${t.id}">Test “${esc(t.title)}”</option>`).join('')}</select></label>
+      <div class="seg mkind" role="group" aria-label="What to attach"><button type="button" data-k="mkind" data-v="file" aria-pressed="${!link}">File</button><button type="button" data-k="mkind" data-v="link" aria-pressed="${link}">Link</button></div>
+      ${link?'<label class="tfield">Link — for example, to Google Drive or a video<input type="url" id="murl" maxlength="1000" placeholder="https://" required></label>'
+        :`<label class="tfield">File up to 20 MB: presentation, PDF, document, spreadsheet, image or mp4 video<input type="file" id="mfile" accept=".${Object.keys(MIMES).join(',.')}" required></label>`}
+      <label class="tfield">Title — optional<input id="mtitle" maxlength="120" placeholder="For example, the presentation “Density of matter”"></label>
+      <div class="tools"><button class="btn main" type="submit">Attach</button></div><p class="tmsg" id="mmsg" role="status"></p>
+      <small class="thint">Used ${mSize(M.used||0)} of 200 MB.</small></form>`}
+async function tcMatAdd(){const msg=$('#mmsg'),tg=$('#mtg').value,title=$('#mtitle').value,cls=TC.cls;
+  if(TC.mk==='link'){const r=await tcCall('t_mat_link',{p_class:cls,p_target:tg,p_title:title,p_url:$('#murl').value});if(r){toast('Material attached');await tcMatLoad()}return}
+  const f=$('#mfile').files[0];if(!f){msg.textContent='Choose a file.';return}
+  const mime=MIMES[(f.name.split('.').pop()||'').toLowerCase()];if(!mime){msg.textContent=errText('ftype');return}if(f.size>20971520){msg.textContent=errText('fsize');return}
+  const r=await tcCall('t_mat_file',{p_class:cls,p_target:tg,p_title:title,p_name:f.name,p_size:f.size,p_mime:mime});if(!r)return;
+  msg.textContent='Uploading the file…';const btn=document.querySelector('.tmatf button[type=submit]');if(btn)btn.disabled=true;
+  let ok=false;try{const up=await fetch(API.url+'/storage/v1/object/materials/'+r.path.split('/').map(encodeURIComponent).join('/'),{method:'POST',headers:{apikey:API.key,'Content-Type':mime,'x-upsert':'false'},body:f});ok=up.ok}catch(_){}
+  if(btn)btn.disabled=false;
+  if(!ok){msg.textContent='The file did not upload. Check your internet connection and try again.';tcCall('t_mat_delete',{p_id:r.id}).catch(()=>{});return}
+  const d=await tcCall('t_mat_done',{p_id:r.id});if(d){toast('File attached');await tcMatLoad()}}
+const mGone=path=>{if(path)fetch(API.url+'/storage/v1/object/materials/'+path.split('/').map(encodeURIComponent).join('/'),{method:'DELETE',headers:{apikey:API.key}}).catch(()=>{})};
 const mCols=w=>w.cols.filter(c=>c.src==='m');
 let JRX=null;const jrCur=()=>JRX||TC.jr;
 function jrLatest(){const by={};(jrCur()?jrCur().res:[]).forEach(r=>{if(r.ok)by[r.student+'|'+r.work]=r});return by}
@@ -3654,6 +3792,9 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='tkill'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!tt||!confirm(`Delete the teacher account ${tt.name} (${tt.email})?\n\nThis will also delete classes (${tt.classes}), students (${tt.students}), their results and tests. They cannot be restored.`))return;
     if(await tcCall('a_teacher_delete',{p_teacher:id})){toast('Teacher account deleted');TC.newPw=null;if(TC.view&&TC.view.id===id)TC.view=null;await tcAdmin()}return}
   if(k==='tview'){tcView(id);return}
+  if(k==='mkind'){TC.mk=t.dataset.v;const b=$('#tcmat');if(b)b.innerHTML=tcMatHTML();return}
+  if(k==='mdel'){const m=TC.mats&&TC.mats.mats.find(x=>x.id===id);if(!m||!confirm(`Delete the material “${m.title}”? Students will no longer see it.`))return;
+    const r=await tcCall('t_mat_delete',{p_id:id});if(r){mGone(r.path);toast('Material deleted');await tcMatLoad()}return}
   if(k==='vclose'){TC.view=null;tcViewRender();return}
   if(k==='vcls'){TC.view.cls=id;TC.view.sel=null;tcViewRender();return}
   if(k==='vsel'){TC.view.sel=TC.view.sel===id?null:id;tcViewRender();const d=$('#tcview .jdet');if(d)d.scrollIntoView({behavior:'smooth',block:'nearest'});return}
@@ -3669,6 +3810,7 @@ async function formAct(kind,f){
       f.innerHTML=`<b>Application sent ✓</b><p class="tmsg">${r.again?'An application with this email is already waiting — we will reply to it.':'The project authors will review it and send an invitation code to '+esc($('#tae')?$('#tae').value:'')+'.'} Then come back here and register with the code.</p>`}
     catch(_){er.textContent=errText('net')}return}
   if(!ACC||ACC.kind!=='t')return;
+  if(kind==='tmat'){await tcMatAdd();return}
   if(kind==='tdelme'){if(!confirm('Delete your account forever? Classes, students, results and tests will be deleted too.'))return;
     const r=await tcCall('t_delete_me',{p_pass:$('#tdp').value});if(r){tcOut();toast('Account deleted')}return}
   if(kind==='tpass'){const r=await tcCall('t_password',{p_old:$('#tpo').value,p_new:$('#tpn').value});if(r){f.hidden=true;f.reset();toast('Password changed')}return}
@@ -3687,6 +3829,13 @@ const QK=[['one','Single choice'],['many','Multiple choice'],['num','Number'],['
 const decRu=v=>LANG.code==='ru'?String(v).replace(/(\d)\.(\d)/g,'$1,$2'):String(v);
 const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 /* ученик: список тестов на странице работ */
+function stMatsHTML(){const ms=ACC&&ACC.kind==='s'&&ACC.mats||[];if(!ms.length)return'';
+  return`<h2 class="th2 stth">Materials from the teacher</h2><div class="note f smats">${mGroups(ms,null,false)}</div>`}
+async function stMatsLoad(){if(!ACC||ACC.kind!=='s'||SRV!=='on')return;let r;try{r=await rpc('s_materials',{p_token:ACC.token})}catch(_){return}
+  if(!r||r.err||!ACC)return;const ch=JSON.stringify(r.mats)!==JSON.stringify(ACC.mats||[]);ACC.mats=r.mats;saveAcc();
+  if(ch){const b=$('#smats');if(b)b.innerHTML=stMatsHTML();const w=$('#wmats');if(w&&cur)w.outerHTML=wMatsHTML(cur.id)}}
+function wMatsHTML(id){const ms=(ACC&&ACC.kind==='s'&&ACC.mats||[]).filter(m=>m.target==='work:'+id);
+  return`<div id="wmats">${ms.length?`<div class="note f smats"><b>Materials from the teacher for this work</b><ul class="mlist">${ms.map(m=>mItem(m,false)).join('')}</ul></div>`:''}</div>`}
 async function stTestsLoad(){const box=$('#stests');if(!box||!ACC||ACC.kind!=='s'||SRV!=='on')return;
   let r;try{r=await rpc('s_tests',{p_token:ACC.token})}catch(_){return}
   if(!r||r.err||!$('#stests'))return;const ts=r.tests||[];
@@ -3855,6 +4004,7 @@ function route(){
   else if(h==='#teacher'){fromHome=false;teacherHome()}
   else if(h==='#install'){fromHome=false;installHome()}
   else if(h==='#works'){fromHome=false;worksHome()}
+  else if(h==='#progress'){fromHome=false;progressHome()}
   else{fromHome=false;home()}
 }
 const tiltOK=()=>window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
