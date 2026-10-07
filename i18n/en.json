@@ -2242,5 +2242,6 @@
  "Резервная копия": "Backup",
  "Все данные сайта одним файлом: учителя, классы, ученики, результаты, тесты, материалы, заявки и статистика. Пригодится при переезде на другой сервер. Пароли и отметки устройств в копию не входят.": "All site data in one file: teachers, classes, students, results, tests, materials, applications and statistics. Useful when moving to another server. Passwords and device marks are not included.",
  "Скачать резервную копию": "Download backup",
- "Резервная копия скачана": "Backup downloaded"
+ "Резервная копия скачана": "Backup downloaded",
+ "Кабинет: классы, коды учеников, журнал, тесты и учебные материалы": "Cabinet: classes, student codes, journal, tests and learning materials"
 }
