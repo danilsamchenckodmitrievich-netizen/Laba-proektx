@@ -8,6 +8,7 @@ self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.
 self.addEventListener('fetch',e=>{
   const r=e.request;if(r.method!=='GET')return;
   const u=new URL(r.url);
+  if(/\.(mp4|webm|mp3)$/i.test(u.pathname))return;
   if(r.mode==='navigate'){
     const key=u.origin+u.pathname,en=/\/en\/(index\.html)?$/.test(u.pathname);
     e.respondWith(fetch(r).then(res=>{if(res.ok){const cp=res.clone();caches.open(V).then(c=>c.put(key,cp))}return res})
