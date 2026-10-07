@@ -363,6 +363,7 @@ table.jtab td.jw{color:#B5531A}
 .mitem a{font-weight:700;color:var(--brand);overflow-wrap:anywhere}.mitem small{color:var(--muted)}.mitem .mini{margin-left:auto}
 .mic{font-size:12px;font-weight:800;padding:3px 8px;border-radius:8px;background:var(--grid);color:var(--ink)}
 .tmatf select{font:inherit;font-weight:500;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;width:100%}.mkind{margin:6px 0 10px}.mkind button{background:var(--surf);color:var(--ink)}.mkind button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
+.pgr .jg{margin:0 2px 2px 0}.plink{margin:4px 8px 0;text-align:right}.plink a{font-weight:700;color:var(--brand)}
 .jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
@@ -2839,7 +2840,7 @@ function worksHome(){
     <div class="tbtns">${tdone<TASK.w.length?`<a class="btn main" href="#work/${taskNext(null)}">${tdone?'Продолжить':'Начать'}</a>`:''}<button class="btn" data-act="taskoff">Выйти из задания</button></div></div>
     ${codes.length?`<div class="taskcodes"><small>Коды для учителя</small><code id="tcodesall">${codes.join('<br>')}</code><button class="btn" data-act="copyall">Копировать все коды</button></div>`:''}`:''}
   <section class="hero"><h1>${only?'Работы задания':'Лабораторные работы'}</h1><p>${only?'Здесь только работы, которые задал учитель. Выполните каждую и нажмите «Проверить работу».':'Берите приборы руками: взвешивайте, погружайте, подвешивайте грузы. Записывайте измерения в таблицу, считайте и делайте вывод.'}</p></section>
-  <div class="progress"><span>Выполнено ${done} из ${list.length}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${list.length}" aria-valuenow="${done}"><i data-w="${done/list.length*100}"></i></div></div>
+  <div class="progress"><span>Выполнено ${done} из ${list.length}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${list.length}" aria-valuenow="${done}"><i data-w="${done/list.length*100}"></i></div></div><p class="plink"><a href="#progress">Мои оценки и прогресс →</a></p>
   <div class="cards" id="cards">${list.map(w=>`
     <a class="card ${isDone(w.id)?'seen':''}" style="--c:${w.color}" href="#work/${w.id}">
       <div class="pb"><i></i></div>
@@ -2855,6 +2856,31 @@ function worksHome(){
 /* установка на телефон и работа без интернета */
 let instEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;const b=$('#instbtn');if(b)b.hidden=false});
 const standalone=()=>(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+/* мой прогресс: оценки по работам и тестам, что осталось сдать */
+async function progressHome(){stop();cur=null;document.title='Мой прогресс — Лаборатория Сириус';
+  const a=accLive(),st=a&&a.kind==='s';
+  app.innerHTML=`<div class="view">`+header()+`<section class="hero"><h1>Мой прогресс</h1><p>${st?`${esc(a.name)} · ${esc(a.cls)}. Оценки по работам и тестам и то, что осталось сдать.`:'Оценки по работам, выполненным на этом устройстве. Войдите по личному коду, чтобы видеть и задания учителя.'}</p></section><main class="sheet tsheet" id="prog"><p class="gempty">Загружаем…</p></main></div>`;window.scrollTo(0,0);
+  let res=null,tests=[];
+  if(st&&SRV==='on'){try{const[r,t]=await Promise.all([rpc('s_progress',{p_token:a.token}),rpc('s_tests',{p_token:a.token})]);if(r&&!r.err)res=r.res;if(t&&!t.err)tests=t.tests||[]}catch(_){}}
+  if(location.hash!=='#progress')return;const box=$('#prog');if(!box)return;
+  const tries=id=>res?res.filter(x=>x.work===id).map(x=>({g:+x.g||0,at:Date.parse(x.at)})):(GRADES[id]||[]).map(x=>({g:x.g,at:x.at}));
+  const asg=id=>st?wAssigned(id):'no';
+  const rows=WORKS.map(w=>{const tr=tries(w.id),as=asg(w.id),last=tr[tr.length-1],dn=st?a.done.includes(w.id)||!!tr.length:!!tr.length||doneW.has(w.id);return{w,tr,as,last,dn,dl:wDeadline(w.id)}});
+  const mine=st&&rows.some(r=>r.as!=='no')?rows.filter(r=>r.as!=='no'):rows;
+  const gs=rows.filter(r=>r.last&&r.last.g).map(r=>r.last.g),avg=gs.length?decRu(Math.round(gs.reduce((x,y)=>x+y,0)/gs.length*10)/10):'—';
+  const left=mine.filter(r=>!r.dn&&r.as!=='late');
+  const tile=(v,t)=>`<div class="stile"><b>${v}</b><span>${t}</span></div>`;
+  const gr=g=>g?`<span class="jg g${g}">${g}</span>`:'<span class="jy">✓</span>';
+  box.innerHTML=`<div class="stiles">${tile(avg,'средняя оценка')}${tile(mine.filter(r=>r.dn).length+' / '+mine.length,st&&mine!==rows?'заданий сдано':'работ выполнено')}${tile(rows.reduce((n,r)=>n+r.tr.length,0),'всего попыток')}${tile(st?tests.filter(t=>t.state==='done').length+' / '+tests.length:'—','тестов сдано')}</div>
+    ${left.length?`<div class="note f"><b>${st&&mine!==rows?'Осталось сдать':'Ещё не выполнены'}</b><ul class="mlist">${left.map(r=>`<li class="mitem"><a href="#work/${r.w.id}">№ ${r.w.num}. ${r.w.title}</a>${r.dl?`<small>сдать до ${fmtDT(r.dl)}</small>`:''}</li>`).join('')}</ul></div>`
+      :`<div class="note ok"><b>${st&&mine!==rows?'Все задания учителя сданы!':'Все работы выполнены!'}</b></div>`}
+    <h2 class="th2">Лабораторные работы</h2>
+    <div class="tblwrap"><table class="res tadm"><thead><tr><th>Работа</th><th>Оценки</th><th>Статус</th></tr></thead><tbody>${rows.map(r=>`<tr><td><a href="#work/${r.w.id}">№ ${r.w.num}. ${r.w.title}</a></td>
+      <td class="pgr">${r.tr.length?r.tr.map(x=>gr(x.g)).join(' '):'—'}</td>
+      <td>${r.as==='yes'?(r.dn?'задание · сдано':r.dl?'задание · до '+fmtDT(r.dl):'задание'):r.as==='late'?(r.dn?'задание · сдано':'срок прошёл'):r.tr.length?(r.tr.length>1?pl3(r.tr.length,'попытка','попытки','попыток'):'выполнена'):'не выполнялась'}</td></tr>`).join('')}</tbody></table></div>
+    ${st?`<h2 class="th2">Тесты</h2>${tests.length?`<div class="tblwrap"><table class="res tadm"><thead><tr><th>Тест</th><th>Результат</th><th>Статус</th></tr></thead><tbody>${tests.map(t=>`<tr><td>${esc(t.title)}</td><td>${t.state==='done'&&t.max?`<b>${decRu(+t.score)} из ${t.max}</b>`:'—'}</td><td>${t.state==='done'?'сдан':t.state==='active'?`<a href="#test/${t.id}">идёт — продолжить</a>`:t.state==='new'?'не начат'+(t.deadline?' · до '+fmtDT(t.deadline):''):'срок прошёл'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="gempty">Учитель пока не открыл тестов.</p>'}`:''}
+    ${st&&SRV!=='on'?'<p class="tmsg">Нет связи с сервером — показаны оценки с этого устройства.</p>':''}
+    <div class="tools"><a class="btn main" href="#works">К лабораторным работам${ICON.next}</a></div>`}
 function installHome(){stop();cur=null;document.title='Установить — Лаборатория Сириус';
   const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   app.innerHTML=`<div class="view">`+header()+`
@@ -3034,7 +3060,9 @@ function wMeasure(){
   el.hidden=false;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}
 /* проверка работы. Пока работа не закончена, сайт говорит только, чего не хватает, — без подсказок о верности.
    Первая полная проверка ставит оценку, показывает ошибки и как их исправить и закрывает работу; дальше — только «Переделать работу». */
-let WGR=null;
+let WGR=null,GRADES={};
+try{GRADES=JSON.parse(localStorage.getItem('lab-sirius-grades')||'{}')||{}}catch(_){}
+function gAdd(id,x){(GRADES[id]=GRADES[id]||[]).push(x);GRADES[id]=GRADES[id].slice(-20);try{localStorage.setItem('lab-sirius-grades',JSON.stringify(GRADES))}catch(_){}}
 const vli=a=>a.map(m=>`<li>${m}</li>`).join('');
 function wLock(on){document.querySelectorAll('#wtab input,#wtab select,.quiz input,.prec input,#mtest input').forEach(x=>x.disabled=on);
   document.querySelectorAll('[data-act="rec"],[data-act="tclear"],[data-act="rowclr"]').forEach(b=>b.disabled=on)}
@@ -3080,7 +3108,7 @@ function wGrade(){const w=cur;let tot=0,err=0;const fix=[],dg=t=>t>=1?0:t>=.1?1:
   const ex=wCheckExtra(w,fix);if(w.prec){tot+=2;err+=ex.perr||0}
   const g=err===0?5:err/tot<=.15?4:err/tot<=.4?3:2;
   const data=T.map((r,i)=>[r,i]).filter(([r])=>r.key!==null&&r.m).map(([r,i])=>{const o=rowM(w,i);return w.cols.filter(c=>c.src==='m').map(c=>Math.round(o[c.id]*10**c.d)/10**c.d)});
-  WATT++;WGR={g,err,tot,fix,ex,data,rows:data.length};doneW.add(w.id);saveDone();wLock(true);wGraph();
+  WATT++;WGR={g,err,tot,fix,ex,data,rows:data.length};gAdd(w.id,{g,e:err,q:tot,t:ex.test||null,at:Date.now()});doneW.add(w.id);saveDone();wLock(true);wGraph();
   if(gated()&&ACC&&ACC.kind==='s'&&wAssigned(w.id)==='yes')wSend(w.id,{r:data,n:data.length,t:ex.test||null,p:ex.prec||null,g,e:err,q:tot,x:fix.slice(0,20).map(s=>s.replace(/<[^>]+>/g,'')),a:WATT,sec:Math.round((Date.now()-WSTART)/1000)});
   wVerdict(true)}
 function wVerdict(sent){const w=cur,R=WGR,ex=R.ex,el=$('#verdict');el.hidden=false;el.className='note '+(R.g>=4?'ok':'');
@@ -3330,7 +3358,7 @@ function accBar(){const a=accLive(),fl=FLASH?`<span class="aflash" role="alert">
     <span class="aerr" id="aerr" role="alert"></span></div></div><p class="ateach"><a href="#teacher">Я учитель — войти в кабинет</a></p>`;
   if(a.kind==='s'){const open=WORKS.filter(w=>wAssigned(w.id)!=='no').length,dn=WORKS.filter(w=>a.done.includes(w.id)).length;
     return`<div class="taskbar accbar"><div><small>Ученик · ${esc(a.cls)}</small><b>${esc(a.name)}</b><span>${open?`Заданий от учителя: ${open}. Отправлено: ${dn}.`:'Учитель пока ничего не задал — все работы можно делать для тренировки.'}</span>${off}${fl}</div>
-      <div class="tbtns"><button class="btn" data-k="slogout">Выйти</button></div></div>`}
+      <div class="tbtns"><a class="btn" href="#progress">Мой прогресс</a><button class="btn" data-k="slogout">Выйти</button></div></div>`}
   if(a.kind==='d')return`<div class="taskbar accbar"><div><small>Демо-режим</small><b>Все работы открыты до ${fmtT(a.expires)}</b><span>Результаты в демо-режиме не сохраняются.</span>${fl}</div><div class="tbtns"><button class="btn" data-k="slogout">Выйти</button></div></div>`;
   return`<div class="taskbar accbar"><div><small>Учитель</small><b>${esc(a.name||'')}</b><span>Вы вошли как учитель: результаты работ не сохраняются.</span>${fl}</div><div class="tbtns"><a class="btn" href="#teacher">Кабинет учителя</a></div></div>`}
 let accTick=0;
@@ -3345,7 +3373,7 @@ function worksGated(){
   const asg=list.filter(x=>x[1]!=='no'),open=st?asg.length:WORKS.length,done=(st?asg:list).filter(x=>isDone(x[0].id)).length;
   app.innerHTML=`<div class="view">`+header()+accBar()+`
   <section class="hero"><h1>Лабораторные работы</h1><p>${st&&asg.length?'Сверху — работы, которые задал учитель: их результаты уйдут в журнал. Остальные можно делать для тренировки.':'Берите приборы руками: взвешивайте, погружайте, подвешивайте грузы. Записывайте измерения в таблицу, считайте и делайте вывод.'}</p></section>
-  ${open?`<div class="progress"><span>Выполнено ${done} из ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div>`:''}
+  ${open?`<div class="progress"><span>Выполнено ${done} из ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div><p class="plink"><a href="#progress">Мои оценки и прогресс →</a></p>`:''}
   ${st?`<div id="stests"></div><div id="smats">${stMatsHTML()}</div>`:''}
   <div class="cards" id="cards">${list.map(([w,ac])=>{const dl=wDeadline(w.id),dn=isDone(w.id);return`
     <a class="card ${dn?'seen':''}" style="--c:${w.color}" href="#work/${w.id}">
@@ -3913,6 +3941,7 @@ function route(){
   else if(h==='#teacher'){fromHome=false;teacherHome()}
   else if(h==='#install'){fromHome=false;installHome()}
   else if(h==='#works'){fromHome=false;worksHome()}
+  else if(h==='#progress'){fromHome=false;progressHome()}
   else{fromHome=false;home()}
 }
 const tiltOK=()=>window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
