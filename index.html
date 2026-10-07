@@ -347,6 +347,7 @@ code.scode{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;font
 table.tst td{vertical-align:middle}table.tst td:first-child{min-width:96px}.tst .jy{color:#367A55;font-weight:700}.tst .jn{color:var(--muted)}
 .tact{white-space:nowrap}.mini{font:inherit;font-size:13px;font-weight:700;padding:6px 10px;margin:2px 4px 2px 0;border-radius:10px;border:2px solid var(--line);background:var(--surf);color:var(--ink);cursor:pointer}
 .mini:hover{border-color:var(--brand)}.mini.del{color:#C4245F}
+.btn.tdanger{color:#C4245F;border-color:#C4245F;background:transparent}.tdelf{border:2px solid #C4245F}
 .jcell{font:inherit;font-weight:800;color:inherit;background:none;border:2px solid transparent;border-radius:10px;padding:4px 8px;cursor:pointer;min-width:44px}
 .jcell[aria-pressed="true"]{border-color:var(--brand);background:var(--soft)}
 table.jtab td.jw{color:#B5531A}
@@ -3238,7 +3239,7 @@ const ERRS={slow:'Слишком много попыток. Подождите 1
   pass:'Пароль должен быть не короче 8 символов.',taken:'Учитель с такой почтой уже зарегистрирован — войдите.',login:'Неверная почта или пароль.',blocked:'Аккаунт заблокирован. Напишите авторам проекта.',
   session:'Вход устарел — войдите ещё раз.',code:'Такого кода нет. Проверьте буквы и цифры.',device:'Этот код уже открыт на другом устройстве. Попросите учителя нажать «Новое устройство» рядом с вашим именем.',
   closed:'Эта работа сейчас закрыта.',late:'Срок сдачи этой работы прошёл.',limit:'Достигнут предел: не больше 40 классов и 60 учеников в классе.',self:'Нельзя заблокировать свой аккаунт.',
-  school:'Укажите школу и город.',decided:'По этой заявке уже принято решение.',
+  school:'Укажите школу и город.',selfdel:'Свой аккаунт удаляется в блоке «Пароль и аккаунт».',lastadmin:'Вы единственный администратор. Сначала выдайте приглашение администратора другому человеку.',decided:'По этой заявке уже принято решение.',
   work:'Неизвестная работа.',data:'Слишком большой результат.',net:'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.'};
 const errText=e=>ERRS[e]||ERRS.net;
 function gated(){return!!accLive()}
@@ -3404,17 +3405,21 @@ async function tLogin(reg){const er=$(reg?'#trerr':'#tlerr');er.textContent=reg?
 async function tcHome(){
   app.innerHTML=`<div class="view">`+header()+`<section class="hero"><h1>Кабинет учителя</h1><p>Классы, личные коды учеников, открытие работ и журнал результатов.</p></section><main class="sheet tsheet" id="tc"><p class="gempty">Загружаем…</p></main></div>`;
   window.scrollTo(0,0);clearInterval(TC.poll);TC.poll=setInterval(tcPoll,10000);await tcLoad()}
-async function tcLoad(){const r=await tcCall('t_me',{});if(!r){if(!$('#tc .tcme'))$('#tc').innerHTML=`<p class="gempty">${errText('net')}</p>`;return}
+async function tcLoad(){const r=await tcCall('t_me',{});if(!r){const b=$('#tc');if(b&&!b.querySelector('.tcme'))b.innerHTML=`<p class="gempty">${errText('net')}</p>`;return}
   TC.me=r.me;TC.classes=r.classes;TC.demo=r.demo;ACC.name=r.me.name;ACC.me=r.me;saveAcc();
   if(!TC.classes.some(c=>c.id===TC.cls)){TC.cls=(TC.classes[0]||{}).id||null;TC.cd=null;TC.jr=null;TC.sel=null}
   tcRender();await tcTestsList();if(TC.cls)await tcClass();if(TC.me.admin)await tcAdmin()}
 function tcRender(){const m=TC.me,box=$('#tc');if(!box)return;
   box.innerHTML=`<div class="taskbar tcme"><div><small>${m.admin?'Учитель · администратор':'Учитель'}</small><b>${esc(m.name)}</b><span>${esc(m.email)}</span></div>
-      <div class="tbtns"><button class="btn" data-k="pw">Сменить пароль</button><button class="btn" data-k="tout">Выйти</button></div></div>
+      <div class="tbtns"><button class="btn" data-k="pw">Пароль и аккаунт</button><button class="btn" data-k="tout">Выйти</button></div></div>
     <form class="note f tline" data-form="tpass" id="tpassf" hidden><b>Новый пароль</b>
       <label class="tfield">Старый пароль<input type="password" id="tpo" autocomplete="current-password" required></label>
       <label class="tfield">Новый пароль — не короче 8 символов<input type="password" id="tpn" minlength="8" maxlength="72" autocomplete="new-password" required></label>
-      <div class="tools"><button class="btn main" type="submit">Сохранить</button></div></form>
+      <div class="tools"><button class="btn main" type="submit">Сохранить</button><button class="btn tdanger" type="button" data-k="delme">Удалить аккаунт…</button></div></form>
+    <form class="note f tline tdelf" data-form="tdelme" id="tdelf" hidden><b>Удаление аккаунта</b>
+      <p class="tmsg">Будут удалены ваш аккаунт, все классы, ученики, их результаты и тесты. Восстановить их будет нельзя.</p>
+      <label class="tfield">Пароль для подтверждения<input type="password" id="tdp" autocomplete="current-password" required></label>
+      <div class="tools"><button class="btn tdanger" type="submit">Удалить навсегда</button></div></form>
     <h2 class="th2">Классы</h2>
     <div class="chips tcls" role="group" aria-label="Классы">${TC.classes.map(c=>`<button class="chip" data-k="cls" data-id="${c.id}" aria-pressed="${c.id===TC.cls}">${esc(c.name)}<span class="n" title="вошли / всего учеников">${c.joined}/${c.students}</span></button>`).join('')}<button class="chip cadd" data-k="newcls" aria-pressed="false">+ Новый класс</button></div>
     <form class="note f tline" data-form="tclass" id="tclassf"${TC.classes.length?' hidden':''}><b>${TC.classes.length?'Новый класс':'Создайте первый класс'}</b>
@@ -3554,7 +3559,8 @@ function tcAdminRender(){const box=$('#tcadm'),a=TC.adm;if(!box||!a)return;const
     <div class="note f"><b>Учителя</b>
     ${TC.newPw?`<div class="bigcode"><code>${esc(TC.newPw[1])}</code><span>временный пароль для ${esc(TC.newPw[0])} — передайте его учителю: пароль можно сменить в кабинете</span><button class="btn" data-k="copy" data-v="${esc(TC.newPw[1])}">Копировать</button></div>`:''}
     <div class="tblwrap"><table class="res"><thead><tr><th>Учитель</th><th>Классов / учеников</th><th>Статус</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${a.teachers.map(t=>`<tr><td><b>${esc(t.name)}</b><small class="db">${esc(t.email)}</small></td><td>${t.classes} / ${t.students}</td>
-      <td>${t.blocked?'заблокирован':t.admin?'администратор':'активен'}</td><td class="tact">${t.id===TC.me.id?'<small>это вы</small>':`<button class="mini" data-k="tblock" data-id="${t.id}" data-v="${t.blocked?0:1}">${t.blocked?'Разблокировать':'Заблокировать'}</button><button class="mini" data-k="treset" data-id="${t.id}">Временный пароль</button>`}</td></tr>`).join('')}</tbody></table></div></div>`}
+      <td>${t.blocked?'заблокирован':t.admin?'администратор':'активен'}</td><td class="tact">${t.id===TC.me.id?'<small>это вы</small>':`<button class="mini" data-k="tblock" data-id="${t.id}" data-v="${t.blocked?0:1}">${t.blocked?'Разблокировать':'Заблокировать'}</button><button class="mini" data-k="treset" data-id="${t.id}">Временный пароль</button><button class="mini del" data-k="tkill" data-id="${t.id}">Удалить</button>`}</td></tr>`).join('')}</tbody></table></div></div>`}
+function tcOut(){ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null,tests:null,ct:null,tres:null});TE=null;teacherHome()}
 async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='slogout'){sLogout();return}
   if(k==='copy'){copyText(t.dataset.v,t);return}
@@ -3568,7 +3574,8 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='tdel'){const tt=(TC.tests||[]).find(x=>x.id===id);if(!confirm(`Удалить тест «${tt?tt.title:''}» вместе с результатами учеников?`))return;if(await tcCall('t_test_delete',{p_test:id})){toast('Тест удалён');if(TC.tres&&TC.tres.test.id===id)TC.tres=null;await tcTestsList();if(TC.cls)await tcCTests()}return}
   if(k==='tres'){tcResults(id);return}
   if(k==='tresx'){TC.tres=null;const b=$('#tcres');if(b)b.innerHTML='';return}
-  if(k==='tout'){if(!confirm('Выйти из кабинета учителя?'))return;rpc('logout',{p_token:ACC.token}).catch(()=>{});ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null,tests:null,ct:null,tres:null});TE=null;teacherHome();return}
+  if(k==='tout'){if(!confirm('Выйти из кабинета учителя?'))return;rpc('logout',{p_token:ACC.token}).catch(()=>{});tcOut();return}
+  if(k==='delme'){const f=$('#tdelf');f.hidden=!f.hidden;if(!f.hidden){f.scrollIntoView({behavior:'smooth',block:'center'});$('#tdp').focus()}return}
   if(k==='pw'){const f=$('#tpassf');f.hidden=!f.hidden;if(!f.hidden)$('#tpo').focus();return}
   if(k==='newcls'){const f=$('#tclassf');f.hidden=false;$('#tclassn').focus();return}
   if(k==='cls'){if(id===TC.cls)return;TC.cls=id;TC.cd=null;TC.jr=null;TC.sel=null;TC.ct=null;TC.tres=null;document.querySelectorAll('.tcls [data-k="cls"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));$('#tcclass').innerHTML='<p class="gempty">Загружаем класс…</p>';await tcClass();return}
@@ -3587,6 +3594,8 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='aok'){const r=await tcCall('a_app_decide',{p_app:id,p_approve:true,p_reason:null});if(r){TC.letter=r;await tcApps();await tcAdmin();const l=$('#tcapps');if(l)l.scrollIntoView({behavior:'smooth',block:'start'})}return}
   if(k==='ano'){const why=prompt('Почему отклоняете? Можно оставить пустым.','');if(why===null)return;if(await tcCall('a_app_decide',{p_app:id,p_approve:false,p_reason:why})){toast('Заявка отклонена');await tcApps()}return}
   if(k==='tblock'){const on=t.dataset.v==='1';if(on&&!confirm('Заблокировать учителя? Учитель не сможет войти, а демо-код учителя перестанет действовать.'))return;if(await tcCall('a_teacher_block',{p_teacher:id,p_blocked:on}))await tcAdmin();return}
+  if(k==='tkill'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!tt||!confirm(`Удалить аккаунт учителя ${tt.name} (${tt.email})?\n\nВместе с ним удалятся классы (${tt.classes}), ученики (${tt.students}), их результаты и тесты. Восстановить их будет нельзя.`))return;
+    if(await tcCall('a_teacher_delete',{p_teacher:id})){toast('Аккаунт учителя удалён');TC.newPw=null;await tcAdmin()}return}
   if(k==='treset'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!confirm(`Выдать временный пароль для ${tt.name}? Старый пароль перестанет работать.`))return;const r=await tcCall('a_teacher_reset',{p_teacher:id});if(r){TC.newPw=[tt.name,r.pass];tcAdminRender()}return}
 }
 async function formAct(kind,f){
@@ -3599,6 +3608,8 @@ async function formAct(kind,f){
       f.innerHTML=`<b>Заявка отправлена ✓</b><p class="tmsg">${r.again?'Заявка с этой почтой уже ждёт решения — мы ответим на неё.':'Авторы проекта проверят её и пришлют код-приглашение на почту '+esc($('#tae')?$('#tae').value:'')+'.'} Потом вернитесь сюда и зарегистрируйтесь по коду.</p>`}
     catch(_){er.textContent=errText('net')}return}
   if(!ACC||ACC.kind!=='t')return;
+  if(kind==='tdelme'){if(!confirm('Удалить ваш аккаунт навсегда? Классы, ученики, результаты и тесты тоже будут удалены.'))return;
+    const r=await tcCall('t_delete_me',{p_pass:$('#tdp').value});if(r){tcOut();toast('Аккаунт удалён')}return}
   if(kind==='tpass'){const r=await tcCall('t_password',{p_old:$('#tpo').value,p_new:$('#tpn').value});if(r){f.hidden=true;f.reset();toast('Пароль изменён')}return}
   if(kind==='tclass'){const r=await tcCall('t_class_create',{p_name:$('#tclassn').value});if(r){TC.cls=r.id;TC.cd=null;toast('Класс создан');await tcLoad()}return}
   if(kind==='tadd'){const names=$('#tnames').value.split(/\n/).map(s=>s.trim()).filter(Boolean);if(!names.length){$('#tnames').focus();return}
