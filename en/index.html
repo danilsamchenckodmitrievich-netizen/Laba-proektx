@@ -356,6 +356,9 @@ table.tst td{vertical-align:middle}table.tst td:first-child{min-width:96px}.tst 
 table.jtab td.jw{color:#B5531A}
 .jdet{margin:10px 6px}.jdet .tblwrap{margin:10px 0}.jflags{color:#B5531A;font-weight:700}
 .jg{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;border-radius:8px;color:#fff;font-weight:800;font-size:14px;background:#C4245F}.jg.g5{background:#367A55}.jg.g4{background:#5E8F2E}.jg.g3{background:#B5791A}
+.tview{border:2px solid var(--brand)}.tvhead{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}.tvhead small{display:block;color:var(--muted);font-weight:700;font-size:13px}.tvhead b{display:block;font-size:18px}.tvhead span{color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.th3{font-size:16px;margin:18px 0 6px}.vlist{list-style:none;margin:0;padding:0}.vlist li{display:flex;flex-wrap:wrap;gap:2px 10px;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line)}.vlist small{color:var(--muted)}
+.vtest{margin:8px 0 14px}.vtest>small{color:var(--muted);margin-left:8px}
 .jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
@@ -3485,26 +3488,27 @@ function tcStudHTML(){const ss=TC.jr?TC.jr.students:TC.cd.students,codes=Object.
     <div class="tools"><button class="btn" data-k="copycodes">Copy codes</button><button class="btn" data-k="printcodes">${ICON.doc}Print code cards</button></div>
     <p class="tmsg">Students sign in on the “Lab works” page by entering their code once. One code works on one device only — if a student changes phone, press “New device”.</p>`}
 const mCols=w=>w.cols.filter(c=>c.src==='m');
-function jrLatest(){const by={};(TC.jr?TC.jr.res:[]).forEach(r=>{if(r.ok)by[r.student+'|'+r.work]=r});return by}
-const jrTries=(st,wk)=>(TC.jr?TC.jr.res:[]).filter(x=>x.ok&&x.student===st&&x.work===wk);
+let JRX=null;const jrCur=()=>JRX||TC.jr;
+function jrLatest(){const by={};(jrCur()?jrCur().res:[]).forEach(r=>{if(r.ok)by[r.student+'|'+r.work]=r});return by}
+const jrTries=(st,wk)=>(jrCur()?jrCur().res:[]).filter(x=>x.ok&&x.student===st&&x.work===wk);
 function jrFlags(r,by){const f=[],k=JSON.stringify(r.data&&r.data.r),w=WORKS.find(x=>x.id===r.work);
   if(w&&w.vary&&r.data&&Array.isArray(r.data.r)&&r.data.r.length){const same=Object.values(by).filter(x=>x!==r&&x.work===r.work&&x.student!==r.student&&JSON.stringify(x.data&&x.data.r)===k).map(x=>stName(x.student));
     if(same.length)f.push('Same instrument readings as: '+same.join(', '))}
   if(r.data&&r.data.sec>0&&r.data.sec<90)f.push('Done very quickly: '+r.data.sec+' s');
   return f}
-const stName=id=>{const s=(TC.jr?TC.jr.students:[]).find(x=>x.id===id);return s?s.name:'—'};
-function tcJHTML(){const jr=TC.jr;if(!jr)return'';const by=jrLatest(),ss=jr.students;
+const stName=id=>{const s=(jrCur()?jrCur().students:[]).find(x=>x.id===id);return s?s.name:'—'};
+function tcJHTML(view){const jr=jrCur();if(!jr)return'';const by=jrLatest(),ss=jr.students,SEL=view?TC.view.sel:TC.sel,KS=view?'vsel':'jsel';
   const ws=WORKS.filter(w=>jr.works.some(x=>x.work===w.id)||jr.res.some(r=>r.work===w.id));
   if(!ss.length||!ws.length)return`<p class="gempty">${!ss.length?'Add students and their results will appear here.':'Open at least one lab for the class — results will appear here automatically.'}</p>`;
-  const sel=TC.sel&&by[TC.sel];
+  const sel=SEL&&by[SEL];
   return`<div class="tblwrap"><table class="res jtab"><thead><tr><th>Student</th>${ws.map(w=>`<th title="${esc(w.title)}">No. ${w.num}</th>`).join('')}<th>Done</th></tr></thead><tbody>${ss.map(s=>{let k=0;
     const cells=ws.map(w=>{const r=by[s.id+'|'+w.id];if(!r)return'<td class="jn">—</td>';k++;const fl=jrFlags(r,by).length,t=r.data&&Array.isArray(r.data.t)?r.data.t:null;
       const gr=r.data&&r.data.g,na=jrTries(s.id,w.id).length;
-      return`<td class="jy${fl?' jw':''}"><button class="jcell" data-k="jsel" data-id="${s.id}|${w.id}" aria-pressed="${TC.sel===s.id+'|'+w.id}" title="${esc(w.title)} · ${fmtDT(r.at)}">${fl?'⚠':''}${gr?`<span class="jg g${gr}">${gr}</span>`:fl?'':'✓'}${t?`<small>test ${t[0]}/${t[1]}</small>`:''}${na>1?`<small>attempts: ${na}</small>`:''}</button></td>`}).join('');
+      return`<td class="jy${fl?' jw':''}"><button class="jcell" data-k="${KS}" data-id="${s.id}|${w.id}" aria-pressed="${SEL===s.id+'|'+w.id}" title="${esc(w.title)} · ${fmtDT(r.at)}">${fl?'⚠':''}${gr?`<span class="jg g${gr}">${gr}</span>`:fl?'':'✓'}${t?`<small>test ${t[0]}/${t[1]}</small>`:''}${na>1?`<small>attempts: ${na}</small>`:''}</button></td>`}).join('');
     return`<tr><td>${esc(s.name)}</td>${cells}<td><b>${k}</b></td></tr>`}).join('')}</tbody></table></div>
     ${sel?tcDetail(sel,by):''}
-    <p class="tmsg jlive">${ICON.check}<span>The journal updates itself every 10 seconds · <span class="jtime">${jr.at?'updated at '+new Date(jr.at).toLocaleTimeString(LOC):''}</span>. Tap a grade, ✓ or ⚠ to see the instrument readings and the student’s mistakes.</span></p>
-    <div class="tools"><button class="btn" data-k="jcsv2">${ICON.dl}Download the journal for Excel</button></div>`}
+    ${view?'<p class="tmsg">Tap a grade, ✓ or ⚠ to see the instrument readings and the student’s mistakes.</p>':`<p class="tmsg jlive">${ICON.check}<span>The journal updates itself every 10 seconds · <span class="jtime">${jr.at?'updated at '+new Date(jr.at).toLocaleTimeString(LOC):''}</span>. Tap a grade, ✓ or ⚠ to see the instrument readings and the student’s mistakes.</span></p>
+    <div class="tools"><button class="btn" data-k="jcsv2">${ICON.dl}Download the journal for Excel</button></div>`}`}
 function tcDetail(r,by){const w=WORKS.find(x=>x.id===r.work),d=r.data||{},cols=w?mCols(w):[],fl=jrFlags(r,by),rows=Array.isArray(d.r)?d.r:[];
   const num=v=>String(v).replace('.',LANG.code==='ru'?',':'.');
   return`<div class="note f jdet"><b>${esc(stName(r.student))} · No. ${w?w.num+'. '+w.title:r.work}</b>
@@ -3592,9 +3596,28 @@ function tcAdminRender(){const box=$('#tcadm'),a=TC.adm;if(!box||!a)return;const
       <td>${i.used?`✓ ${esc(i.by||'')}`:Date.parse(i.expires)<now?'expired':'valid until '+fmtDT(i.expires)}</td><td class="tact">${i.used?'':`<button class="mini del" data-k="idel" data-id="${i.code}">Delete</button>`}</td></tr>`).join('')}</tbody></table></div>`:''}</div>
     <div class="note f"><b>Teachers</b>
     ${TC.newPw?`<div class="bigcode"><code>${esc(TC.newPw[1])}</code><span>temporary password for ${esc(TC.newPw[0])} — give it to the teacher: the password can be changed in the dashboard</span><button class="btn" data-k="copy" data-v="${esc(TC.newPw[1])}">Copy</button></div>`:''}
-    <div class="tblwrap"><table class="res tadm tteach"><thead><tr><th>Teacher</th><th>Classes / students</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>${a.teachers.map(t=>`<tr><td><b>${esc(t.name)}</b><small class="db">${esc(t.email)}</small></td><td>${t.classes} / ${t.students}</td>
-      <td>${t.blocked?'blocked':t.admin?'administrator':'active'}</td><td class="tact">${t.id===TC.me.id?'<small>you</small>':`<button class="mini" data-k="treset" data-id="${t.id}">Temporary password</button><button class="mini" data-k="tblock" data-id="${t.id}" data-v="${t.blocked?0:1}">${t.blocked?'Unblock':'Block'}</button><button class="mini del" data-k="tkill" data-id="${t.id}">Delete</button>`}</td></tr>`).join('')}</tbody></table></div></div>`}
-function tcOut(){ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null,tests:null,ct:null,tres:null});TE=null;teacherHome()}
+    <div class="tblwrap"><table class="res tadm tteach"><thead><tr><th>Teacher</th><th>Classes / students</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>${a.teachers.map(t=>`<tr><td><b>${esc(t.name)}</b><small class="db">${esc(t.email)}</small>${t.app?`<small class="db">application: ${esc(t.app.name)} · ${esc(t.app.school)}</small>`:''}</td><td>${t.classes} / ${t.students}</td>
+      <td>${t.blocked?'blocked':t.admin?'administrator':'active'}</td><td class="tact">${t.id===TC.me.id?'<small>you</small>':`<button class="mini" data-k="tview" data-id="${t.id}">View</button><button class="mini" data-k="treset" data-id="${t.id}">Temporary password</button><button class="mini" data-k="tblock" data-id="${t.id}" data-v="${t.blocked?0:1}">${t.blocked?'Unblock':'Block'}</button><button class="mini del" data-k="tkill" data-id="${t.id}">Delete</button>`}</td></tr>`).join('')}</tbody></table></div></div><div id="tcview">${tcViewHTML()}</div>`}
+/* просмотр учителя администратором: классы, ученики, журнал и тесты — только чтение */
+async function tcView(id){TC.view={id,d:null,cls:null,sel:null};tcViewRender();const b=$('#tcview');if(b)b.scrollIntoView({behavior:'smooth',block:'start'});
+  const r=await tcCall('a_teacher_view',{p_teacher:id});if(!TC.view||TC.view.id!==id)return;if(!r){TC.view=null;tcViewRender();return}
+  TC.view.d=r;TC.view.cls=(r.classes[0]||{}).id||null;tcViewRender()}
+function tcViewRender(){const b=$('#tcview');if(b)b.innerHTML=tcViewHTML()}
+function tcViewHTML(){const v=TC.view;if(!v)return'';if(!v.d)return'<div class="note f tview"><p class="gempty">Loading…</p></div>';
+  const d=v.d,t=d.teacher,a=d.app,c=d.classes.find(x=>x.id===v.cls);
+  let body='<p class="gempty">No classes yet.</p>';
+  if(c){JRX={res:c.results.slice().sort((x,y)=>x.id-y.id),students:c.students,works:c.works};const jh=tcJHTML(true);JRX=null;
+    body=`<h3 class="th3">Students · ${c.students.length}</h3>${c.students.length?`<ul class="vlist">${c.students.map(s=>`<li><b>${esc(s.name)}</b><small>${s.joined?'has signed in'+(s.seen?' · last seen '+fmtDT(s.seen):''):'has not signed in yet'}</small></li>`).join('')}</ul>`:'<p class="gempty">No students.</p>'}
+      <h3 class="th3">Assigned works · ${c.works.length}</h3>${c.works.length?`<ul class="vlist">${c.works.map(x=>{const w=WORKS.find(y=>y.id===x.work);return`<li><b>${w?'No. '+w.num+'. '+w.title:esc(x.work)}</b><small>${x.deadline?'due '+fmtDT(x.deadline):'no deadline'}</small></li>`}).join('')}</ul>`:'<p class="gempty">No works assigned to the class.</p>'}
+      <h3 class="th3">Works journal</h3>${jh}
+      <h3 class="th3">Class tests · ${c.tests.length}</h3>${c.tests.length?c.tests.map(x=>`<div class="vtest"><b>${esc(x.title)}</b><small>${x.deadline?'due '+fmtDT(x.deadline):'no deadline'}</small>
+        ${x.attempts.length?`<div class="tblwrap"><table class="res"><thead><tr><th>Student</th><th>Score</th><th>Left the page</th></tr></thead><tbody>${x.attempts.map(at=>{const s=c.students.find(y=>y.id===at.student);return`<tr><td>${esc(s?s.name:'—')}</td><td>${at.done?(at.score!==null?`${String(+at.score).replace(',','.')} of ${at.max}`:'—'):'in progress'}</td><td>${at.leaves}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="tmsg">Nobody has taken it yet.</p>'}</div>`).join(''):'<p class="gempty">No tests assigned to the class.</p>'}`}
+  return`<div class="note f tview"><div class="tvhead"><div><small>Teacher view · read only</small><b>${esc(t.name)}</b><span>${esc(t.email)}${t.blocked?' · blocked':''}</span></div><button class="btn" data-k="vclose">Close</button></div>
+    ${a?`<p class="tmsg">From the application: <b>${esc(a.name)}</b> · ${esc(a.school)}${a.classes?' · classes: '+esc(a.classes):''}${a.comment?` · “${esc(a.comment)}”`:''}</p>`:'<p class="tmsg">Registered with an invitation, no application.</p>'}
+    <p class="tmsg">Tests created: <b>${d.tests.length}</b>${d.tests.length?' — '+d.tests.map(x=>`${esc(x.title)} (${pl3(x.n,'question','questions','questions')})`).join(', '):''}</p>
+    ${d.classes.length?`<div class="chips tcls" role="group" aria-label="Teacher’s classes">${d.classes.map(x=>`<button class="chip" data-k="vcls" data-id="${x.id}" aria-pressed="${x.id===v.cls}">${esc(x.name)}<span class="n">${x.students.length}</span></button>`).join('')}</div>`:''}
+    ${body}</div>`}
+function tcOut(){ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null,tests:null,ct:null,tres:null,view:null});TE=null;teacherHome()}
 async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='slogout'){sLogout();return}
   if(k==='copy'){copyText(t.dataset.v,t);return}
@@ -3629,7 +3652,11 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='ano'){const why=prompt('Why are you declining? You can leave this empty.','');if(why===null)return;if(await tcCall('a_app_decide',{p_app:id,p_approve:false,p_reason:why})){toast('Application declined');await tcApps()}return}
   if(k==='tblock'){const on=t.dataset.v==='1';if(on&&!confirm('Block this teacher? The teacher will not be able to sign in, and their demo code will stop working.'))return;if(await tcCall('a_teacher_block',{p_teacher:id,p_blocked:on}))await tcAdmin();return}
   if(k==='tkill'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!tt||!confirm(`Delete the teacher account ${tt.name} (${tt.email})?\n\nThis will also delete classes (${tt.classes}), students (${tt.students}), their results and tests. They cannot be restored.`))return;
-    if(await tcCall('a_teacher_delete',{p_teacher:id})){toast('Teacher account deleted');TC.newPw=null;await tcAdmin()}return}
+    if(await tcCall('a_teacher_delete',{p_teacher:id})){toast('Teacher account deleted');TC.newPw=null;if(TC.view&&TC.view.id===id)TC.view=null;await tcAdmin()}return}
+  if(k==='tview'){tcView(id);return}
+  if(k==='vclose'){TC.view=null;tcViewRender();return}
+  if(k==='vcls'){TC.view.cls=id;TC.view.sel=null;tcViewRender();return}
+  if(k==='vsel'){TC.view.sel=TC.view.sel===id?null:id;tcViewRender();const d=$('#tcview .jdet');if(d)d.scrollIntoView({behavior:'smooth',block:'nearest'});return}
   if(k==='treset'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!confirm(`Issue a temporary password for ${tt.name}? The old password will stop working.`))return;const r=await tcCall('a_teacher_reset',{p_teacher:id});if(r){TC.newPw=[tt.name,r.pass];tcAdminRender()}return}
 }
 async function formAct(kind,f){
