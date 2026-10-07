@@ -275,6 +275,9 @@ table.jtab td.jn{color:var(--muted);text-align:center}table.jtab th{text-align:c
 .prec .pfields{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0 4px}.prec label{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px;flex:1 1 180px}
 .prec input{font:inherit;font-weight:600;color:var(--ink);background:var(--surf);border:2px solid var(--lab);border-radius:12px;padding:9px 10px;max-width:220px}
 .prec input.ok{border-color:#367A55;background:rgba(54,122,85,.16)}.prec input.bad{border-color:#C4245F;background:rgba(196,36,95,.12)}
+#verdict .vgrade{display:flex;gap:14px;align-items:center}#verdict .vgrade small{display:block;color:var(--muted);font-size:14px;margin-top:2px}
+.grade{flex:none;display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:16px;font-size:28px;font-weight:800;line-height:1;color:#fff;background:#C4245F}
+.grade.g5{background:#367A55}.grade.g4{background:#5E8F2E}.grade.g3{background:#B5791A}#verdict .tools{margin:12px 0 0}
 #verdict ul.hints{margin:6px 0 0;padding-left:18px;font-size:14px}.vextra{margin:10px 0 0}
 table.res td.tnums{font-variant-numeric:tabular-nums;min-width:140px}table.res td.tnums small{display:block;color:#C4245F;font-weight:700;margin-top:4px}
 table.res tr.dup td{background:rgba(196,36,95,.08)}
@@ -352,6 +355,11 @@ table.tst td{vertical-align:middle}table.tst td:first-child{min-width:96px}.tst 
 .jcell[aria-pressed="true"]{border-color:var(--brand);background:var(--soft)}
 table.jtab td.jw{color:#B5531A}
 .jdet{margin:10px 6px}.jdet .tblwrap{margin:10px 0}.jflags{color:#B5531A;font-weight:700}
+.jg{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;border-radius:8px;color:#fff;font-weight:800;font-size:14px;background:#C4245F}.jg.g5{background:#367A55}.jg.g4{background:#5E8F2E}.jg.g3{background:#B5791A}
+.tview{border:2px solid var(--brand)}.tvhead{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}.tvhead small{display:block;color:var(--muted);font-weight:700;font-size:13px}.tvhead b{display:block;font-size:18px}.tvhead span{color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.th3{font-size:16px;margin:18px 0 6px}.vlist{list-style:none;margin:0;padding:0}.vlist li{display:flex;flex-wrap:wrap;gap:2px 10px;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line)}.vlist small{color:var(--muted)}
+.vtest{margin:8px 0 14px}.vtest>small{color:var(--muted);margin-left:8px}
+.jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
 .bigcode code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:28px;font-weight:800;letter-spacing:.14em;color:var(--brand)}
@@ -2693,8 +2701,9 @@ function wCheckExtra(w,msgs){const out={};
   const p=w.prec;if(p){const d=$('#pdiv'),e=$('#perr'),nd=num(d.value),ne=num(e.value);[d,e].forEach(x=>x.classList.remove('ok','bad'));
     if(isNaN(nd)||isNaN(ne))msgs.push('Fill in the scale division and the error in the “Measurement accuracy” section.');
     else{const okd=Math.abs(nd-p.div)<1e-9,oke=Math.abs(ne-p.div/2)<1e-9;d.classList.add(okd?'ok':'bad');e.classList.add(oke?'ok':'bad');
-      if(!okd)msgs.push(`The scale division of the ${p.dev} is wrong. Find two neighbouring numbers on the scale, subtract the smaller from the larger and divide by the number of divisions between them.`);
-      else if(!oke)msgs.push('The measurement error is half the scale division.');
+      out.perr=(okd?0:1)+(oke?0:1);
+      if(!okd)msgs.push(`The scale division of the ${p.dev} is wrong: it should be ${String(p.div).replace(',','.')}. Take two neighbouring numbers on the scale, subtract the smaller from the larger and divide by the number of divisions between them.`);
+      if(!oke)msgs.push(`The measurement error is half the scale division: ${String(p.div/2).replace(',','.')}.`);
       else{const ri=T.findIndex(x=>x.key!==null&&x.m);if(ri>=0){const k=p.k||1,v=rowM(w,ri)[p.col]*k;out.prec=`${p.sym} = ${String(+v.toFixed(2)).replace(',','.')} ± ${String(p.div/2).replace(',','.')} ${p.u}`}}}}
   return out}
 
@@ -2722,7 +2731,7 @@ const b64e=v=>{const b=new TextEncoder().encode(v);let t='';b.forEach(x=>t+=Stri
 const b64d=v=>{v=v.replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const t=atob(v),b=new Uint8Array(t.length);for(let i=0;i<t.length;i++)b[i]=t.charCodeAt(i);return new TextDecoder().decode(b)};
 function fnv(v){let h=0x811c9dc5;for(let i=0;i<v.length;i++){h^=v.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}return h.toString(36)}
 const SALT='lab-sirius-7';
-function makeCode(w,name,rows,d,s){const p=b64e(JSON.stringify({v:1,n:name,w:w.id,t:Math.round(Date.now()/60000),r:rows,d,s}));return'LS-'+p+'-'+fnv(p+SALT)}
+function makeCode(w,name,rows,d,s,gr){const p=b64e(JSON.stringify({v:1,n:name,w:w.id,t:Math.round(Date.now()/60000),r:rows,d,s,g:gr||undefined}));return'LS-'+p+'-'+fnv(p+SALT)}
 function readCode(c){const m=String(c).trim().match(/^LS-([A-Za-z0-9_-]+)-([0-9a-z]+)$/);if(!m)return null;let o;try{o=JSON.parse(b64d(m[1]))}catch(_){return null}
   if(!o||typeof o!=='object')return null;return{o,ok:fnv(m[1]+SALT)===m[2]}}
 function copyText(v,btn){const done=()=>{if(!btn)return;const o=btn.textContent;btn.textContent='Copied ✓';setTimeout(()=>{btn.textContent=o},1600)};
@@ -2857,20 +2866,20 @@ function installHome(){stop();cur=null;document.title='Install — Sirius Lab';
 /* журнал класса: проверенные коды на устройстве учителя */
 let JOURNAL=[];try{JOURNAL=JSON.parse(localStorage.getItem('lab-sirius-journal')||'[]').filter(x=>x&&x.c&&x.w)}catch(_){}
 function jSave(){try{localStorage.setItem('lab-sirius-journal',JSON.stringify(JOURNAL))}catch(_){}}
-function jAdd(list){let n=0;list.forEach(([c,o])=>{if(JOURNAL.some(x=>x.c===c))return;JOURNAL.push({c,n:String(o.n||'—').slice(0,60),w:o.w,t:+o.t||0,r:+o.r||0,d:Array.isArray(o.d)?o.d:[],s:Array.isArray(o.s)?o.s:null});n++});if(n)jSave();return n}
+function jAdd(list){let n=0;list.forEach(([c,o])=>{if(JOURNAL.some(x=>x.c===c))return;JOURNAL.push({c,n:String(o.n||'—').slice(0,60),w:o.w,t:+o.t||0,r:+o.r||0,d:Array.isArray(o.d)?o.d:[],s:Array.isArray(o.s)?o.s:null,g:+o.g||0});n++});if(n)jSave();return n}
 const jWhen=t=>new Date(t*60000).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 function jRender(){const box=$('#tjournal');if(!box)return;
   if(!JOURNAL.length){box.innerHTML='<p class="gempty">The journal is empty for now — check the students’ codes above and they will appear here.</p>';return}
   const names=[...new Set(JOURNAL.map(x=>x.n))].sort((a,b)=>a.localeCompare(b,'ru')),ws=WORKS.filter(w=>JOURNAL.some(x=>x.w===w.id));
   const best=(n,w)=>JOURNAL.filter(x=>x.n===n&&x.w===w).sort((a,b)=>b.t-a.t)[0];
   box.innerHTML=`<div class="tblwrap"><table class="res jtab"><thead><tr><th>Student</th>${ws.map(w=>`<th title="${esc(w.title)}">No. ${w.num}</th>`).join('')}<th>Total</th></tr></thead><tbody>${names.map(n=>{let k=0;
-    const cells=ws.map(w=>{const e=best(n,w.id);if(!e)return'<td class="jn">—</td>';k++;return`<td class="jy" title="${esc(w.title)} · ${jWhen(e.t)}">✓${e.s?`<small>test ${e.s[0]}/${e.s[1]}</small>`:''}</td>`}).join('');
+    const cells=ws.map(w=>{const e=best(n,w.id);if(!e)return'<td class="jn">—</td>';k++;return`<td class="jy" title="${esc(w.title)} · ${jWhen(e.t)}">${e.g?`<span class="jg g${e.g}">${e.g}</span>`:'✓'}${e.s?`<small>test ${e.s[0]}/${e.s[1]}</small>`:''}</td>`}).join('');
     return`<tr><td>${esc(n)}</td>${cells}<td><b>${k}</b></td></tr>`}).join('')}</tbody></table></div>
     <p class="tmsg">${pl3(names.length,'student','students','students')}, ${pl3(JOURNAL.length,'checked work','checked works','checked works')}. Hover over ✓ to see the name of the work and the time.</p>`}
 function jCSV(){if(!JOURNAL.length){$('#tjournal').innerHTML='<p class="gempty">The journal is empty — check the students’ codes first.</p>';return}
-  const q=v=>'"'+String(v).replace(/"/g,'""')+'"',lines=[['Student','Work','When','Experiments','Mini-test','Instrument readings'].map(q).join(';')];
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"',lines=[['Student','Work','When','Grade','Experiments','Mini-test','Instrument readings'].map(q).join(';')];
   JOURNAL.slice().sort((a,b)=>a.n.localeCompare(b.n,'ru')||a.t-b.t).forEach(x=>{const w=WORKS.find(y=>y.id===x.w);
-    lines.push([x.n,w?'No. '+w.num+'. '+w.title:x.w,jWhen(x.t),x.r,x.s?x.s[0]+' of '+x.s[1]:'',x.d.map(r=>(Array.isArray(r)?r:[]).map(v=>String(v).replace(',','.')).join(' / ')).join(' · ')].map(q).join(';'))});
+    lines.push([x.n,w?'No. '+w.num+'. '+w.title:x.w,jWhen(x.t),x.g||'',x.r,x.s?x.s[0]+' of '+x.s[1]:'',x.d.map(r=>(Array.isArray(r)?r:[]).map(v=>String(v).replace(',','.')).join(' / ')).join(' · ')].map(q).join(';'))});
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='class-journal-sirius-lab.csv';
   document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 function jClear(){if(!JOURNAL.length)return;if(!confirm('Clear the class journal on this device? The students’ codes can be checked again.'))return;JOURNAL=[];jSave();jRender()}
@@ -2885,7 +2894,7 @@ function tVerify(){const codes=$('#tcodes').value.split(/\s+/).filter(Boolean),o
   const rows=codes.map((c,i)=>{const r=all[i];if(!r)return`<tr><td colspan="6">This is not a result code: ${esc(c.slice(0,24))}${c.length>24?'…':''}</td><td>✗ error</td></tr>`;
     const w=WORKS.find(x=>x.id===r.o.w),d=new Date((+r.o.t||0)*60000),n=+r.o.r||0,k=dkey(r.o);
     const same=k&&w&&w.vary?[...new Set(all.filter((o,j)=>o&&j!==i&&o.ok&&dkey(o.o)===k&&o.o.n!==r.o.n).map(o=>o.o.n))]:[];
-    return`<tr${same.length?' class="dup"':''}><td>${esc(r.o.n||'—')}</td><td>${w?'No. '+w.num+'. '+w.title:'unknown work'}</td><td>${d.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>${n} ${plural(n,'experiment','experiments','experiments')}</td><td>${Array.isArray(r.o.s)?r.o.s[0]+' of '+r.o.s[1]:'—'}</td><td class="tnums">${esc(fmtD(r.o.d))}${same.length?`<small>⚠ Same numbers as: ${esc(same.join(', '))}</small>`:''}</td><td>${r.ok?'✓ valid':'✗ altered'}</td></tr>`});
+    return`<tr${same.length?' class="dup"':''}><td>${esc(r.o.n||'—')}</td><td>${w?'No. '+w.num+'. '+w.title:'unknown work'}</td><td>${d.toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>${n} ${plural(n,'experiment','experiments','experiments')}</td><td>${Array.isArray(r.o.s)?r.o.s[0]+' of '+r.o.s[1]:'—'}${+r.o.g?`<br><b>grade ${+r.o.g}</b>`:''}</td><td class="tnums">${esc(fmtD(r.o.d))}${same.length?`<small>⚠ Same numbers as: ${esc(same.join(', '))}</small>`:''}</td><td>${r.ok?'✓ valid':'✗ altered'}</td></tr>`});
   out.innerHTML=`<div class="tblwrap"><table class="res"><thead><tr><th>Student</th><th>Work</th><th>When</th><th>Experiments</th><th>Test</th><th>Instrument readings</th><th>Code</th></tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
   const added=jAdd(codes.map((c,i)=>[c.trim(),all[i]]).filter(([c,r])=>r&&r.ok&&WORKS.some(w=>w.id===r.o.w)).map(([c,r])=>[c,r.o]));
   jRender();if(added)out.insertAdjacentHTML('beforeend',`<p class="tmsg">Added to the class journal: ${pl3(added,'work','works','works')}.</p>`)}
@@ -2937,7 +2946,7 @@ function tableHTML(w){
 }
 function openWork(id){
   if(!cur)worksScroll=window.scrollY;
-  stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};lastRes=null;TLOCK=null;WSEED=Math.floor(Math.random()*4294967296);cur.init(S);wSnap();WSTART=Date.now();WATT=0;
+  stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};lastRes=null;TLOCK=null;WSEED=Math.floor(Math.random()*4294967296);cur.init(S);wSnap();WSTART=Date.now();WATT=0;WGR=null;
   T=Array.from({length:cur.rows},()=>({key:null,k:{}}));
   const w=cur,idx=WORKS.indexOf(w),tw=inTask(w.id),tn=tw?taskNext(w.id):null,nx=WORKS.find(x=>x.id===tn)||WORKS[(idx+1)%WORKS.length];
   document.title=w.title+' — Sirius Lab';
@@ -3018,56 +3027,72 @@ function wMeasure(){
   el.innerHTML='<h3>Instrument readings</h3><div class="mv">'+cur.cols.filter(c=>c.rt).map(c=>`<span>${c.label}<b>${f1(Math.round(r.m[c.id]/c.rt)*c.rt,dg(c.rt))}</b></span>`).join('')+
     '</div><small>They are not entered in the table — press “Record measurement” and enter them yourself.</small>';
   el.hidden=false;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}
-function wCheck(){
-  WATT++;const w=cur;let rows=0,bad=0,miss=0,norec=0,forged=0,unread=0,misread=0;const hints=[],rhints=[];
-  T.forEach((row,i)=>{const tr=wRow(i),v={};let any=false;
-    const mins=w.cols.filter(c=>c.src==='m').map(c=>[c,tr.querySelector(`[data-c="${c.id}"]`)]);
-    mins.forEach(([c,el])=>{el.classList.remove('ok','bad');const n=num(el.value);v[c.id]=n;if(!isNaN(n))any=true});if(row.key!==null)any=true;
-    const ins=w.cols.filter(c=>c.src==='c').map(c=>[c,tr.querySelector(`[data-c="${c.id}"]`)]);
-    ins.forEach(([c,el])=>el.classList.remove('ok','bad'));if(!any)return;rows++;
-    if(row.key===null||!row.m){norec++;mins.forEach(([c,el])=>el.classList.add('bad'))}
-    else mins.forEach(([c,el])=>{const n=num(el.value);
-      if(c.rt){if(isNaN(n)){unread++;el.classList.add('bad')}
-        else if(Math.abs(n-row.m[c.id])<=c.rt+1e-9)el.classList.add('ok');
-        else{misread++;el.classList.add('bad');el.title=c.rh;const h=`row ${i+1}, “${c.label}”: ${c.rh}`;if(!rhints.includes(h))rhints.push(h)}
-        return}
-      const q=10**c.d;if(!(Math.abs(n-Math.round(row.m[c.id]*q)/q)<.5/q)){forged++;el.classList.add('bad')}});
-    ins.forEach(([c,el])=>{const t=el.value.trim();if(!t){miss++;el.classList.add('bad');return}
-      const n=num(t),e=c.f(v),tol=Math.max(c.tol||0,Math.abs(e)*.02);
-      el.removeAttribute('title');
-      if(isFinite(e)&&Math.abs(n-e)<=tol+1e-9)el.classList.add('ok');else{bad++;el.classList.add('bad');const h=errHint(w,c,n,e);if(h){el.title=h;hints.push(`row ${i+1}, “${c.label}”: ${h}`)}}})});
-  w.cols.filter(c=>c.src==='s').forEach(c=>T.forEach((row,i)=>{const el=wRow(i).querySelector(`[data-c="${c.id}"]`);el.classList.remove('ok','bad');if(row.key===null)return;
-    if(!el.value){miss++;el.classList.add('bad');return}
-    const o=rowM(w,i),rho=o.m/(o.V2-o.V1)*1000,near=isFinite(rho)?c.opts.reduce((a,b)=>Math.abs(b[2]-rho)<Math.abs(a[2]-rho)?b:a)[0]:null;
-    if(el.value===row.k.mat||el.value===near)el.classList.add('ok');else{bad++;el.classList.add('bad');hints.push(`row ${i+1}, “${c.label}”: compare your density with the density table in the procedure`)}}));
-  const need=w.need||w.rows,q=document.querySelector('input[name="wq"]:checked'),qok=!!q&&+q.value===w.quiz.a;
-  document.querySelectorAll('.quiz label').forEach(l=>l.classList.remove('ok','bad'));if(q)q.closest('label').classList.add(qok?'ok':'bad');
-  const msgs=[];
+/* проверка работы. Пока работа не закончена, сайт говорит только, чего не хватает, — без подсказок о верности.
+   Первая полная проверка ставит оценку, показывает ошибки и как их исправить и закрывает работу; дальше — только “Переделать работу”. */
+let WGR=null;
+const vli=a=>a.map(m=>`<li>${m}</li>`).join('');
+function wLock(on){document.querySelectorAll('#wtab input,#wtab select,.quiz input,.prec input,#mtest input').forEach(x=>x.disabled=on);
+  document.querySelectorAll('[data-act="rec"],[data-act="tclear"],[data-act="rowclr"]').forEach(b=>b.disabled=on)}
+function wCheck(){const w=cur;if(WGR){wVerdict();return}
+  let rows=0,norec=0,forged=0,unread=0,miss=0;const msgs=[];
+  document.querySelectorAll('#wtab input,#wtab select,.prec input').forEach(x=>x.classList.remove('ok','bad'));
+  T.forEach((row,i)=>{const tr=wRow(i),els=w.cols.filter(c=>c.src!=='k').map(c=>[c,tr.querySelector(`[data-c="${c.id}"]`)]);
+    if(row.key===null&&els.every(([c,el])=>!el.value.trim()))return;rows++;
+    if(row.key===null||!row.m){norec++;els.forEach(([c,el])=>{if(c.src==='m')el.classList.add('bad')})}
+    els.forEach(([c,el])=>{const t=el.value.trim();
+      if(c.src==='m'){if(row.key===null||!row.m)return;if(c.rt){if(!t){unread++;el.classList.add('bad')}return}
+        const q=10**c.d;if(!(Math.abs(num(t)-Math.round(row.m[c.id]*q)/q)<.5/q)){forged++;el.classList.add('bad')}return}
+      if(!t){miss++;el.classList.add('bad')}})});
+  const need=w.need||w.rows;
   if(rows<need)msgs.push(`Experiments done: ${rows} of ${need}. Still to record: ${need-rows}.`);
   if(norec)msgs.push(`Rows typed in by hand: ${norec}. Instrument readings get into the table only with the “Record measurement” button — every student has their own instruments and their own numbers.`);
   if(forged)msgs.push('The readings in the cells marked red do not match your instruments. Press “Record measurement” again or clear the row.');
   if(unread)msgs.push('Enter the instrument readings in the cells with a dashed border — read them from the scales.');
-  if(misread)msgs.push(`Incorrect readings: ${misread}. Look at the scale again.`+'<ul class="hints">'+rhints.slice(0,3).map(h=>`<li>${h[0].toUpperCase()+h.slice(1)}.</li>`).join('')+'</ul>');
   if(miss)msgs.push('Fill in the empty cells in the calculation columns.');
-  if(bad)msgs.push(`Calculation errors: ${bad}. Check the cells marked red.`+(hints.length?'<ul class="hints">'+hints.slice(0,3).map(h=>`<li>${h[0].toUpperCase()+h.slice(1)}.</li>`).join('')+'</ul>':' '+(w.tip||'')));
-  if(!q)msgs.push('Choose an answer in the “Conclusion” section.');else if(!qok)msgs.push('The answer in the “Conclusion” section is wrong — think again.');
-  const ex=wCheckExtra(w,msgs);
-  const el=$('#verdict');el.hidden=false;wGraph();
-  if(!msgs.length){doneW.add(w.id);saveDone();const data=T.map((r,i)=>[r,i]).filter(([r])=>r.key!==null&&r.m).map(([r,i])=>{const o=rowM(w,i);return w.cols.filter(c=>c.src==='m').map(c=>Math.round(o[c.id]*10**c.d)/10**c.d)});
-    lastRes={w:w.id,rows,test:ex.test||null,prec:ex.prec||null,code:!gated()&&SNAME.trim()?makeCode(w,SNAME.trim(),rows,data,ex.test):null};el.className='note ok';
-    if(gated()&&ACC){const as=ACC.kind==='s'?wAssigned(w.id):'',sv=as==='yes';
-      el.innerHTML=`<b>Work completed!</b> ${w.concl}`+(ex.prec||ex.test?`<p class="vextra">${ex.prec?`Result with error (experiment 1): <b>${ex.prec}</b>.`:''}${ex.test?` Mini-test: <b>${ex.test[0]} of ${ex.test[1]}</b>.`:''}</p>`:'')
-        +`<div class="rescode" id="wsend"><small>${sv?'Sending the result to your teacher…':as==='late'?'The due date has passed — the result was not sent to the teacher.':as==='no'?'Your teacher did not assign this lab — the result was not sent.':ACC.kind==='d'?'Demo mode: the result is not saved.':'You are signed in as a teacher: the result is not saved.'}</small>${sv?'':`<a class="btn main" href="#works">Back to the labs${ICON.next}</a>`}</div>`;
-      if(sv)wSend(w.id,{r:data,n:rows,t:ex.test||null,p:ex.prec||null,a:WATT,sec:Math.round((Date.now()-WSTART)/1000)});
-      el.scrollIntoView({behavior:'smooth',block:'nearest'});return}
-    const tw=inTask(w.id);let tn=null;
-    if(tw){if(lastRes.code){if(!TASK.done.includes(w.id))TASK.done.push(w.id);TASK.codes[w.id]=lastRes.code;setTask(TASK)}tn=taskNext(w.id)}
-    const go=tw&&lastRes.code?(tn?`<a class="btn main" href="#work/${tn}">Next assignment work${ICON.next}</a>`:`<a class="btn main" href="#works">Assignment done — all codes${ICON.next}</a>`):'';
-    el.innerHTML=`<b>Work completed!</b> ${w.concl}`+(ex.prec||ex.test?`<p class="vextra">${ex.prec?`Result with error (experiment 1): <b>${ex.prec}</b>.`:''}${ex.test?` Mini-test: <b>${ex.test[0]} of ${ex.test[1]}</b>.`:''}</p>`:'')+(lastRes.code?`<div class="rescode"><small>Result code for the teacher</small><code>${lastRes.code}</code><button class="btn" data-act="copycode">Copy</button>${go}</div>`
-      :`<div class="rescode"><small>Enter your surname and name in the “Student” field and press “Check the work” again — a result code for the teacher will appear${tw?' and the work will count towards the assignment':''}.</small></div>`)}
-  else{lastRes=null;el.className='note';el.innerHTML='<b>Almost there.</b><ul>'+msgs.map(m=>`<li>${m}</li>`).join('')+'</ul>'}
-  el.scrollIntoView({behavior:'smooth',block:'nearest'});
-}
+  if(!document.querySelector('input[name="wq"]:checked'))msgs.push('Choose an answer in the “Conclusion” section.');
+  if(w.test.length){const left=w.test.filter((t,qi)=>!$('#mtest').querySelector(`input[name="t${qi}"]:checked`)).length;
+    if(left)msgs.push(`Answer the ${left===w.test.length?'questions':'remaining questions'} of the mini-test (left: ${left}).`)}
+  if(w.prec&&(isNaN(num($('#pdiv').value))||isNaN(num($('#perr').value))))msgs.push('Fill in the scale division and the error in the “Measurement accuracy” section.');
+  const el=$('#verdict');el.hidden=false;
+  if(msgs.length){lastRes=null;el.className='note';el.innerHTML=`<b>The work is not finished yet.</b><ul>${vli(msgs)}</ul><p class="vextra">When everything is filled in, press “Check the work”: the site will give a grade and show the mistakes. After the check you can’t change the answers — only redo the work from the start.</p>`;
+    el.scrollIntoView({behavior:'smooth',block:'nearest'});return}
+  if(!confirm('Hand in the work for checking? After the check you won’t be able to change the answers.'))return;
+  wGrade()}
+function wGrade(){const w=cur;let tot=0,err=0;const fix=[],dg=t=>t>=1?0:t>=.1?1:2,at=(i,c)=>`row ${i+1}, “${c.label}”: `;
+  T.forEach((row,i)=>{if(row.key===null||!row.m)return;const tr=wRow(i),v={},cell=c=>tr.querySelector(`[data-c="${c.id}"]`);
+    w.cols.filter(c=>c.src==='m').forEach(c=>{const el=cell(c),n=num(el.value);v[c.id]=n;if(!c.rt)return;tot++;
+      if(Math.abs(n-row.m[c.id])<=c.rt+1e-9)el.classList.add('ok');
+      else{err++;el.classList.add('bad');fix.push(at(i,c)+`you wrote ${esc(el.value.trim())}, but the instrument showed ${f1(Math.round(row.m[c.id]/c.rt)*c.rt,dg(c.rt))}. ${c.rh}`)}});
+    w.cols.filter(c=>c.src==='c').forEach(c=>{const el=cell(c),n=num(el.value),e=c.f(v),tol=Math.max(c.tol||0,Math.abs(e)*.02);tot++;
+      if(isFinite(e)&&Math.abs(n-e)<=tol+1e-9)el.classList.add('ok');
+      else{err++;el.classList.add('bad');const h=errHint(w,c,n,e);fix.push(at(i,c)+(h?h[0].toUpperCase()+h.slice(1)+'. ':'')+(isFinite(e)?`From your measurements it should be ${f1(e,c.d)}.`:(w.tip||'')))}});
+    w.cols.filter(c=>c.src==='s').forEach(c=>{const el=cell(c),o=rowM(w,i),rho=o.m/(o.V2-o.V1)*1000,near=isFinite(rho)?c.opts.reduce((a,b)=>Math.abs(b[2]-rho)<Math.abs(a[2]-rho)?b:a):null;tot++;
+      if(el.value===row.k.mat||(near&&el.value===near[0]))el.classList.add('ok');
+      else{err++;el.classList.add('bad');fix.push(at(i,c)+`compare your density with the density table in the procedure${near?` — the closest is “${near[1]}”`:''}.`)}})});
+  const q=document.querySelector('input[name="wq"]:checked'),qok=+q.value===w.quiz.a;tot++;
+  document.querySelectorAll('.quiz:not(.tq) label').forEach(l=>{const v=+l.querySelector('input').value;l.classList.toggle('ok',v===w.quiz.a);l.classList.toggle('bad',l.contains(q)&&!qok)});
+  if(!qok){err++;fix.push(`Conclusion: the correct answer is “${w.quiz.opts[w.quiz.a]}”.`)}
+  const ex=wCheckExtra(w,fix);if(w.prec){tot+=2;err+=ex.perr||0}
+  const g=err===0?5:err/tot<=.15?4:err/tot<=.4?3:2;
+  const data=T.map((r,i)=>[r,i]).filter(([r])=>r.key!==null&&r.m).map(([r,i])=>{const o=rowM(w,i);return w.cols.filter(c=>c.src==='m').map(c=>Math.round(o[c.id]*10**c.d)/10**c.d)});
+  WATT++;WGR={g,err,tot,fix,ex,data,rows:data.length};doneW.add(w.id);saveDone();wLock(true);wGraph();
+  if(gated()&&ACC&&ACC.kind==='s'&&wAssigned(w.id)==='yes')wSend(w.id,{r:data,n:data.length,t:ex.test||null,p:ex.prec||null,g,e:err,q:tot,x:fix.slice(0,20).map(s=>s.replace(/<[^>]+>/g,'')),a:WATT,sec:Math.round((Date.now()-WSTART)/1000)});
+  wVerdict(true)}
+function wVerdict(sent){const w=cur,R=WGR,ex=R.ex,el=$('#verdict');el.hidden=false;el.className='note '+(R.g>=4?'ok':'');
+  lastRes={w:w.id,rows:R.rows,g:R.g,test:ex.test||null,prec:ex.prec||null,code:!gated()&&SNAME.trim()?makeCode(w,SNAME.trim(),R.rows,R.data,ex.test,R.g):null};
+  const head=`<div class="vgrade"><span class="grade g${R.g}">${R.g}</span><div><b>The work is checked. Grade: ${R.g}</b><small>${R.err?`Mistakes: ${R.err} of ${R.tot} checked answers.`:'No mistakes — excellent!'}</small></div></div>`
+    +(R.err?`<p class="vextra"><b>Mistakes and how to fix them</b></p><ul class="hints">${vli(R.fix)}</ul><p class="tmsg">Cells with mistakes are marked red, correct ones green.</p>`:'')
+    +`<p class="vextra">${w.concl}</p>`+(ex.prec||ex.test?`<p class="vextra">${ex.prec?`Result with error (experiment 1): <b>${ex.prec}</b>.`:''}${ex.test?` Mini-test: <b>${ex.test[0]} of ${ex.test[1]}</b>.`:''}</p>`:'');
+  const redo=`<button class="btn" data-act="redo">${ICON.again}Redo the work</button>`;
+  if(gated()&&ACC){const as=ACC.kind==='s'?wAssigned(w.id):'',sv=as==='yes';
+    el.innerHTML=head+`<div class="rescode" id="wsend"><small>${sv?(sent?'Sending the result to your teacher…':'The result has already been sent to the teacher.'):as==='late'?'The due date has passed — the result was not sent to the teacher.':as==='no'?'Your teacher did not assign this lab — the result was not sent.':ACC.kind==='d'?'Demo mode: the result is not saved.':'You are signed in as a teacher: the result is not saved.'}</small>${sv&&sent?'':`<a class="btn main" href="#works">Back to the labs${ICON.next}</a>`}</div><div class="tools">${redo}</div>`;
+    el.scrollIntoView({behavior:'smooth',block:'nearest'});return}
+  const tw=inTask(w.id);let tn=null;
+  if(tw){if(lastRes.code){if(!TASK.done.includes(w.id))TASK.done.push(w.id);TASK.codes[w.id]=lastRes.code;setTask(TASK)}tn=taskNext(w.id)}
+  const go=tw&&lastRes.code?(tn?`<a class="btn main" href="#work/${tn}">Next assignment work${ICON.next}</a>`:`<a class="btn main" href="#works">Assignment done — all codes${ICON.next}</a>`):'';
+  el.innerHTML=head+(lastRes.code?`<div class="rescode"><small>Result code for the teacher</small><code>${lastRes.code}</code><button class="btn" data-act="copycode">Copy</button>${go}</div>`
+    :`<div class="rescode"><small>Enter your surname and name in the “Student” field and press “Check the work” again — a result code for the teacher will appear${tw?' and the work will count towards the assignment':''}. The grade will not change.</small></div>`)+`<div class="tools">${redo}</div>`;
+  el.scrollIntoView({behavior:'smooth',block:'nearest'})}
 function printReport(){
   const w=cur,rows=[];
   T.forEach((r,i)=>{const tr=wRow(i),cells=w.cols.map(c=>{const el=tr.querySelector(`[data-c="${c.id}"]`);
@@ -3084,6 +3109,7 @@ function printReport(){
     <h3>Conclusion</h3><p><i>${w.quiz.q}</i><br>${q?esc(w.quiz.opts[+q.value]):'No answer chosen.'}</p>
     ${done&&lastRes.prec?`<h3>Measurement accuracy</h3><p>Result with error (experiment 1): ${lastRes.prec}.</p>`:''}
     ${done&&lastRes.test?`<p><b>Mini-test:</b> ${lastRes.test[0]} of ${lastRes.test[1]}.</p>`:''}
+    ${done&&lastRes.g?`<p><b>Grade:</b> ${lastRes.g}.</p>`:''}
     ${done?`<p>${w.concl}</p><p class="pv"><b>The work is completed and checked on the site.</b>${lastRes.code?`<br>Result code: <code>${lastRes.code}</code>`:''}</p>`:'<p class="pv">The work has not been checked on the site yet.</p>'}
     <p class="pf">Sirius Lab · ${esc(location.href.split('#')[0])}</p>`;
   {const pg=$('#pgraph');if(pg&&!renderGraph(pg,w,620)){pg.previousElementSibling.remove();pg.remove()}}
@@ -3193,6 +3219,7 @@ app.addEventListener('click',e=>{
   if(!cur)return;
   if(cur.kind==='work'){const a=t.dataset.act;
     if(a==='rec')wRecord();else if(a==='meas')wMeasure();else if(a==='wreset')wRestart();else if(a==='check')wCheck();
+    else if(a==='redo'){if(confirm('Redo the work from the start? The table and answers will be cleared, and the new attempt will get a new grade.')){const n=WATT;openWork(cur.id);WATT=n}}
     else if(a==='report')printReport();else if(a==='copycode'){if(lastRes&&lastRes.code)copyText(lastRes.code,t)}
     else if(a==='tclear'){T.forEach((r,i)=>wClearRow(i));$('#verdict').hidden=true}
     else if(a==='rowclr')wClearRow(+t.dataset.r);
@@ -3461,28 +3488,33 @@ function tcStudHTML(){const ss=TC.jr?TC.jr.students:TC.cd.students,codes=Object.
     <div class="tools"><button class="btn" data-k="copycodes">Copy codes</button><button class="btn" data-k="printcodes">${ICON.doc}Print code cards</button></div>
     <p class="tmsg">Students sign in on the “Lab works” page by entering their code once. One code works on one device only — if a student changes phone, press “New device”.</p>`}
 const mCols=w=>w.cols.filter(c=>c.src==='m');
-function jrLatest(){const by={};(TC.jr?TC.jr.res:[]).forEach(r=>{if(r.ok)by[r.student+'|'+r.work]=r});return by}
+let JRX=null;const jrCur=()=>JRX||TC.jr;
+function jrLatest(){const by={};(jrCur()?jrCur().res:[]).forEach(r=>{if(r.ok)by[r.student+'|'+r.work]=r});return by}
+const jrTries=(st,wk)=>(jrCur()?jrCur().res:[]).filter(x=>x.ok&&x.student===st&&x.work===wk);
 function jrFlags(r,by){const f=[],k=JSON.stringify(r.data&&r.data.r),w=WORKS.find(x=>x.id===r.work);
   if(w&&w.vary&&r.data&&Array.isArray(r.data.r)&&r.data.r.length){const same=Object.values(by).filter(x=>x!==r&&x.work===r.work&&x.student!==r.student&&JSON.stringify(x.data&&x.data.r)===k).map(x=>stName(x.student));
     if(same.length)f.push('Same instrument readings as: '+same.join(', '))}
   if(r.data&&r.data.sec>0&&r.data.sec<90)f.push('Done very quickly: '+r.data.sec+' s');
   return f}
-const stName=id=>{const s=(TC.jr?TC.jr.students:[]).find(x=>x.id===id);return s?s.name:'—'};
-function tcJHTML(){const jr=TC.jr;if(!jr)return'';const by=jrLatest(),ss=jr.students;
+const stName=id=>{const s=(jrCur()?jrCur().students:[]).find(x=>x.id===id);return s?s.name:'—'};
+function tcJHTML(view){const jr=jrCur();if(!jr)return'';const by=jrLatest(),ss=jr.students,SEL=view?TC.view.sel:TC.sel,KS=view?'vsel':'jsel';
   const ws=WORKS.filter(w=>jr.works.some(x=>x.work===w.id)||jr.res.some(r=>r.work===w.id));
   if(!ss.length||!ws.length)return`<p class="gempty">${!ss.length?'Add students and their results will appear here.':'Open at least one lab for the class — results will appear here automatically.'}</p>`;
-  const sel=TC.sel&&by[TC.sel];
+  const sel=SEL&&by[SEL];
   return`<div class="tblwrap"><table class="res jtab"><thead><tr><th>Student</th>${ws.map(w=>`<th title="${esc(w.title)}">No. ${w.num}</th>`).join('')}<th>Done</th></tr></thead><tbody>${ss.map(s=>{let k=0;
     const cells=ws.map(w=>{const r=by[s.id+'|'+w.id];if(!r)return'<td class="jn">—</td>';k++;const fl=jrFlags(r,by).length,t=r.data&&Array.isArray(r.data.t)?r.data.t:null;
-      return`<td class="jy${fl?' jw':''}"><button class="jcell" data-k="jsel" data-id="${s.id}|${w.id}" aria-pressed="${TC.sel===s.id+'|'+w.id}" title="${esc(w.title)} · ${fmtDT(r.at)}">${fl?'⚠':'✓'}${t?`<small>test ${t[0]}/${t[1]}</small>`:''}</button></td>`}).join('');
+      const gr=r.data&&r.data.g,na=jrTries(s.id,w.id).length;
+      return`<td class="jy${fl?' jw':''}"><button class="jcell" data-k="${KS}" data-id="${s.id}|${w.id}" aria-pressed="${SEL===s.id+'|'+w.id}" title="${esc(w.title)} · ${fmtDT(r.at)}">${fl?'⚠':''}${gr?`<span class="jg g${gr}">${gr}</span>`:fl?'':'✓'}${t?`<small>test ${t[0]}/${t[1]}</small>`:''}${na>1?`<small>attempts: ${na}</small>`:''}</button></td>`}).join('');
     return`<tr><td>${esc(s.name)}</td>${cells}<td><b>${k}</b></td></tr>`}).join('')}</tbody></table></div>
     ${sel?tcDetail(sel,by):''}
-    <p class="tmsg jlive">${ICON.check}<span>The journal updates itself every 10 seconds · <span class="jtime">${jr.at?'updated at '+new Date(jr.at).toLocaleTimeString(LOC):''}</span>. Press ✓ or ⚠ to see the instrument readings.</span></p>
-    <div class="tools"><button class="btn" data-k="jcsv2">${ICON.dl}Download the journal for Excel</button></div>`}
+    ${view?'<p class="tmsg">Tap a grade, ✓ or ⚠ to see the instrument readings and the student’s mistakes.</p>':`<p class="tmsg jlive">${ICON.check}<span>The journal updates itself every 10 seconds · <span class="jtime">${jr.at?'updated at '+new Date(jr.at).toLocaleTimeString(LOC):''}</span>. Tap a grade, ✓ or ⚠ to see the instrument readings and the student’s mistakes.</span></p>
+    <div class="tools"><button class="btn" data-k="jcsv2">${ICON.dl}Download the journal for Excel</button></div>`}`}
 function tcDetail(r,by){const w=WORKS.find(x=>x.id===r.work),d=r.data||{},cols=w?mCols(w):[],fl=jrFlags(r,by),rows=Array.isArray(d.r)?d.r:[];
   const num=v=>String(v).replace('.',LANG.code==='ru'?',':'.');
   return`<div class="note f jdet"><b>${esc(stName(r.student))} · No. ${w?w.num+'. '+w.title:r.work}</b>
-    <p class="tmsg">Submitted ${fmtDT(r.at)}${d.sec?` · time spent ${Math.floor(d.sec/60)} min ${d.sec%60} s`:''}${d.a?` · checks before success: ${d.a}`:''}${Array.isArray(d.t)?` · mini-test ${d.t[0]} of ${d.t[1]}`:''}</p>
+    <p class="tmsg">Submitted ${fmtDT(r.at)}${d.sec?` · time spent ${Math.floor(d.sec/60)} min ${d.sec%60} s`:''}${d.g?'':d.a?` · checks before success: ${d.a}`:''}${Array.isArray(d.t)?` · mini-test ${d.t[0]} of ${d.t[1]}`:''}</p>
+    ${d.g?`<p class="tmsg">Grade: <b>${d.g}</b> · mistakes ${d.e||0} of ${d.q||'—'}${(()=>{const a=jrTries(r.student,r.work);return a.length>1?` · attempts: ${a.length} (grades: ${a.map(x=>x.data&&x.data.g||'✓').join(', ')})`:''})()}</p>`:''}
+    ${Array.isArray(d.x)&&d.x.length?`<details class="jerr"><summary>Student’s mistakes (${d.x.length})</summary><ul>${d.x.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details>`:''}
     ${d.p?`<p class="tmsg">Result with uncertainty: <b>${esc(d.p)}</b></p>`:''}
     ${rows.length&&cols.length?`<div class="tblwrap"><table class="res"><thead><tr><th>No.</th>${cols.map(c=>`<th>${c.label}</th>`).join('')}</tr></thead><tbody>${rows.map((x,i)=>`<tr><td>${i+1}</td>${cols.map((c,j)=>`<td>${Array.isArray(x)&&x[j]!==undefined?num(x[j]):'—'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
     ${fl.length?`<ul class="jflags">${fl.map(f=>`<li>⚠ ${esc(f)}</li>`).join('')}</ul>`:''}</div>`}
@@ -3514,9 +3546,9 @@ function printCodes(){const c=TC.cd;if(!c||!c.students.length)return;const url=l
   const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);
   setTimeout(()=>window.print(),60)}
 function jCSV2(){const jr=TC.jr;if(!jr||!jr.res.length){toast('There are no results in the journal yet.');return}const by=jrLatest();
-  const q=v=>'"'+String(v).replace(/"/g,'""')+'"',lines=[['Student','Work','When','Mini-test','Time, min','Checks','Instrument readings','Flags'].map(q).join(';')];
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"',lines=[['Student','Work','When','Grade','Mistakes','Attempts','Mini-test','Time, min','Instrument readings','Flags'].map(q).join(';')];
   Object.values(by).sort((a,b)=>stName(a.student).localeCompare(stName(b.student),'ru')||a.id-b.id).forEach(r=>{const w=WORKS.find(y=>y.id===r.work),d=r.data||{};
-    lines.push([stName(r.student),w?'No. '+w.num+'. '+w.title:r.work,fmtDT(r.at),Array.isArray(d.t)?d.t[0]+' of '+d.t[1]:'',d.sec?String(Math.round(d.sec/6)/10).replace(',','.'):'',d.a||'',
+    lines.push([stName(r.student),w?'No. '+w.num+'. '+w.title:r.work,fmtDT(r.at),d.g||'',d.g?d.e||0:'',jrTries(r.student,r.work).length,Array.isArray(d.t)?d.t[0]+' of '+d.t[1]:'',d.sec?String(Math.round(d.sec/6)/10).replace(',','.'):'',
       (Array.isArray(d.r)?d.r:[]).map(x=>(Array.isArray(x)?x:[]).map(v=>String(v).replace(',','.')).join(' / ')).join(' · '),jrFlags(r,by).join('; ')].map(q).join(';'))});
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='zhurnal-'+(TC.cd?TC.cd.class.name:'klass').replace(/[^\wА-Яа-яЁё-]+/g,'_')+'.csv';
   document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
@@ -3564,9 +3596,28 @@ function tcAdminRender(){const box=$('#tcadm'),a=TC.adm;if(!box||!a)return;const
       <td>${i.used?`✓ ${esc(i.by||'')}`:Date.parse(i.expires)<now?'expired':'valid until '+fmtDT(i.expires)}</td><td class="tact">${i.used?'':`<button class="mini del" data-k="idel" data-id="${i.code}">Delete</button>`}</td></tr>`).join('')}</tbody></table></div>`:''}</div>
     <div class="note f"><b>Teachers</b>
     ${TC.newPw?`<div class="bigcode"><code>${esc(TC.newPw[1])}</code><span>temporary password for ${esc(TC.newPw[0])} — give it to the teacher: the password can be changed in the dashboard</span><button class="btn" data-k="copy" data-v="${esc(TC.newPw[1])}">Copy</button></div>`:''}
-    <div class="tblwrap"><table class="res tadm tteach"><thead><tr><th>Teacher</th><th>Classes / students</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>${a.teachers.map(t=>`<tr><td><b>${esc(t.name)}</b><small class="db">${esc(t.email)}</small></td><td>${t.classes} / ${t.students}</td>
-      <td>${t.blocked?'blocked':t.admin?'administrator':'active'}</td><td class="tact">${t.id===TC.me.id?'<small>you</small>':`<button class="mini" data-k="treset" data-id="${t.id}">Temporary password</button><button class="mini" data-k="tblock" data-id="${t.id}" data-v="${t.blocked?0:1}">${t.blocked?'Unblock':'Block'}</button><button class="mini del" data-k="tkill" data-id="${t.id}">Delete</button>`}</td></tr>`).join('')}</tbody></table></div></div>`}
-function tcOut(){ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null,tests:null,ct:null,tres:null});TE=null;teacherHome()}
+    <div class="tblwrap"><table class="res tadm tteach"><thead><tr><th>Teacher</th><th>Classes / students</th><th>Status</th><th><span class="sr">Actions</span></th></tr></thead><tbody>${a.teachers.map(t=>`<tr><td><b>${esc(t.name)}</b><small class="db">${esc(t.email)}</small>${t.app?`<small class="db">application: ${esc(t.app.name)} · ${esc(t.app.school)}</small>`:''}</td><td>${t.classes} / ${t.students}</td>
+      <td>${t.blocked?'blocked':t.admin?'administrator':'active'}</td><td class="tact">${t.id===TC.me.id?'<small>you</small>':`<button class="mini" data-k="tview" data-id="${t.id}">View</button><button class="mini" data-k="treset" data-id="${t.id}">Temporary password</button><button class="mini" data-k="tblock" data-id="${t.id}" data-v="${t.blocked?0:1}">${t.blocked?'Unblock':'Block'}</button><button class="mini del" data-k="tkill" data-id="${t.id}">Delete</button>`}</td></tr>`).join('')}</tbody></table></div></div><div id="tcview">${tcViewHTML()}</div>`}
+/* просмотр учителя администратором: классы, ученики, журнал и тесты — только чтение */
+async function tcView(id){TC.view={id,d:null,cls:null,sel:null};tcViewRender();const b=$('#tcview');if(b)b.scrollIntoView({behavior:'smooth',block:'start'});
+  const r=await tcCall('a_teacher_view',{p_teacher:id});if(!TC.view||TC.view.id!==id)return;if(!r){TC.view=null;tcViewRender();return}
+  TC.view.d=r;TC.view.cls=(r.classes[0]||{}).id||null;tcViewRender()}
+function tcViewRender(){const b=$('#tcview');if(b)b.innerHTML=tcViewHTML()}
+function tcViewHTML(){const v=TC.view;if(!v)return'';if(!v.d)return'<div class="note f tview"><p class="gempty">Loading…</p></div>';
+  const d=v.d,t=d.teacher,a=d.app,c=d.classes.find(x=>x.id===v.cls);
+  let body='<p class="gempty">No classes yet.</p>';
+  if(c){JRX={res:c.results.slice().sort((x,y)=>x.id-y.id),students:c.students,works:c.works};const jh=tcJHTML(true);JRX=null;
+    body=`<h3 class="th3">Students · ${c.students.length}</h3>${c.students.length?`<ul class="vlist">${c.students.map(s=>`<li><b>${esc(s.name)}</b><small>${s.joined?'has signed in'+(s.seen?' · last seen '+fmtDT(s.seen):''):'has not signed in yet'}</small></li>`).join('')}</ul>`:'<p class="gempty">No students.</p>'}
+      <h3 class="th3">Assigned works · ${c.works.length}</h3>${c.works.length?`<ul class="vlist">${c.works.map(x=>{const w=WORKS.find(y=>y.id===x.work);return`<li><b>${w?'No. '+w.num+'. '+w.title:esc(x.work)}</b><small>${x.deadline?'due '+fmtDT(x.deadline):'no deadline'}</small></li>`}).join('')}</ul>`:'<p class="gempty">No works assigned to the class.</p>'}
+      <h3 class="th3">Works journal</h3>${jh}
+      <h3 class="th3">Class tests · ${c.tests.length}</h3>${c.tests.length?c.tests.map(x=>`<div class="vtest"><b>${esc(x.title)}</b><small>${x.deadline?'due '+fmtDT(x.deadline):'no deadline'}</small>
+        ${x.attempts.length?`<div class="tblwrap"><table class="res"><thead><tr><th>Student</th><th>Score</th><th>Left the page</th></tr></thead><tbody>${x.attempts.map(at=>{const s=c.students.find(y=>y.id===at.student);return`<tr><td>${esc(s?s.name:'—')}</td><td>${at.done?(at.score!==null?`${String(+at.score).replace(',','.')} of ${at.max}`:'—'):'in progress'}</td><td>${at.leaves}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="tmsg">Nobody has taken it yet.</p>'}</div>`).join(''):'<p class="gempty">No tests assigned to the class.</p>'}`}
+  return`<div class="note f tview"><div class="tvhead"><div><small>Teacher view · read only</small><b>${esc(t.name)}</b><span>${esc(t.email)}${t.blocked?' · blocked':''}</span></div><button class="btn" data-k="vclose">Close</button></div>
+    ${a?`<p class="tmsg">From the application: <b>${esc(a.name)}</b> · ${esc(a.school)}${a.classes?' · classes: '+esc(a.classes):''}${a.comment?` · “${esc(a.comment)}”`:''}</p>`:'<p class="tmsg">Registered with an invitation, no application.</p>'}
+    <p class="tmsg">Tests created: <b>${d.tests.length}</b>${d.tests.length?' — '+d.tests.map(x=>`${esc(x.title)} (${pl3(x.n,'question','questions','questions')})`).join(', '):''}</p>
+    ${d.classes.length?`<div class="chips tcls" role="group" aria-label="Teacher’s classes">${d.classes.map(x=>`<button class="chip" data-k="vcls" data-id="${x.id}" aria-pressed="${x.id===v.cls}">${esc(x.name)}<span class="n">${x.students.length}</span></button>`).join('')}</div>`:''}
+    ${body}</div>`}
+function tcOut(){ACC=null;saveAcc();clearInterval(TC.poll);Object.assign(TC,{cls:null,cd:null,jr:null,adm:null,sel:null,newInv:null,newPw:null,tests:null,ct:null,tres:null,view:null});TE=null;teacherHome()}
 async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='slogout'){sLogout();return}
   if(k==='copy'){copyText(t.dataset.v,t);return}
@@ -3601,7 +3652,11 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='ano'){const why=prompt('Why are you declining? You can leave this empty.','');if(why===null)return;if(await tcCall('a_app_decide',{p_app:id,p_approve:false,p_reason:why})){toast('Application declined');await tcApps()}return}
   if(k==='tblock'){const on=t.dataset.v==='1';if(on&&!confirm('Block this teacher? The teacher will not be able to sign in, and their demo code will stop working.'))return;if(await tcCall('a_teacher_block',{p_teacher:id,p_blocked:on}))await tcAdmin();return}
   if(k==='tkill'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!tt||!confirm(`Delete the teacher account ${tt.name} (${tt.email})?\n\nThis will also delete classes (${tt.classes}), students (${tt.students}), their results and tests. They cannot be restored.`))return;
-    if(await tcCall('a_teacher_delete',{p_teacher:id})){toast('Teacher account deleted');TC.newPw=null;await tcAdmin()}return}
+    if(await tcCall('a_teacher_delete',{p_teacher:id})){toast('Teacher account deleted');TC.newPw=null;if(TC.view&&TC.view.id===id)TC.view=null;await tcAdmin()}return}
+  if(k==='tview'){tcView(id);return}
+  if(k==='vclose'){TC.view=null;tcViewRender();return}
+  if(k==='vcls'){TC.view.cls=id;TC.view.sel=null;tcViewRender();return}
+  if(k==='vsel'){TC.view.sel=TC.view.sel===id?null:id;tcViewRender();const d=$('#tcview .jdet');if(d)d.scrollIntoView({behavior:'smooth',block:'nearest'});return}
   if(k==='treset'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!confirm(`Issue a temporary password for ${tt.name}? The old password will stop working.`))return;const r=await tcCall('a_teacher_reset',{p_teacher:id});if(r){TC.newPw=[tt.name,r.pass];tcAdminRender()}return}
 }
 async function formAct(kind,f){
