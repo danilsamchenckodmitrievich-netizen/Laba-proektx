@@ -2862,10 +2862,8 @@ function closeMenu(){if(menuEl.hidden)return;menuEl.hidden=true;document.body.st
 menuEl.addEventListener('click',e=>{
   if(e.target===menuEl||e.target.closest('[data-m="close"]')){closeMenu();return}
   const a=e.target.closest('a');if(!a)return;e.preventDefault();closeMenu();fromHome=false;
-  if(a.getAttribute('href')==='#works'){location.hash='works';return}
-  if(a.getAttribute('href')==='#teacher'){location.hash='teacher';return}
-  if(a.getAttribute('href')==='#install'){location.hash='install';return}
-  filter=a.dataset.cat;try{sessionStorage.setItem('lab-sirius-filter',filter)}catch(_){}
+  const href=a.getAttribute('href');if(href&&href!=='#'){location.hash=href.slice(1);return}
+  filter=CATS.includes(a.dataset.cat)?a.dataset.cat:'All';try{sessionStorage.setItem('lab-sirius-filter',filter)}catch(_){}
   homeScroll=0;if(location.hash&&location.hash!=='#')location.hash='';else{setFilter(filter);window.scrollTo({top:0,behavior:'smooth'})}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menuEl.hidden){e.stopImmediatePropagation();closeMenu()}},true);
