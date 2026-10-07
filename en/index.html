@@ -364,6 +364,9 @@ table.jtab td.jw{color:#B5531A}
 .mic{font-size:12px;font-weight:800;padding:3px 8px;border-radius:8px;background:var(--grid);color:var(--ink)}
 .tmatf select{font:inherit;font-weight:500;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;width:100%}.mkind{margin:6px 0 10px}.mkind button{background:var(--surf);color:var(--ink)}.mkind button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
 .pgr .jg{margin:0 2px 2px 0}.plink{margin:4px 8px 0;text-align:right}.plink a{font-weight:700;color:var(--brand)}
+.mtask{padding:10px 0;border-top:1px solid var(--line)}.mtask p{margin:0 0 8px}.mtask.done>p:first-child{color:var(--muted)}
+.mtrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.mtin{display:flex;align-items:center;gap:6px}.mtin input{width:120px;font:inherit;font-weight:600;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:12px;padding:8px 10px}.mtin span{color:var(--muted);font-weight:600}
+.mtres{margin:8px 0 0!important;font-weight:600}.mtres.ok,.mtask.done .mtres{color:#367A55}.mtres.bad{color:#C4245F}
 .jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
@@ -2712,6 +2715,64 @@ function wCheckExtra(w,msgs){const out={};
       else{const ri=T.findIndex(x=>x.key!==null&&x.m);if(ri>=0){const k=p.k||1,v=rowM(w,ri)[p.col]*k;out.prec=`${p.sym} = ${String(+v.toFixed(2)).replace(',','.')} ± ${String(p.div/2).replace(',','.')} ${p.u}`}}}}
   return out}
 
+/* мини-задачи к моделям: “подберите параметры” (проверка по ползункам) и “посчитайте” (ответ по текущим значениям).
+   Подсказок нет: сайт отвечает только “верно” или “пока нет”; объяснение появляется после верного ответа. */
+const MRHO=id=>(MATS.find(m=>m[0]===id)||[])[2];
+const GASP=P=>P.N*(P.t+273)/(30+460*P.V/100-38)/(60*293/452)*100;
+const MTASKS={
+  states:[{q:'Melt the ice, but don’t bring the water to the boil.',ok:P=>P.t>=0&&P.t<100,why:'At 0 °C ice melts: the crystal lattice breaks down and the molecules start moving around while staying close to each other.'},
+    {q:'Turn the water into steam.',ok:P=>P.t>=100,why:'At 100 °C (at normal pressure) water boils: the molecules move so fast that they break away from each other and fly apart.'}],
+  diffusion:[{q:'Make diffusion as fast as possible: choose the substances and a temperature of at least 80 °C.',ok:P=>P.med==='g'&&P.t>=80,why:'Diffusion is fastest in gases and at high temperature: the molecules are far apart and move fast.'},
+    {q:'Show the slowest diffusion: temperature no higher than 20 °C.',ok:P=>P.med==='l'&&P.t<=20,why:'In liquids the molecules are packed closely, and at low temperature they move slowly — so diffusion is slow.'}],
+  motion:[{q:'Make the car’s speed exactly 3 times the cyclist’s speed.',ok:P=>P.v2===3*P.v1,why:'Then in the same time the car travels 3 times as far: s = v · t.'},
+    {q:'How many seconds does the car need to travel 300 m at its current speed?',ans:P=>300/P.v2,u:'s',why:'t = s / v.'}],
+  density:[{q:'What is the mass of the body with the current substance and volume? Answer in grams.',ans:P=>MRHO(P.mat)*P.V/1000,u:'g',why:'m = ρ · V. Divide the density in kg/m³ by 1000 to get g/cm³.'},
+    {q:'Choose the substance and volume so that the mass is 360 g.',ok:P=>Math.abs(MRHO(P.mat)*P.V/1000-360)<=3,why:'m = ρ · V: for example, 900 cm³ of pine or 400 cm³ of ice. The greater the density, the smaller the volume needed for the same mass.'}],
+  hooke:[{q:'How far is the spring stretched with the current settings? Answer in centimetres.',ans:P=>P.m*P.g/P.k*100,u:'cm',why:'Δl = F / k = m · g / k; convert metres to centimetres.'},
+    {q:'On Earth (g = 9.8 N/kg) choose the load and stiffness so that the spring stretches by 9.8 cm.',ok:P=>Math.abs(P.g-9.8)<.05&&Math.abs(P.m*P.g/P.k*100-9.8)<=.15,why:'Δl = m · g / k: for example, 0.5 kg on a 50 N/m spring or 1 kg on a 100 N/m spring.'}],
+  friction:[{q:'Get a 5 kg block moving on asphalt.',ok:P=>P.surf==='asph'&&P.m>=5&&P.F>SURF.asph[1]*P.m*G,why:'The block moves when the pulling force exceeds the maximum static friction μ · m · g ≈ 0.75 · 5 · 9.8 ≈ 37 N.'},
+    {q:'Find a surface on which a block of 2 kg (or heavier) moves with a force of no more than 1 N.',ok:P=>P.m>=2&&P.F<=1&&P.F>SURF[P.surf][1]*P.m*G,why:'The smaller the friction coefficient (ice, wheels), the smaller the force needed to move the body.'}],
+  resultant:[{q:'Make the resultant zero while neither force is zero.',ok:P=>P.mode==='opp'&&P.F1===P.F2&&P.F1>0,why:'Equal opposite forces balance each other: the body behaves as if there were no forces.'},
+    {q:'Get a resultant of 700 N.',ok:P=>P.mode==='same'&&P.F1+P.F2===700,why:'Forces in the same direction add up: R = F₁ + F₂. Opposite forces subtract and give no more than 500 N.'},
+    {q:'What is the resultant force now? Answer in newtons.',ans:P=>P.mode==='same'?P.F1+P.F2:Math.abs(P.F1-P.F2),u:'N',why:'Same direction: R = F₁ + F₂; opposite directions: R = |F₁ − F₂|.'}],
+  solidp:[{q:'What pressure does the body exert now? Answer in kilopascals (g = 9.8 N/kg).',ans:P=>P.m*G/P.S/1000,u:'kPa',why:'p = F / S = m · g / S; divide pascals by 1000.'},
+    {q:'For a body of at least 50 kg, get a pressure of no more than 1 kPa.',ok:P=>P.m>=50&&P.m*G/P.S<=1000.5,why:'p = F / S: the larger the support area, the lower the pressure — that is why skis don’t sink into snow.'}],
+  gas:[{q:'Increase the gas pressure at least 2 times without changing the 20 °C temperature.',ok:P=>P.t===20&&GASP(P)>=199.5,why:'The more often molecules hit the walls, the higher the pressure: more molecules or a smaller volume means more hits.'},
+    {q:'Make the pressure above 100 % while reducing the number of molecules below 60.',ok:P=>P.N<60&&GASP(P)>100.5,why:'When heated, molecules move faster and hit the walls harder and more often — the pressure rises even with fewer molecules.'}],
+  liquid:[{q:'What pressure does the liquid exert on the sensor now? Answer in kilopascals (g = 9.8 N/kg).',ans:P=>+P.liq*G*Math.min(P.d,P.h)/1000,u:'kPa',why:'p = ρ · g · h, where h is the depth of the sensor below the liquid surface.'},
+    {q:'Get a pressure on the sensor above 100 kPa.',ok:P=>+P.liq*G*Math.min(P.d,P.h)>100000,why:'p = ρ · g · h: mercury is 13.6 times denser than water, so already at 0.8 m it presses with more than 100 kPa.'}],
+  vessels:[{q:'How many centimetres does the column of the first liquid rise above the boundary between the liquids now?',ans:P=>PAIRS[P.pair][3]*P.hB/PAIRS[P.pair][2],u:'cm',why:'The pressures of the columns at the boundary level are equal: ρ₁ · h₁ = ρ₂ · h₂, so h₁ = ρ₂ · h₂ / ρ₁.'},
+    {q:'Choose the liquids and height so that the added column is exactly 2 cm higher than the other one.',ok:P=>Math.abs(P.hB-PAIRS[P.pair][3]*P.hB/PAIRS[P.pair][2]-2)<.01,why:'For example, water + oil: with h₂ = 20 cm the water column is 18 cm. The lower the density of the added liquid, the taller its column.'}],
+  atm:[{q:'Climb to a height where the pressure is below 380 mmHg — half the sea-level pressure.',ok:P=>LABS.find(l=>l.id==='atm').mm(P.alt)<380,why:'With height the air gets thinner and the pressure drops: at about 5.5 km it is half the sea-level pressure.'},
+    {q:'What is the pressure at the current height? Answer in mmHg.',ans:P=>LABS.find(l=>l.id==='atm').mm(P.alt),u:'mmHg',why:'The barometer shows the value; at sea level it is about 760 mmHg.'}],
+  press:[{q:'Get a force gain of exactly 50 times.',ok:P=>P.S2===50*P.S1,why:'F₂ / F₁ = S₂ / S₁: the force gain equals the ratio of the piston areas.'},
+    {q:'With what force does the large piston press now? Answer in newtons.',ans:P=>P.F1*P.S2/P.S1,u:'N',why:'F₂ = F₁ · S₂ / S₁ — pressure in a liquid is transmitted equally in all directions (Pascal’s law).'}],
+  archimedes:[{q:'Make the body float half submerged.',ok:P=>Math.abs(P.rho/P.rl-.5)<.005,why:'A floating body is submerged by the fraction ρbody / ρliquid. Half — when the liquid is twice as dense as the body.'},
+    {q:'What is the buoyant force if the body is fully submerged? Answer in newtons (g = 9.8 N/kg).',ans:P=>P.rl*G*P.V/1000,u:'N',why:'Fb = ρliquid · g · V; divide the volume in dm³ by 1000 to get m³.'}],
+  work:[{q:'How much work does the lift do now? Answer in kilojoules (g = 9.8 N/kg).',ans:P=>P.m*G*P.h/1000,u:'kJ',why:'A = F · s = m · g · h.'},
+    {q:'Get a power of at least 1 kW.',ok:P=>P.m*G*P.h/P.t>=1000,why:'P = W / t: the more work and the faster it is done, the greater the power.'}],
+  lever:[{q:'Balance the lever with a load on the right twice as heavy as on the left.',ok:P=>P.m2===2*P.m1&&Math.abs(P.m1*P.d1-P.m2*P.d2)<1e-6,why:'Rule of moments: m₁ · l₁ = m₂ · l₂. A load twice as heavy balances on an arm half as long.'},
+    {q:'Balance a 10 kg load with a 2 kg load.',ok:P=>((P.m1===10&&P.m2===2)||(P.m1===2&&P.m2===10))&&Math.abs(P.m1*P.d1-P.m2*P.d2)<1e-6,why:'The arm of the light load must be 5 times longer: for example, 0.4 m and 2 m.'}],
+  pulleys:[{q:'Lift a 30 kg load with a force of less than 150 N.',ok:P=>P.mode==='mov'&&P.m>=30&&P.m*G/2<150,why:'A movable pulley halves the force: F = m · g / 2 ≈ 147 N.'},
+    {q:'What force is needed now? Answer in newtons (g = 9.8 N/kg).',ans:P=>P.m*G/(P.mode==='mov'?2:1),u:'N',why:'A fixed pulley only changes the direction of the force: F = m · g; a movable one halves the force.'}],
+  incline:[{q:'Get an inclined plane efficiency above 80 %.',ok:P=>{const a=P.ang*Math.PI/180;return Math.sin(a)/(Math.sin(a)+P.mu*Math.cos(a))>.8},why:'η = Wuseful / Wtotal: the less friction and the steeper the plane, the less work goes into friction and the higher the efficiency.'},
+    {q:'What is the efficiency now? Answer in percent.',ans:P=>{const a=P.ang*Math.PI/180;return Math.sin(a)/(Math.sin(a)+P.mu*Math.cos(a))*100},u:'%',why:'η = Wuseful / Wtotal · 100 % = m · g · h / (F · l) · 100 %.'}],
+  energy:[{q:'What is the ball’s potential energy at the start? Answer in joules (g = 9.8 N/kg).',ans:P=>P.m*G*P.h,u:'J',why:'Ep = m · g · h.'},
+    {q:'Make the ball bounce to exactly half its starting height after the first impact.',ok:P=>P.loss===50,why:'After the impact (100 − losses) % of the energy remains, and the bounce height is proportional to the energy: 50 % losses — half the height.'}]};
+let MSOLVED=new Set();try{MSOLVED=new Set(JSON.parse(localStorage.getItem('lab-sirius-mtasks')||'[]'))}catch(_){}
+function mtHTML(l){const ts=MTASKS[l.id];if(!ts)return'';
+  return`<div class="note f mtasks" id="mtasks"><b>Tasks · solved ${ts.filter((t,i)=>MSOLVED.has(l.id+':'+i)).length} of ${ts.length}</b><p class="tmsg">Adjust the settings or calculate, then press “Check”. There are no hints — keep trying until it works.</p>
+    ${ts.map((t,i)=>{const sv=MSOLVED.has(l.id+':'+i);return`<div class="mtask${sv?' done':''}" data-i="${i}"><p><b>${i+1}.</b> ${t.q}</p>
+      <div class="mtrow">${t.ans?`<label class="mtin"><input inputmode="decimal" id="mta${i}" aria-label="Answer to task ${i+1}" placeholder="Answer"><span>${t.u}</span></label>`:''}<button class="btn" data-act="mt" data-i="${i}">Check</button></div>
+      <p class="mtres" id="mtr${i}" role="status">${sv?`✓ Solved. ${t.why}`:''}</p></div>`}).join('')}</div>`}
+function mtCheck(i){const l=cur,t=MTASKS[l.id][i],r=$('#mtr'+i);let ok;
+  if(t.ans){const v=num(($('#mta'+i)||{}).value||''),e=t.ans(P,S);if(isNaN(v)){r.className='mtres';r.textContent='Enter the answer as a number.';return}
+    ok=Math.abs(v-e)<=Math.max(Math.abs(e)*.03,.05)}else ok=!!t.ok(P,S);
+  r.className='mtres '+(ok?'ok':'bad');
+  if(ok){MSOLVED.add(l.id+':'+i);try{localStorage.setItem('lab-sirius-mtasks',JSON.stringify([...MSOLVED]))}catch(_){}
+    r.textContent=`✓ Correct! ${t.ans?'Answer: '+f1(t.ans(P,S),2).replace(/[,.]?0+$/,'')+' '+t.u+'. ':''}${t.why}`;r.closest('.mtask').classList.add('done');
+    const h=$('#mtasks>b');if(h){const ts=MTASKS[l.id];h.textContent=`Tasks · solved ${ts.filter((x,j)=>MSOLVED.has(l.id+':'+j)).length} of ${ts.length}`}}
+  else r.textContent=t.ans?'Not right yet — recalculate.':'Not yet — change the settings and check again.'}
 /* ===================== APP ===================== */
 const app=$('#app');
 let visited=new Set();
@@ -2962,6 +3023,7 @@ function openLab(id){
     <div class="note"><b>Phenomenon.</b> ${l.def}</div>
     <div class="note f"><b>${l.fhead||'Formulas'}</b>${l.formulas.map(f=>`<div class="fm${l.fhead?' t':''}">${f}</div>`).join('')}</div>
     <div class="note f"><b>Try it yourself</b><ol>${l.tryit.map(t=>`<li>${t}</li>`).join('')}</ol></div>
+    ${mtHTML(l)}
     <a class="nextlab" href="#lab/${nx.id}" style="--c:${nx.color}"><span><small>Next phenomenon</small><b>${nx.title}</b></span>${ICON.next}</a>
   </main></div>`;
   cv=$('#cv');g=cv.getContext('2d');LIGHT=null;readColors();sizeCanvas();
@@ -3258,6 +3320,7 @@ app.addEventListener('click',e=>{
     else if(a==='rowclr')wClearRow(+t.dataset.r);
     else if(t.dataset.wact!==undefined){cur.actions[+t.dataset.wact][1](S);updateOuts()}
     return}
+  if(t.dataset.act==='mt'){mtCheck(+t.dataset.i);return}
   if(t.dataset.act==='pause'){setPaused(!paused);return}
   if(t.dataset.act==='restart'){cur.init(S,P);setPaused(false);updateOuts();return}
   if(t.dataset.act==='reset'){cur.params.forEach(p=>P[p.id]=p.val);cur.init(S,P);syncControls();clearPresets();updateOuts();return}

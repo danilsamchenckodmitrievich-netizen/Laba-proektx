@@ -364,6 +364,9 @@ table.jtab td.jw{color:#B5531A}
 .mic{font-size:12px;font-weight:800;padding:3px 8px;border-radius:8px;background:var(--grid);color:var(--ink)}
 .tmatf select{font:inherit;font-weight:500;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;width:100%}.mkind{margin:6px 0 10px}.mkind button{background:var(--surf);color:var(--ink)}.mkind button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:#fff}
 .pgr .jg{margin:0 2px 2px 0}.plink{margin:4px 8px 0;text-align:right}.plink a{font-weight:700;color:var(--brand)}
+.mtask{padding:10px 0;border-top:1px solid var(--line)}.mtask p{margin:0 0 8px}.mtask.done>p:first-child{color:var(--muted)}
+.mtrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.mtin{display:flex;align-items:center;gap:6px}.mtin input{width:120px;font:inherit;font-weight:600;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:12px;padding:8px 10px}.mtin span{color:var(--muted);font-weight:600}
+.mtres{margin:8px 0 0!important;font-weight:600}.mtres.ok,.mtask.done .mtres{color:#367A55}.mtres.bad{color:#C4245F}
 .jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
@@ -2712,6 +2715,64 @@ function wCheckExtra(w,msgs){const out={};
       else{const ri=T.findIndex(x=>x.key!==null&&x.m);if(ri>=0){const k=p.k||1,v=rowM(w,ri)[p.col]*k;out.prec=`${p.sym} = ${String(+v.toFixed(2)).replace('.',',')} ± ${String(p.div/2).replace('.',',')} ${p.u}`}}}}
   return out}
 
+/* мини-задачи к моделям: «подберите параметры» (проверка по ползункам) и «посчитайте» (ответ по текущим значениям).
+   Подсказок нет: сайт отвечает только «верно» или «пока нет»; объяснение появляется после верного ответа. */
+const MRHO=id=>(MATS.find(m=>m[0]===id)||[])[2];
+const GASP=P=>P.N*(P.t+273)/(30+460*P.V/100-38)/(60*293/452)*100;
+const MTASKS={
+  states:[{q:'Растопите лёд, но не доводите воду до кипения.',ok:P=>P.t>=0&&P.t<100,why:'При 0 °C лёд тает: кристаллическая решётка разрушается, и молекулы начинают перемещаться, оставаясь близко друг к другу.'},
+    {q:'Превратите воду в пар.',ok:P=>P.t>=100,why:'При 100 °C (при нормальном давлении) вода кипит: молекулы движутся так быстро, что отрываются друг от друга и разлетаются.'}],
+  diffusion:[{q:'Сделайте так, чтобы диффузия шла как можно быстрее: выберите вещества и температуру не ниже 80 °C.',ok:P=>P.med==='g'&&P.t>=80,why:'Быстрее всего диффузия идёт в газах и при высокой температуре: молекулы далеко друг от друга и движутся быстро.'},
+    {q:'Покажите самую медленную диффузию: температура не выше 20 °C.',ok:P=>P.med==='l'&&P.t<=20,why:'В жидкостях молекулы расположены тесно, а при низкой температуре движутся медленно — поэтому диффузия идёт медленно.'}],
+  motion:[{q:'Сделайте скорость автомобиля ровно в 3 раза больше скорости велосипедиста.',ok:P=>P.v2===3*P.v1,why:'Тогда за одно и то же время автомобиль проезжает в 3 раза больший путь: s = v · t.'},
+    {q:'За сколько секунд автомобиль проедет 300 м при текущей скорости?',ans:P=>300/P.v2,u:'с',why:'t = s / v.'}],
+  density:[{q:'Какова масса тела при текущих веществе и объёме? Ответ — в граммах.',ans:P=>MRHO(P.mat)*P.V/1000,u:'г',why:'m = ρ · V. Плотность в кг/м³ делим на 1000, чтобы получить г/см³.'},
+    {q:'Подберите вещество и объём так, чтобы масса тела была 360 г.',ok:P=>Math.abs(MRHO(P.mat)*P.V/1000-360)<=3,why:'m = ρ · V: например, 900 см³ сосны или 400 см³ льда. Чем больше плотность, тем меньший объём нужен для той же массы.'}],
+  hooke:[{q:'Насколько растянута пружина при текущих параметрах? Ответ — в сантиметрах.',ans:P=>P.m*P.g/P.k*100,u:'см',why:'Δl = F / k = m · g / k; метры переводим в сантиметры.'},
+    {q:'На Земле (g = 9,8 Н/кг) подберите груз и жёсткость так, чтобы пружина растянулась на 9,8 см.',ok:P=>Math.abs(P.g-9.8)<.05&&Math.abs(P.m*P.g/P.k*100-9.8)<=.15,why:'Δl = m · g / k: например, 0,5 кг на пружине 50 Н/м или 1 кг на пружине 100 Н/м.'}],
+  friction:[{q:'Сдвиньте с места брусок массой 5 кг на асфальте.',ok:P=>P.surf==='asph'&&P.m>=5&&P.F>SURF.asph[1]*P.m*G,why:'Брусок сдвинется, когда сила тяги станет больше наибольшей силы трения покоя μ · m · g ≈ 0,75 · 5 · 9,8 ≈ 37 Н.'},
+    {q:'Подберите поверхность, на которой брусок 2 кг (или тяжелее) сдвигается силой не больше 1 Н.',ok:P=>P.m>=2&&P.F<=1&&P.F>SURF[P.surf][1]*P.m*G,why:'Чем меньше коэффициент трения (лёд, колёсики), тем меньшая сила нужна, чтобы сдвинуть тело.'}],
+  resultant:[{q:'Сделайте равнодействующую равной нулю так, чтобы обе силы не были нулевыми.',ok:P=>P.mode==='opp'&&P.F1===P.F2&&P.F1>0,why:'Равные противоположно направленные силы уравновешивают друг друга: тело ведёт себя так, будто сил нет.'},
+    {q:'Получите равнодействующую 700 Н.',ok:P=>P.mode==='same'&&P.F1+P.F2===700,why:'Силы, направленные в одну сторону, складываются: R = F₁ + F₂. Противоположные вычитаются и дают не больше 500 Н.'},
+    {q:'Чему равна равнодействующая сил сейчас? Ответ — в ньютонах.',ans:P=>P.mode==='same'?P.F1+P.F2:Math.abs(P.F1-P.F2),u:'Н',why:'В одну сторону: R = F₁ + F₂, в противоположные: R = |F₁ − F₂|.'}],
+  solidp:[{q:'Какое давление оказывает тело сейчас? Ответ — в килопаскалях (g = 9,8 Н/кг).',ans:P=>P.m*G/P.S/1000,u:'кПа',why:'p = F / S = m · g / S; паскали делим на 1000.'},
+    {q:'Для тела массой не меньше 50 кг получите давление не больше 1 кПа.',ok:P=>P.m>=50&&P.m*G/P.S<=1000.5,why:'p = F / S: чем больше площадь опоры, тем меньше давление — поэтому на лыжах не проваливаются в снег.'}],
+  gas:[{q:'Увеличьте давление газа хотя бы в 2 раза, не меняя температуру 20 °C.',ok:P=>P.t===20&&GASP(P)>=199.5,why:'Давление тем больше, чем чаще молекулы ударяются о стенки: больше молекул или меньше объём — больше ударов.'},
+    {q:'Сделайте давление больше 100 %, уменьшив число молекул меньше 60.',ok:P=>P.N<60&&GASP(P)>100.5,why:'При нагревании молекулы движутся быстрее и бьют по стенкам сильнее и чаще — давление растёт, даже если молекул стало меньше.'}],
+  liquid:[{q:'Какое давление жидкость оказывает на датчик сейчас? Ответ — в килопаскалях (g = 9,8 Н/кг).',ans:P=>+P.liq*G*Math.min(P.d,P.h)/1000,u:'кПа',why:'p = ρ · g · h, где h — глубина датчика под поверхностью жидкости.'},
+    {q:'Получите давление на датчик больше 100 кПа.',ok:P=>+P.liq*G*Math.min(P.d,P.h)>100000,why:'p = ρ · g · h: ртуть в 13,6 раза плотнее воды, поэтому уже на глубине 0,8 м давит сильнее 100 кПа.'}],
+  vessels:[{q:'На сколько сантиметров столб первой жидкости поднимается над границей жидкостей сейчас?',ans:P=>PAIRS[P.pair][3]*P.hB/PAIRS[P.pair][2],u:'см',why:'Давления столбов на уровне границы равны: ρ₁ · h₁ = ρ₂ · h₂, значит h₁ = ρ₂ · h₂ / ρ₁.'},
+    {q:'Подберите жидкости и высоту так, чтобы долитый столб был выше другого ровно на 2 см.',ok:P=>Math.abs(P.hB-PAIRS[P.pair][3]*P.hB/PAIRS[P.pair][2]-2)<.01,why:'Например, вода + масло: при h₂ = 20 см столб воды — 18 см. Чем меньше плотность долитой жидкости, тем выше её столб.'}],
+  atm:[{q:'Поднимитесь на высоту, где давление меньше 380 мм рт. ст. — вдвое ниже, чем у моря.',ok:P=>LABS.find(l=>l.id==='atm').mm(P.alt)<380,why:'С высотой воздух становится реже, и давление падает: примерно на 5,5 км оно вдвое меньше, чем у моря.'},
+    {q:'Какое давление на текущей высоте? Ответ — в мм рт. ст.',ans:P=>LABS.find(l=>l.id==='atm').mm(P.alt),u:'мм рт. ст.',why:'Значение показывает барометр; у моря — около 760 мм рт. ст.'}],
+  press:[{q:'Получите выигрыш в силе ровно в 50 раз.',ok:P=>P.S2===50*P.S1,why:'F₂ / F₁ = S₂ / S₁: выигрыш в силе равен отношению площадей поршней.'},
+    {q:'С какой силой давит большой поршень сейчас? Ответ — в ньютонах.',ans:P=>P.F1*P.S2/P.S1,u:'Н',why:'F₂ = F₁ · S₂ / S₁ — давление в жидкости передаётся одинаково во все стороны (закон Паскаля).'}],
+  archimedes:[{q:'Сделайте так, чтобы тело плавало, погрузившись ровно наполовину.',ok:P=>Math.abs(P.rho/P.rl-.5)<.005,why:'Плавающее тело погружено на долю, равную ρтела / ρжидкости. Половина — когда жидкость вдвое плотнее тела.'},
+    {q:'Какова выталкивающая сила, если тело погрузить полностью? Ответ — в ньютонах (g = 9,8 Н/кг).',ans:P=>P.rl*G*P.V/1000,u:'Н',why:'Fa = ρжидкости · g · V; объём в дм³ делим на 1000, чтобы получить м³.'}],
+  work:[{q:'Какую работу совершает подъёмник сейчас? Ответ — в килоджоулях (g = 9,8 Н/кг).',ans:P=>P.m*G*P.h/1000,u:'кДж',why:'A = F · s = m · g · h.'},
+    {q:'Получите мощность не меньше 1 кВт.',ok:P=>P.m*G*P.h/P.t>=1000,why:'N = A / t: чем больше работа и чем быстрее её совершают, тем больше мощность.'}],
+  lever:[{q:'Уравновесьте рычаг, повесив справа груз в 2 раза тяжелее, чем слева.',ok:P=>P.m2===2*P.m1&&Math.abs(P.m1*P.d1-P.m2*P.d2)<1e-6,why:'Правило моментов: m₁ · l₁ = m₂ · l₂. Вдвое больший груз уравновешивает на вдвое меньшем плече.'},
+    {q:'Уравновесьте груз 10 кг грузом 2 кг.',ok:P=>((P.m1===10&&P.m2===2)||(P.m1===2&&P.m2===10))&&Math.abs(P.m1*P.d1-P.m2*P.d2)<1e-6,why:'Плечо лёгкого груза должно быть в 5 раз длиннее: например, 0,4 м и 2 м.'}],
+  pulleys:[{q:'Поднимите груз 30 кг, прикладывая силу меньше 150 Н.',ok:P=>P.mode==='mov'&&P.m>=30&&P.m*G/2<150,why:'Подвижный блок даёт выигрыш в силе в 2 раза: F = m · g / 2 ≈ 147 Н.'},
+    {q:'Какую силу нужно приложить сейчас? Ответ — в ньютонах (g = 9,8 Н/кг).',ans:P=>P.m*G/(P.mode==='mov'?2:1),u:'Н',why:'Неподвижный блок меняет только направление силы: F = m · g; подвижный — выигрыш в силе в 2 раза.'}],
+  incline:[{q:'Получите КПД наклонной плоскости больше 80 %.',ok:P=>{const a=P.ang*Math.PI/180;return Math.sin(a)/(Math.sin(a)+P.mu*Math.cos(a))>.8},why:'η = Aп / Aз: чем меньше трение и чем круче плоскость, тем меньше работы уходит на трение и тем выше КПД.'},
+    {q:'Чему равен КПД сейчас? Ответ — в процентах.',ans:P=>{const a=P.ang*Math.PI/180;return Math.sin(a)/(Math.sin(a)+P.mu*Math.cos(a))*100},u:'%',why:'η = Aп / Aз · 100 % = m · g · h / (F · l) · 100 %.'}],
+  energy:[{q:'Какова потенциальная энергия мяча в начале? Ответ — в джоулях (g = 9,8 Н/кг).',ans:P=>P.m*G*P.h,u:'Дж',why:'Eп = m · g · h.'},
+    {q:'Сделайте так, чтобы после первого удара мяч подскочил ровно на половину начальной высоты.',ok:P=>P.loss===50,why:'После удара остаётся (100 − потери) % энергии, а высота подскока пропорциональна энергии: потери 50 % — подскок вдвое ниже.'}]};
+let MSOLVED=new Set();try{MSOLVED=new Set(JSON.parse(localStorage.getItem('lab-sirius-mtasks')||'[]'))}catch(_){}
+function mtHTML(l){const ts=MTASKS[l.id];if(!ts)return'';
+  return`<div class="note f mtasks" id="mtasks"><b>Задачи · решено ${ts.filter((t,i)=>MSOLVED.has(l.id+':'+i)).length} из ${ts.length}</b><p class="tmsg">Подберите параметры или посчитайте и нажмите «Проверить». Подсказок нет — пробуйте, пока не получится.</p>
+    ${ts.map((t,i)=>{const sv=MSOLVED.has(l.id+':'+i);return`<div class="mtask${sv?' done':''}" data-i="${i}"><p><b>${i+1}.</b> ${t.q}</p>
+      <div class="mtrow">${t.ans?`<label class="mtin"><input inputmode="decimal" id="mta${i}" aria-label="Ответ на задачу ${i+1}" placeholder="Ответ"><span>${t.u}</span></label>`:''}<button class="btn" data-act="mt" data-i="${i}">Проверить</button></div>
+      <p class="mtres" id="mtr${i}" role="status">${sv?`✓ Решено. ${t.why}`:''}</p></div>`}).join('')}</div>`}
+function mtCheck(i){const l=cur,t=MTASKS[l.id][i],r=$('#mtr'+i);let ok;
+  if(t.ans){const v=num(($('#mta'+i)||{}).value||''),e=t.ans(P,S);if(isNaN(v)){r.className='mtres';r.textContent='Впишите ответ числом.';return}
+    ok=Math.abs(v-e)<=Math.max(Math.abs(e)*.03,.05)}else ok=!!t.ok(P,S);
+  r.className='mtres '+(ok?'ok':'bad');
+  if(ok){MSOLVED.add(l.id+':'+i);try{localStorage.setItem('lab-sirius-mtasks',JSON.stringify([...MSOLVED]))}catch(_){}
+    r.textContent=`✓ Верно! ${t.ans?'Ответ: '+f1(t.ans(P,S),2).replace(/[,.]?0+$/,'')+' '+t.u+'. ':''}${t.why}`;r.closest('.mtask').classList.add('done');
+    const h=$('#mtasks>b');if(h){const ts=MTASKS[l.id];h.textContent=`Задачи · решено ${ts.filter((x,j)=>MSOLVED.has(l.id+':'+j)).length} из ${ts.length}`}}
+  else r.textContent=t.ans?'Пока неверно — пересчитайте.':'Пока не получилось — измените параметры и проверьте ещё раз.'}
 /* ===================== APP ===================== */
 const app=$('#app');
 let visited=new Set();
@@ -2962,6 +3023,7 @@ function openLab(id){
     <div class="note"><b>Явление.</b> ${l.def}</div>
     <div class="note f"><b>${l.fhead||'Формулы'}</b>${l.formulas.map(f=>`<div class="fm${l.fhead?' t':''}">${f}</div>`).join('')}</div>
     <div class="note f"><b>Попробуйте сами</b><ol>${l.tryit.map(t=>`<li>${t}</li>`).join('')}</ol></div>
+    ${mtHTML(l)}
     <a class="nextlab" href="#lab/${nx.id}" style="--c:${nx.color}"><span><small>Следующее явление</small><b>${nx.title}</b></span>${ICON.next}</a>
   </main></div>`;
   cv=$('#cv');g=cv.getContext('2d');LIGHT=null;readColors();sizeCanvas();
@@ -3258,6 +3320,7 @@ app.addEventListener('click',e=>{
     else if(a==='rowclr')wClearRow(+t.dataset.r);
     else if(t.dataset.wact!==undefined){cur.actions[+t.dataset.wact][1](S);updateOuts()}
     return}
+  if(t.dataset.act==='mt'){mtCheck(+t.dataset.i);return}
   if(t.dataset.act==='pause'){setPaused(!paused);return}
   if(t.dataset.act==='restart'){cur.init(S,P);setPaused(false);updateOuts();return}
   if(t.dataset.act==='reset'){cur.params.forEach(p=>P[p.id]=p.val);cur.init(S,P);syncControls();clearPresets();updateOuts();return}
