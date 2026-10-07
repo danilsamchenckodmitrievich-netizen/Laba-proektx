@@ -367,6 +367,9 @@ table.jtab td.jw{color:#B5531A}
 .mtask{padding:10px 0;border-top:1px solid var(--line)}.mtask p{margin:0 0 8px}.mtask.done>p:first-child{color:var(--muted)}
 .mtrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.mtin{display:flex;align-items:center;gap:6px}.mtin input{width:120px;font:inherit;font-weight:600;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:12px;padding:8px 10px}.mtin span{color:var(--muted);font-weight:600}
 .mtres{margin:8px 0 0!important;font-weight:600}.mtres.ok,.mtask.done .mtres{color:#367A55}.mtres.bad{color:#C4245F}
+.snotice{border:2px solid var(--brand);margin:12px 8px}.snotice p{margin:6px 0 4px;font-size:17px;font-weight:600}.snotice small{color:var(--muted)}
+#tntext{width:100%;font:inherit;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;resize:vertical}
+.tsum td,.tsum th{text-align:center}.tsum td:first-child,.tsum th:first-child{text-align:left}
 .jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
@@ -3437,7 +3440,7 @@ function worksGated(){
   app.innerHTML=`<div class="view">`+header()+accBar()+`
   <section class="hero"><h1>Лабораторные работы</h1><p>${st&&asg.length?'Сверху — работы, которые задал учитель: их результаты уйдут в журнал. Остальные можно делать для тренировки.':'Берите приборы руками: взвешивайте, погружайте, подвешивайте грузы. Записывайте измерения в таблицу, считайте и делайте вывод.'}</p></section>
   ${open?`<div class="progress"><span>Выполнено ${done} из ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div><p class="plink"><a href="#progress">Мои оценки и прогресс →</a></p>`:''}
-  ${st?`<div id="stests"></div><div id="smats">${stMatsHTML()}</div>`:''}
+  ${st?`<div id="smats">${stMatsHTML()}</div><div id="stests"></div>`:''}
   <div class="cards" id="cards">${list.map(([w,ac])=>{const dl=wDeadline(w.id),dn=isDone(w.id);return`
     <a class="card ${dn?'seen':''}" style="--c:${w.color}" href="#work/${w.id}">
       <div class="pb"><i></i></div>
@@ -3565,7 +3568,7 @@ function tcDemoHTML(){const d=TC.demo&&Date.parse(TC.demo.expires)>srvNow()?TC.d
     (d?`<div class="bigcode"><code>${d.code}</code><span>действует до ${fmtT(d.expires)}</span><button class="btn" data-k="copy" data-v="${d.code}">Копировать</button><button class="btn" data-k="demostop">Остановить</button></div>`
       :`<div class="trow"><select id="tdmin" aria-label="Сколько действует демо-код"><option value="15">15 минут</option><option value="30">30 минут</option><option value="45" selected>45 минут</option><option value="90">90 минут</option></select><button class="btn main" data-k="demo">Создать демо-код</button></div>`)}
 async function tcClass(){const r=await tcCall('t_class',{p_class:TC.cls});if(!r)return;TC.cd=r;TC.jr={since:0,res:[],students:r.students,works:r.works};
-  TC.mats=null;tcClassRender();await tcPoll(true);await tcCTests();await tcMatLoad()}
+  TC.mats=null;TC.ex=null;tcClassRender();await tcPoll(true);await tcCTests();await tcMatLoad();await tcExtra()}
 function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=TC.cd,ws=c.works;
   box.innerHTML=`<div class="note f tclass"><div class="tchead"><b>${esc(c.class.name)}</b><span class="tbtns"><button class="btn" data-k="ren">Переименовать</button><button class="btn" data-k="delcls">Удалить класс</button></span></div>
     <h3>Задания для класса</h3><p class="tmsg">Отметьте работы, которые задаёте классу: результаты по ним придут в журнал. Срок сдачи можно не ставить. Все работы и модели открыты всем и без входа — остальные ученики могут делать для тренировки.</p>
@@ -3575,11 +3578,41 @@ function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=
     <div id="tcct">${TC.ct?tcCTHTML():'<p class="gempty">Загружаем…</p>'}</div>
     <h3>Учебные материалы</h3><p class="tmsg">Прикрепите презентацию, PDF, документ, картинку, видео или ссылку — ко всему классу, к работе или к тесту. Ученики увидят материалы после входа по коду.</p>
     <div id="tcmat">${tcMatHTML()}</div>
+    <h3>Объявление для класса</h3><div id="tcnote">${tcNoteHTML()}</div>
     <h3>Ученики</h3>
     <p class="tmsg">Впишите учеников — каждого с новой строки. Хватит имени и первой буквы фамилии: полные фамилии сайту не нужны. Каждый получит личный код для входа.</p>
     <form data-form="tadd"><textarea id="tnames" rows="3" placeholder="Анна К.&#10;Пётр С." aria-label="Имена учеников"></textarea><div class="tools"><button class="btn main" type="submit">Добавить учеников</button></div></form>
     <div id="tcstud">${tcStudHTML()}</div>
-    <h3>Журнал результатов</h3><div id="tcj">${tcJHTML()}</div></div>`}
+    <h3>Журнал результатов</h3><div id="tcj">${tcJHTML()}</div>
+    <h3>Итоговая ведомость</h3><div id="tcsum">${tcSumHTML()}</div></div>`}
+/* объявление классу и итоговая ведомость */
+async function tcExtra(){const cls=TC.cls,r=await tcCall('t_class_extra',{p_class:cls});if(!r||cls!==TC.cls)return;TC.ex=r;
+  const n=$('#tcnote');if(n)n.innerHTML=tcNoteHTML();tcSumRender()}
+function tcNoteHTML(){const ex=TC.ex;if(!ex)return'<p class="gempty">Загружаем…</p>';
+  return`<form class="note f tline" data-form="tnotice"><p class="tmsg">Короткое сообщение ученикам — например, «до пятницы сдать работу № 3». Ученики увидят его на странице работ после входа по коду.</p>
+    <textarea id="tntext" rows="3" maxlength="1000" placeholder="Текст объявления" aria-label="Текст объявления">${esc(ex.notice||'')}</textarea>
+    <div class="tools"><button class="btn main" type="submit">${ex.notice?'Обновить объявление':'Опубликовать'}</button>${ex.notice?'<button class="btn" type="button" data-k="ntclear">Убрать объявление</button>':''}</div>
+    ${ex.notice?`<small class="thint">Опубликовано ${fmtDT(ex.notice_at)}.</small>`:''}</form>`}
+function tcSumRender(){const b=$('#tcsum');if(b)b.innerHTML=tcSumHTML()}
+function tcSumData(){const jr=TC.jr,ex=TC.ex;if(!jr||!ex)return null;const by=jrLatest(),ws=WORKS.filter(w=>jr.works.some(x=>x.work===w.id)),ts=ex.tests;
+  const rows=jr.students.map(s=>{const wc=ws.map(w=>{const r=by[s.id+'|'+w.id];return r?(r.data&&r.data.g?+r.data.g:'✓'):''}),
+    tc=ts.map(t=>{const a=t.attempts.find(x=>x.student===s.id);return a?(a.done&&a.score!==null?decRu(+a.score)+' / '+a.max:'идёт'):''}),
+    gs=wc.filter(x=>typeof x==='number');return{name:s.name,wc,tc,avg:gs.length?decRu(Math.round(gs.reduce((x,y)=>x+y,0)/gs.length*10)/10):'',n:wc.filter(Boolean).length}});
+  return{ws,ts,rows}}
+function tcSumHTML(){const d=tcSumData();if(!d)return'<p class="gempty">Загружаем…</p>';
+  if(!d.rows.length)return'<p class="gempty">Учеников пока нет.</p>';if(!d.ws.length&&!d.ts.length)return'<p class="gempty">Откройте классу работы или тесты — здесь появится сводная таблица оценок.</p>';
+  return`<p class="tmsg">Последняя оценка по каждой заданной работе, баллы за тесты и средняя оценка за работы.</p><div class="tblwrap"><table class="res jtab tsum"><thead><tr><th>Ученик</th>${d.ws.map(w=>`<th title="${esc(w.title)}">№ ${w.num}</th>`).join('')}${d.ts.map(t=>`<th>${esc(t.title)}</th>`).join('')}<th>Средняя</th></tr></thead>
+    <tbody>${d.rows.map(r=>`<tr><td>${esc(r.name)}</td>${r.wc.map(x=>`<td>${typeof x==='number'?`<span class="jg g${x}">${x}</span>`:x||'<span class="jn">—</span>'}</td>`).join('')}${r.tc.map(x=>`<td>${x||'<span class="jn">—</span>'}</td>`).join('')}<td><b>${r.avg||'—'}</b></td></tr>`).join('')}</tbody></table></div>
+    <div class="tools"><button class="btn" data-k="sumcsv">${ICON.dl}Скачать для Excel</button><button class="btn" data-k="sumprint">${ICON.doc}Распечатать</button></div>`}
+function tcSumCSV(){const d=tcSumData();if(!d)return;const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const lines=[['Ученик',...d.ws.map(w=>'№ '+w.num+'. '+w.title),...d.ts.map(t=>'Тест: '+t.title),'Средняя оценка','Сдано работ'].map(q).join(';'),...d.rows.map(r=>[r.name,...r.wc,...r.tc,r.avg,r.n].map(q).join(';'))];
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='vedomost-'+(TC.cd?TC.cd.class.name:'klass').replace(/[^\wА-Яа-яЁё-]+/g,'_')+'.csv';
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function tcSumPrint(){const d=tcSumData();if(!d)return;let el=$('#print');if(!el){el=document.createElement('div');el.id='print';document.body.appendChild(el)}
+  el.innerHTML=`<h1>Итоговая ведомость</h1><h2>Класс ${esc(TC.cd?TC.cd.class.name:'')}</h2><p><b>Учитель:</b> ${esc(TC.me?TC.me.name:'')}&nbsp;&nbsp; <b>Дата:</b> ${new Date().toLocaleDateString(LOC)}</p>
+    <table><tr><th>Ученик</th>${d.ws.map(w=>`<th>№ ${w.num}</th>`).join('')}${d.ts.map(t=>`<th>${esc(t.title)}</th>`).join('')}<th>Средняя</th></tr>${d.rows.map(r=>`<tr><td>${esc(r.name)}</td>${r.wc.map(x=>`<td>${x||'—'}</td>`).join('')}${r.tc.map(x=>`<td>${x||'—'}</td>`).join('')}<td>${r.avg||'—'}</td></tr>`).join('')}</table>
+    <p>${d.ws.map(w=>`№ ${w.num} — ${w.title}`).join('; ')}.</p><p class="pf">Лаборатория Сириус · ${esc(location.href.split('#')[0])}</p>`;
+  document.body.classList.add('printing');const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);setTimeout(()=>window.print(),60)}
 function tcStudHTML(){const ss=TC.jr?TC.jr.students:TC.cd.students,codes=Object.fromEntries(TC.cd.students.map(s=>[s.id,s.code]));
   if(!ss.length)return'<p class="gempty">Учеников пока нет — добавьте их выше.</p>';
   return`<div class="tblwrap"><table class="res tst"><thead><tr><th>Ученик</th><th>Код для входа</th><th>Вход</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${ss.map(s=>`<tr><td>${esc(s.name)}</td><td><code class="scode">${codes[s.id]||''}</code></td>
@@ -3665,7 +3698,7 @@ async function tcPoll(force){if(location.hash!=='#teacher'||!ACC||ACC.kind!=='t'
   const st=$('#tcstud');if(st&&JSON.stringify([jr.students,jr.works])!==before&&!st.contains(document.activeElement))st.innerHTML=tcStudHTML();
   const c=TC.classes.find(x=>x.id===cls);if(c){c.students=jr.students.length;c.joined=jr.students.filter(s=>s.joined).length;const n=$(`.tcls [data-id="${cls}"] .n`);if(n)n.textContent=c.joined+'/'+c.students}
   const j=$('#tcj');if(!j)return;
-  if(force||r.results.length||JSON.stringify([jr.students,jr.works])!==before){if(force||!j.contains(document.activeElement))j.innerHTML=tcJHTML()}
+  if(force||r.results.length||JSON.stringify([jr.students,jr.works])!==before){if(force||!j.contains(document.activeElement))j.innerHTML=tcJHTML();tcSumRender()}
   else{const t=j.querySelector('.jtime');if(t)t.textContent='обновлено в '+new Date(jr.at).toLocaleTimeString(LOC)}}
 async function tcWork(id){const box=$(`.twrow input[data-wk="${id}"]`),dl=$(`.twrow input[data-wd="${id}"]`);if(!box||!dl)return;
   const open=box.checked,dv=open&&dl.value?new Date(dl.value):null;
@@ -3763,6 +3796,8 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='tfinish'){testFinish(false);return}
   if(!ACC||ACC.kind!=='t')return;
   if(['qadd','qdel','qup','qdown','oadd','odel','vadd','vdel','tsave','tcancel'].includes(k)){teAct(k,t);return}
+  if(k==='tlib'){TC.lib=!TC.lib;const b=$('#tcte');if(b&&!TE)b.innerHTML=tcTLHTML();return}
+  if(k==='tlibuse'){const L=TLIB[+id];TE={id:null,used:false,title:L.title,minutes:L.minutes,pick:'',qs:L.qs.map(qFromSrv)};TC.lib=false;teRender();$('#tcte').scrollIntoView({behavior:'smooth',block:'start'});toast('Тест открыт в конструкторе — проверьте и сохраните');return}
   if(k==='tnew'){TE={id:null,used:false,title:'',minutes:15,pick:'',qs:[qBlank('one')]};teRender();$('#tcte').scrollIntoView({behavior:'smooth',block:'start'});return}
   if(k==='tedit'){tcTestOpen(id,false);return}
   if(k==='tcopy'){tcTestOpen(id,true);return}
@@ -3792,6 +3827,9 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='tkill'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!tt||!confirm(`Удалить аккаунт учителя ${tt.name} (${tt.email})?\n\nВместе с ним удалятся классы (${tt.classes}), ученики (${tt.students}), их результаты и тесты. Восстановить их будет нельзя.`))return;
     if(await tcCall('a_teacher_delete',{p_teacher:id})){toast('Аккаунт учителя удалён');TC.newPw=null;if(TC.view&&TC.view.id===id)TC.view=null;await tcAdmin()}return}
   if(k==='tview'){tcView(id);return}
+  if(k==='sumcsv'){tcSumCSV();return}
+  if(k==='sumprint'){tcSumPrint();return}
+  if(k==='ntclear'){if(!confirm('Убрать объявление? Ученики перестанут его видеть.'))return;const r=await tcCall('t_notice_set',{p_class:TC.cls,p_text:''});if(r){TC.ex.notice='';TC.ex.notice_at=null;$('#tcnote').innerHTML=tcNoteHTML();toast('Объявление убрано')}return}
   if(k==='mkind'){TC.mk=t.dataset.v;const b=$('#tcmat');if(b)b.innerHTML=tcMatHTML();return}
   if(k==='mdel'){const m=TC.mats&&TC.mats.mats.find(x=>x.id===id);if(!m||!confirm(`Удалить материал «${m.title}»? Ученики перестанут его видеть.`))return;
     const r=await tcCall('t_mat_delete',{p_id:id});if(r){mGone(r.path);toast('Материал удалён');await tcMatLoad()}return}
@@ -3811,6 +3849,7 @@ async function formAct(kind,f){
     catch(_){er.textContent=errText('net')}return}
   if(!ACC||ACC.kind!=='t')return;
   if(kind==='tmat'){await tcMatAdd();return}
+  if(kind==='tnotice'){const v=$('#tntext').value.trim();if(!v){$('#tntext').focus();return}const r=await tcCall('t_notice_set',{p_class:TC.cls,p_text:v});if(r){TC.ex.notice=r.notice;TC.ex.notice_at=r.notice_at;$('#tcnote').innerHTML=tcNoteHTML();toast('Объявление опубликовано')}return}
   if(kind==='tdelme'){if(!confirm('Удалить ваш аккаунт навсегда? Классы, ученики, результаты и тесты тоже будут удалены.'))return;
     const r=await tcCall('t_delete_me',{p_pass:$('#tdp').value});if(r){tcOut();toast('Аккаунт удалён')}return}
   if(kind==='tpass'){const r=await tcCall('t_password',{p_old:$('#tpo').value,p_new:$('#tpn').value});if(r){f.hidden=true;f.reset();toast('Пароль изменён')}return}
@@ -3829,10 +3868,11 @@ const QK=[['one','Один ответ'],['many','Несколько ответо
 const decRu=v=>LANG.code==='ru'?String(v).replace(/(\d)\.(\d)/g,'$1,$2'):String(v);
 const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 /* ученик: список тестов на странице работ */
-function stMatsHTML(){const ms=ACC&&ACC.kind==='s'&&ACC.mats||[];if(!ms.length)return'';
-  return`<h2 class="th2 stth">Материалы от учителя</h2><div class="note f smats">${mGroups(ms,null,false)}</div>`}
+function stMatsHTML(){const st=ACC&&ACC.kind==='s',ms=st&&ACC.mats||[],nt=st&&ACC.notice;
+  return(nt?`<div class="note snotice" role="status"><b>Объявление учителя</b><p>${esc(nt).replace(/\n/g,'<br>')}</p>${ACC.notice_at?`<small>${fmtDT(ACC.notice_at)}</small>`:''}</div>`:'')
+    +(ms.length?`<h2 class="th2 stth">Материалы от учителя</h2><div class="note f smats">${mGroups(ms,null,false)}</div>`:'')}
 async function stMatsLoad(){if(!ACC||ACC.kind!=='s'||SRV!=='on')return;let r;try{r=await rpc('s_materials',{p_token:ACC.token})}catch(_){return}
-  if(!r||r.err||!ACC)return;const ch=JSON.stringify(r.mats)!==JSON.stringify(ACC.mats||[]);ACC.mats=r.mats;saveAcc();
+  if(!r||r.err||!ACC)return;const ch=JSON.stringify([r.mats,r.notice||''])!==JSON.stringify([ACC.mats||[],ACC.notice||'']);ACC.mats=r.mats;ACC.notice=r.notice||'';ACC.notice_at=r.notice_at||null;saveAcc();
   if(ch){const b=$('#smats');if(b)b.innerHTML=stMatsHTML();const w=$('#wmats');if(w&&cur)w.outerHTML=wMatsHTML(cur.id)}}
 function wMatsHTML(id){const ms=(ACC&&ACC.kind==='s'&&ACC.mats||[]).filter(m=>m.target==='work:'+id);
   return`<div id="wmats">${ms.length?`<div class="note f smats"><b>Материалы от учителя к этой работе</b><ul class="mlist">${ms.map(m=>mItem(m,false)).join('')}</ul></div>`:''}</div>`}
@@ -3922,7 +3962,67 @@ function tcTLHTML(){const ts=TC.tests||[];
   return`<p class="tmsg">Соберите тест из вопросов четырёх видов: один ответ, несколько ответов, число (можно со своими числами у каждого ученика) и короткий ответ. Правильные ответы хранятся только на сервере — ученик их не увидит. Каждому ученику можно показывать не все вопросы, а случайные, и в своём порядке.</p>
     ${ts.length?`<div class="twork">${ts.map(t=>`<div class="twrow"><span class="twk"><span>${esc(t.title)}<small class="db">${pl3(t.n,'вопрос','вопроса','вопросов')}${t.pick?', каждому — '+t.pick:''} · ${t.minutes} мин${t.used?' · уже проходили':''}</small></span></span>
       <span class="tact"><button class="mini" data-k="tedit" data-id="${t.id}">Изменить</button><button class="mini" data-k="tcopy" data-id="${t.id}">Копия</button><button class="mini del" data-k="tdel" data-id="${t.id}">Удалить</button></span></div>`).join('')}</div>`:''}
-    <div class="tools"><button class="btn main" data-k="tnew">+ Новый тест</button></div>`}
+    <div class="tools"><button class="btn main" data-k="tnew">+ Новый тест</button><button class="btn" data-k="tlib" aria-expanded="${!!TC.lib}">Готовые тесты по темам</button></div>
+    ${TC.lib?`<div class="note f tlib"><b>Готовые тесты по физике 7 класса</b><p class="tmsg">Возьмите тест — он откроется в конструкторе: можно поправить вопросы и время, затем сохранить как свой.</p>
+      <div class="twork">${TLIB.map((t,i)=>`<div class="twrow"><span class="twk"><span>${esc(t.title)}<small class="db">${pl3(t.qs.length,'вопрос','вопроса','вопросов')} · ${t.minutes} мин${t.qs.some(q=>q.v)?' · свои числа у каждого ученика':''}</small></span></span><span class="tact"><button class="mini" data-k="tlibuse" data-id="${i}">Взять</button></span></div>`).join('')}</div></div>`:''}`}
+/* готовые тесты по темам 7 класса: учитель берёт тест, при желании правит и сохраняет как свой */
+const TLIB=[
+ {title:'Строение вещества',minutes:10,qs:[
+  {k:'one',t:'Из чего состоят все вещества?',o:['Из молекул (атомов)','Из сплошного материала без промежутков','Из капель','Из света'],a:0},
+  {k:'one',t:'Что такое диффузия?',o:['Взаимное проникновение молекул одного вещества между молекулами другого','Превращение жидкости в пар','Расширение тел при нагревании','Притяжение тел к Земле'],a:0},
+  {k:'one',t:'Где диффузия идёт быстрее всего при одинаковой температуре?',o:['В газах','В жидкостях','В твёрдых телах','Везде одинаково'],a:0},
+  {k:'many',t:'Отметьте верные утверждения о молекулах.',o:['Молекулы непрерывно и беспорядочно движутся','Между молекулами есть промежутки','Молекулы притягиваются и отталкиваются','Молекулы одного вещества различны'],a:[0,1,2]},
+  {k:'one',t:'Как меняется скорость движения молекул при нагревании?',o:['Увеличивается','Уменьшается','Не меняется','Молекулы останавливаются'],a:0},
+  {k:'text',t:'В каком состоянии вещество сохраняет и форму, и объём? Ответ — одно слово.',a:['твёрдом','твердом','твёрдое','твердое']}]},
+ {title:'Механическое движение и скорость',minutes:15,qs:[
+  {k:'one',t:'Что такое траектория?',o:['Линия, по которой движется тело','Расстояние между начальной и конечной точками','Время движения','Скорость тела'],a:0},
+  {k:'one',t:'В каких единицах в СИ измеряют скорость?',o:['м/с','км/ч','м','с'],a:0},
+  {k:'num',t:'Велосипедист проехал {s} м за {t} с. Найдите его скорость в м/с.',v:{s:[60,300,20],t:[10,30,5]},a:'s/t',tol:2},
+  {k:'num',t:'Сколько метров в секунду составляет скорость 72 км/ч?',a:20,tol:0},
+  {k:'num',t:'Автомобиль движется со скоростью {v} м/с. Какой путь (в метрах) он пройдёт за {t} с?',v:{v:[10,30,1],t:[5,20,1]},a:'v*t',tol:1},
+  {k:'one',t:'Движение, при котором тело за любые равные промежутки времени проходит равные пути, называется…',o:['равномерным','неравномерным','колебательным','вращательным'],a:0}]},
+ {title:'Плотность вещества',minutes:15,qs:[
+  {k:'one',t:'Как найти плотность вещества?',o:['Разделить массу на объём','Умножить массу на объём','Разделить объём на массу','Сложить массу и объём'],a:0},
+  {k:'one',t:'В каких единицах в СИ измеряют плотность?',o:['кг/м³','г/см³','кг','м³'],a:0},
+  {k:'num',t:'Масса бруска {m} г, его объём {v} см³. Найдите плотность в г/см³.',v:{m:[54,270,27],v:[20,100,10]},a:'m/v',tol:2},
+  {k:'num',t:'Плотность алюминия 2,7 г/см³. Какова масса (в граммах) алюминиевой детали объёмом {v} см³?',v:{v:[10,200,10]},a:'2.7*v',tol:2},
+  {k:'one',t:'Два кубика одинакового объёма: стальной и алюминиевый. Масса какого больше?',o:['Стального','Алюминиевого','Одинаковая','Нельзя сказать'],a:0},
+  {k:'num',t:'Сколько кг/м³ составляет плотность 1 г/см³?',a:1000,tol:0}]},
+ {title:'Силы: тяжести, упругости, трения',minutes:15,qs:[
+  {k:'num',t:'Найдите силу тяжести (в ньютонах), действующую на тело массой {m} кг. Считайте g = 10 Н/кг.',v:{m:[2,50,1]},a:'m*10',tol:1},
+  {k:'one',t:'Как называется прибор для измерения силы?',o:['Динамометр','Барометр','Манометр','Мензурка'],a:0},
+  {k:'num',t:'Пружина жёсткостью {k} Н/м растянулась на {x} м. Какова сила упругости в ньютонах?',v:{k:[20,200,10],x:[0.02,0.2,0.02]},a:'k*x',tol:2},
+  {k:'one',t:'Как уменьшить силу трения?',o:['Использовать смазку или колёса','Увеличить шероховатость поверхностей','Увеличить массу тела','Прижать тело сильнее'],a:0},
+  {k:'many',t:'Отметьте силы, которые измеряют в ньютонах.',o:['Сила тяжести','Сила упругости','Вес тела','Масса тела'],a:[0,1,2]},
+  {k:'one',t:'Две силы 30 Н и 50 Н направлены в одну сторону вдоль прямой. Чему равна равнодействующая?',o:['80 Н','20 Н','50 Н','1500 Н'],a:0}]},
+ {title:'Давление твёрдых тел, жидкостей и газов',minutes:15,qs:[
+  {k:'one',t:'Как найти давление твёрдого тела на опору?',o:['Разделить силу на площадь','Умножить силу на площадь','Разделить площадь на силу','Сложить силу и площадь'],a:0},
+  {k:'num',t:'Ящик весом {f} Н стоит на площади {s} м². Найдите давление в паскалях.',v:{f:[200,1000,50],s:[0.1,0.5,0.1]},a:'f/s',tol:2},
+  {k:'num',t:'Найдите давление воды (в паскалях) на глубине {h} м. Плотность воды 1000 кг/м³, g = 10 Н/кг.',v:{h:[1,10,1]},a:'1000*10*h',tol:1},
+  {k:'one',t:'Почему у трактора широкие гусеницы?',o:['Чтобы уменьшить давление на почву','Чтобы увеличить давление на почву','Чтобы увеличить массу','Для красоты'],a:0},
+  {k:'one',t:'Как меняется атмосферное давление с высотой?',o:['Уменьшается','Увеличивается','Не меняется','Сначала растёт, потом падает'],a:0},
+  {k:'text',t:'Как называется закон: давление в жидкости или газе передаётся одинаково во всех направлениях? Ответ — фамилия учёного.',a:['Паскаля','Паскаль','закон Паскаля']}]},
+ {title:'Архимедова сила и плавание тел',minutes:15,qs:[
+  {k:'one',t:'От чего зависит выталкивающая (архимедова) сила?',o:['От плотности жидкости и объёма погружённой части тела','От массы тела','От формы тела','От глубины погружения'],a:0},
+  {k:'num',t:'Тело объёмом {v} м³ полностью погружено в воду (1000 кг/м³). Найдите архимедову силу в ньютонах (g = 10 Н/кг).',v:{v:[0.001,0.01,0.001]},a:'1000*10*v',tol:2},
+  {k:'one',t:'Тело тонет, если…',o:['сила тяжести больше архимедовой силы','архимедова сила больше силы тяжести','силы равны','тело полое'],a:0},
+  {k:'one',t:'Почему стальной корабль плавает?',o:['Средняя плотность корабля с воздухом внутри меньше плотности воды','Сталь легче воды','Вода толкает его вверх сильнее, чем любой камень','Корабль покрашен'],a:0},
+  {k:'one',t:'Брусок плотностью 600 кг/м³ положили в воду. Какая часть его объёма погрузится?',o:['0,6','0,4','Весь брусок','Половина'],a:0},
+  {k:'many',t:'Какие тела будут плавать в воде?',o:['Пробка (240 кг/м³)','Лёд (900 кг/м³)','Алюминий (2700 кг/м³)','Свинец (11 300 кг/м³)'],a:[0,1]}]},
+ {title:'Работа, мощность, энергия',minutes:15,qs:[
+  {k:'num',t:'Груз подняли силой {f} Н на высоту {h} м. Какую работу (в джоулях) совершили?',v:{f:[50,500,50],h:[1,10,1]},a:'f*h',tol:1},
+  {k:'num',t:'Мотор совершил работу {a} Дж за {t} с. Найдите мощность в ваттах.',v:{a:[1000,10000,500],t:[5,50,5]},a:'a/t',tol:2},
+  {k:'one',t:'В каких единицах измеряют мощность?',o:['Вт','Дж','Н','Па'],a:0},
+  {k:'one',t:'Какой энергией обладает поднятый над землёй камень?',o:['Потенциальной','Кинетической','Никакой','Тепловой'],a:0},
+  {k:'num',t:'Найдите потенциальную энергию (в джоулях) тела массой {m} кг на высоте {h} м (g = 10 Н/кг).',v:{m:[1,20,1],h:[1,10,1]},a:'m*10*h',tol:1},
+  {k:'one',t:'Совершается ли механическая работа, если человек держит тяжёлую сумку, стоя на месте?',o:['Нет: тело не перемещается','Да: человек прикладывает силу','Да, но отрицательная','Только если сумка тяжелее 10 кг'],a:0}]},
+ {title:'Простые механизмы и КПД',minutes:15,qs:[
+  {k:'one',t:'Сформулируйте правило равновесия рычага.',o:['Силы обратно пропорциональны их плечам','Силы прямо пропорциональны плечам','Силы всегда равны','Плечи всегда равны'],a:0},
+  {k:'num',t:'На рычаг действуют силы: {f} Н на плече 0,2 м. На каком плече (в метрах) уравновесит её сила 20 Н?',v:{f:[40,200,20]},a:'f*0.2/20',tol:2},
+  {k:'one',t:'Какой выигрыш в силе даёт подвижный блок?',o:['В 2 раза','Не даёт','В 4 раза','Зависит от массы груза'],a:0},
+  {k:'one',t:'«Золотое правило» механики: во сколько раз выигрываем в силе, во столько же раз…',o:['проигрываем в расстоянии','выигрываем в расстоянии','выигрываем в работе','проигрываем в массе'],a:0},
+  {k:'num',t:'Полезная работа {p} Дж, затраченная — {z} Дж. Найдите КПД в процентах.',v:{p:[200,600,50],z:[700,1000,50]},a:'p/z*100',tol:2},
+  {k:'one',t:'Может ли КПД механизма быть больше 100 %?',o:['Нет','Да, у хороших механизмов','Да, у рычага','Да, если нет трения'],a:0}]}];
 const qBlank=k=>({k,t:'',o:k==='one'||k==='many'?['','']:[],cor:[],ans:'',tol:1,vars:[]});
 function qFromSrv(q){const u=qBlank(q.k);u.t=q.t;if(q.k==='one'||q.k==='many'){u.o=q.o.slice();u.cor=q.k==='one'?[q.a]:q.a.slice()}
   else if(q.k==='num'){u.vars=Object.entries(q.v||{}).map(([n,r])=>[n,decRu(r[0]),decRu(r[1]),decRu(r[2])]);u.ans=u.vars.length?q.a:decRu(q.a);u.tol=q.tol!=null?q.tol:1}

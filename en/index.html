@@ -367,6 +367,9 @@ table.jtab td.jw{color:#B5531A}
 .mtask{padding:10px 0;border-top:1px solid var(--line)}.mtask p{margin:0 0 8px}.mtask.done>p:first-child{color:var(--muted)}
 .mtrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.mtin{display:flex;align-items:center;gap:6px}.mtin input{width:120px;font:inherit;font-weight:600;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:12px;padding:8px 10px}.mtin span{color:var(--muted);font-weight:600}
 .mtres{margin:8px 0 0!important;font-weight:600}.mtres.ok,.mtask.done .mtres{color:#367A55}.mtres.bad{color:#C4245F}
+.snotice{border:2px solid var(--brand);margin:12px 8px}.snotice p{margin:6px 0 4px;font-size:17px;font-weight:600}.snotice small{color:var(--muted)}
+#tntext{width:100%;font:inherit;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;resize:vertical}
+.tsum td,.tsum th{text-align:center}.tsum td:first-child,.tsum th:first-child{text-align:left}
 .jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
@@ -3437,7 +3440,7 @@ function worksGated(){
   app.innerHTML=`<div class="view">`+header()+accBar()+`
   <section class="hero"><h1>Lab works</h1><p>${st&&asg.length?'At the top are the labs your teacher assigned: their results go to the journal. You can do the rest for practice.':'Handle the equipment yourself: weigh, immerse, hang loads. Record your measurements in the table, calculate and draw a conclusion.'}</p></section>
   ${open?`<div class="progress"><span>Done ${done} of ${open}</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${open}" aria-valuenow="${done}"><i data-w="${open?done/open*100:0}"></i></div></div><p class="plink"><a href="#progress">My grades and progress →</a></p>`:''}
-  ${st?`<div id="stests"></div><div id="smats">${stMatsHTML()}</div>`:''}
+  ${st?`<div id="smats">${stMatsHTML()}</div><div id="stests"></div>`:''}
   <div class="cards" id="cards">${list.map(([w,ac])=>{const dl=wDeadline(w.id),dn=isDone(w.id);return`
     <a class="card ${dn?'seen':''}" style="--c:${w.color}" href="#work/${w.id}">
       <div class="pb"><i></i></div>
@@ -3565,7 +3568,7 @@ function tcDemoHTML(){const d=TC.demo&&Date.parse(TC.demo.expires)>srvNow()?TC.d
     (d?`<div class="bigcode"><code>${d.code}</code><span>valid until ${fmtT(d.expires)}</span><button class="btn" data-k="copy" data-v="${d.code}">Copy</button><button class="btn" data-k="demostop">Stop</button></div>`
       :`<div class="trow"><select id="tdmin" aria-label="How long the demo code is valid"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="45" selected>45 minutes</option><option value="90">90 minutes</option></select><button class="btn main" data-k="demo">Create demo code</button></div>`)}
 async function tcClass(){const r=await tcCall('t_class',{p_class:TC.cls});if(!r)return;TC.cd=r;TC.jr={since:0,res:[],students:r.students,works:r.works};
-  TC.mats=null;tcClassRender();await tcPoll(true);await tcCTests();await tcMatLoad()}
+  TC.mats=null;TC.ex=null;tcClassRender();await tcPoll(true);await tcCTests();await tcMatLoad();await tcExtra()}
 function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=TC.cd,ws=c.works;
   box.innerHTML=`<div class="note f tclass"><div class="tchead"><b>${esc(c.class.name)}</b><span class="tbtns"><button class="btn" data-k="ren">Rename</button><button class="btn" data-k="delcls">Delete class</button></span></div>
     <h3>Assignments for the class</h3><p class="tmsg">Tick the labs you assign to the class: their results will arrive in the journal. The due date is optional. All labs and models are open to everyone without sign-in — students can do the rest for practice.</p>
@@ -3575,11 +3578,41 @@ function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=
     <div id="tcct">${TC.ct?tcCTHTML():'<p class="gempty">Loading…</p>'}</div>
     <h3>Learning materials</h3><p class="tmsg">Attach a presentation, PDF, document, image, video or link — to the whole class, a work or a test. Students will see the materials after signing in with their code.</p>
     <div id="tcmat">${tcMatHTML()}</div>
+    <h3>Class announcement</h3><div id="tcnote">${tcNoteHTML()}</div>
     <h3>Students</h3>
     <p class="tmsg">Enter students one per line. A first name and the first letter of the surname are enough: the site does not need full surnames. Each student gets a personal sign-in code.</p>
     <form data-form="tadd"><textarea id="tnames" rows="3" placeholder="Anna K.&#10;Peter S." aria-label="Student names"></textarea><div class="tools"><button class="btn main" type="submit">Add students</button></div></form>
     <div id="tcstud">${tcStudHTML()}</div>
-    <h3>Results journal</h3><div id="tcj">${tcJHTML()}</div></div>`}
+    <h3>Results journal</h3><div id="tcj">${tcJHTML()}</div>
+    <h3>Summary sheet</h3><div id="tcsum">${tcSumHTML()}</div></div>`}
+/* объявление классу и итоговая ведомость */
+async function tcExtra(){const cls=TC.cls,r=await tcCall('t_class_extra',{p_class:cls});if(!r||cls!==TC.cls)return;TC.ex=r;
+  const n=$('#tcnote');if(n)n.innerHTML=tcNoteHTML();tcSumRender()}
+function tcNoteHTML(){const ex=TC.ex;if(!ex)return'<p class="gempty">Loading…</p>';
+  return`<form class="note f tline" data-form="tnotice"><p class="tmsg">A short message to students — for example, “hand in work No. 3 by Friday”. Students will see it on the works page after signing in with their code.</p>
+    <textarea id="tntext" rows="3" maxlength="1000" placeholder="Announcement text" aria-label="Announcement text">${esc(ex.notice||'')}</textarea>
+    <div class="tools"><button class="btn main" type="submit">${ex.notice?'Update announcement':'Publish'}</button>${ex.notice?'<button class="btn" type="button" data-k="ntclear">Remove announcement</button>':''}</div>
+    ${ex.notice?`<small class="thint">Published ${fmtDT(ex.notice_at)}.</small>`:''}</form>`}
+function tcSumRender(){const b=$('#tcsum');if(b)b.innerHTML=tcSumHTML()}
+function tcSumData(){const jr=TC.jr,ex=TC.ex;if(!jr||!ex)return null;const by=jrLatest(),ws=WORKS.filter(w=>jr.works.some(x=>x.work===w.id)),ts=ex.tests;
+  const rows=jr.students.map(s=>{const wc=ws.map(w=>{const r=by[s.id+'|'+w.id];return r?(r.data&&r.data.g?+r.data.g:'✓'):''}),
+    tc=ts.map(t=>{const a=t.attempts.find(x=>x.student===s.id);return a?(a.done&&a.score!==null?decRu(+a.score)+' / '+a.max:'in progress'):''}),
+    gs=wc.filter(x=>typeof x==='number');return{name:s.name,wc,tc,avg:gs.length?decRu(Math.round(gs.reduce((x,y)=>x+y,0)/gs.length*10)/10):'',n:wc.filter(Boolean).length}});
+  return{ws,ts,rows}}
+function tcSumHTML(){const d=tcSumData();if(!d)return'<p class="gempty">Loading…</p>';
+  if(!d.rows.length)return'<p class="gempty">No students yet.</p>';if(!d.ws.length&&!d.ts.length)return'<p class="gempty">Assign works or tests to the class — a summary table of grades will appear here.</p>';
+  return`<p class="tmsg">The latest grade for each assigned work, test scores and the average grade for works.</p><div class="tblwrap"><table class="res jtab tsum"><thead><tr><th>Student</th>${d.ws.map(w=>`<th title="${esc(w.title)}">No. ${w.num}</th>`).join('')}${d.ts.map(t=>`<th>${esc(t.title)}</th>`).join('')}<th>Average</th></tr></thead>
+    <tbody>${d.rows.map(r=>`<tr><td>${esc(r.name)}</td>${r.wc.map(x=>`<td>${typeof x==='number'?`<span class="jg g${x}">${x}</span>`:x||'<span class="jn">—</span>'}</td>`).join('')}${r.tc.map(x=>`<td>${x||'<span class="jn">—</span>'}</td>`).join('')}<td><b>${r.avg||'—'}</b></td></tr>`).join('')}</tbody></table></div>
+    <div class="tools"><button class="btn" data-k="sumcsv">${ICON.dl}Download for Excel</button><button class="btn" data-k="sumprint">${ICON.doc}Print</button></div>`}
+function tcSumCSV(){const d=tcSumData();if(!d)return;const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const lines=[['Student',...d.ws.map(w=>'No. '+w.num+'. '+w.title),...d.ts.map(t=>'Test: '+t.title),'Average grade','Works handed in'].map(q).join(';'),...d.rows.map(r=>[r.name,...r.wc,...r.tc,r.avg,r.n].map(q).join(';'))];
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='vedomost-'+(TC.cd?TC.cd.class.name:'klass').replace(/[^\wА-Яа-яЁё-]+/g,'_')+'.csv';
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function tcSumPrint(){const d=tcSumData();if(!d)return;let el=$('#print');if(!el){el=document.createElement('div');el.id='print';document.body.appendChild(el)}
+  el.innerHTML=`<h1>Summary sheet</h1><h2>Class ${esc(TC.cd?TC.cd.class.name:'')}</h2><p><b>Teacher:</b> ${esc(TC.me?TC.me.name:'')}&nbsp;&nbsp; <b>Date:</b> ${new Date().toLocaleDateString(LOC)}</p>
+    <table><tr><th>Student</th>${d.ws.map(w=>`<th>No. ${w.num}</th>`).join('')}${d.ts.map(t=>`<th>${esc(t.title)}</th>`).join('')}<th>Average</th></tr>${d.rows.map(r=>`<tr><td>${esc(r.name)}</td>${r.wc.map(x=>`<td>${x||'—'}</td>`).join('')}${r.tc.map(x=>`<td>${x||'—'}</td>`).join('')}<td>${r.avg||'—'}</td></tr>`).join('')}</table>
+    <p>${d.ws.map(w=>`No. ${w.num} — ${w.title}`).join('; ')}.</p><p class="pf">Sirius Lab · ${esc(location.href.split('#')[0])}</p>`;
+  document.body.classList.add('printing');const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);setTimeout(()=>window.print(),60)}
 function tcStudHTML(){const ss=TC.jr?TC.jr.students:TC.cd.students,codes=Object.fromEntries(TC.cd.students.map(s=>[s.id,s.code]));
   if(!ss.length)return'<p class="gempty">No students yet — add them above.</p>';
   return`<div class="tblwrap"><table class="res tst"><thead><tr><th>Student</th><th>Sign-in code</th><th>Sign in</th><th><span class="sr">Actions</span></th></tr></thead><tbody>${ss.map(s=>`<tr><td>${esc(s.name)}</td><td><code class="scode">${codes[s.id]||''}</code></td>
@@ -3665,7 +3698,7 @@ async function tcPoll(force){if(location.hash!=='#teacher'||!ACC||ACC.kind!=='t'
   const st=$('#tcstud');if(st&&JSON.stringify([jr.students,jr.works])!==before&&!st.contains(document.activeElement))st.innerHTML=tcStudHTML();
   const c=TC.classes.find(x=>x.id===cls);if(c){c.students=jr.students.length;c.joined=jr.students.filter(s=>s.joined).length;const n=$(`.tcls [data-id="${cls}"] .n`);if(n)n.textContent=c.joined+'/'+c.students}
   const j=$('#tcj');if(!j)return;
-  if(force||r.results.length||JSON.stringify([jr.students,jr.works])!==before){if(force||!j.contains(document.activeElement))j.innerHTML=tcJHTML()}
+  if(force||r.results.length||JSON.stringify([jr.students,jr.works])!==before){if(force||!j.contains(document.activeElement))j.innerHTML=tcJHTML();tcSumRender()}
   else{const t=j.querySelector('.jtime');if(t)t.textContent='updated at '+new Date(jr.at).toLocaleTimeString(LOC)}}
 async function tcWork(id){const box=$(`.twrow input[data-wk="${id}"]`),dl=$(`.twrow input[data-wd="${id}"]`);if(!box||!dl)return;
   const open=box.checked,dv=open&&dl.value?new Date(dl.value):null;
@@ -3763,6 +3796,8 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='tfinish'){testFinish(false);return}
   if(!ACC||ACC.kind!=='t')return;
   if(['qadd','qdel','qup','qdown','oadd','odel','vadd','vdel','tsave','tcancel'].includes(k)){teAct(k,t);return}
+  if(k==='tlib'){TC.lib=!TC.lib;const b=$('#tcte');if(b&&!TE)b.innerHTML=tcTLHTML();return}
+  if(k==='tlibuse'){const L=TLIB[+id];TE={id:null,used:false,title:L.title,minutes:L.minutes,pick:'',qs:L.qs.map(qFromSrv)};TC.lib=false;teRender();$('#tcte').scrollIntoView({behavior:'smooth',block:'start'});toast('The test is open in the editor — check it and save');return}
   if(k==='tnew'){TE={id:null,used:false,title:'',minutes:15,pick:'',qs:[qBlank('one')]};teRender();$('#tcte').scrollIntoView({behavior:'smooth',block:'start'});return}
   if(k==='tedit'){tcTestOpen(id,false);return}
   if(k==='tcopy'){tcTestOpen(id,true);return}
@@ -3792,6 +3827,9 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='tkill'){const tt=TC.adm.teachers.find(x=>x.id===id);if(!tt||!confirm(`Delete the teacher account ${tt.name} (${tt.email})?\n\nThis will also delete classes (${tt.classes}), students (${tt.students}), their results and tests. They cannot be restored.`))return;
     if(await tcCall('a_teacher_delete',{p_teacher:id})){toast('Teacher account deleted');TC.newPw=null;if(TC.view&&TC.view.id===id)TC.view=null;await tcAdmin()}return}
   if(k==='tview'){tcView(id);return}
+  if(k==='sumcsv'){tcSumCSV();return}
+  if(k==='sumprint'){tcSumPrint();return}
+  if(k==='ntclear'){if(!confirm('Remove the announcement? Students will no longer see it.'))return;const r=await tcCall('t_notice_set',{p_class:TC.cls,p_text:''});if(r){TC.ex.notice='';TC.ex.notice_at=null;$('#tcnote').innerHTML=tcNoteHTML();toast('Announcement removed')}return}
   if(k==='mkind'){TC.mk=t.dataset.v;const b=$('#tcmat');if(b)b.innerHTML=tcMatHTML();return}
   if(k==='mdel'){const m=TC.mats&&TC.mats.mats.find(x=>x.id===id);if(!m||!confirm(`Delete the material “${m.title}”? Students will no longer see it.`))return;
     const r=await tcCall('t_mat_delete',{p_id:id});if(r){mGone(r.path);toast('Material deleted');await tcMatLoad()}return}
@@ -3811,6 +3849,7 @@ async function formAct(kind,f){
     catch(_){er.textContent=errText('net')}return}
   if(!ACC||ACC.kind!=='t')return;
   if(kind==='tmat'){await tcMatAdd();return}
+  if(kind==='tnotice'){const v=$('#tntext').value.trim();if(!v){$('#tntext').focus();return}const r=await tcCall('t_notice_set',{p_class:TC.cls,p_text:v});if(r){TC.ex.notice=r.notice;TC.ex.notice_at=r.notice_at;$('#tcnote').innerHTML=tcNoteHTML();toast('Announcement published')}return}
   if(kind==='tdelme'){if(!confirm('Delete your account forever? Classes, students, results and tests will be deleted too.'))return;
     const r=await tcCall('t_delete_me',{p_pass:$('#tdp').value});if(r){tcOut();toast('Account deleted')}return}
   if(kind==='tpass'){const r=await tcCall('t_password',{p_old:$('#tpo').value,p_new:$('#tpn').value});if(r){f.hidden=true;f.reset();toast('Password changed')}return}
@@ -3829,10 +3868,11 @@ const QK=[['one','Single choice'],['many','Multiple choice'],['num','Number'],['
 const decRu=v=>LANG.code==='ru'?String(v).replace(/(\d)\.(\d)/g,'$1,$2'):String(v);
 const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
 /* ученик: список тестов на странице работ */
-function stMatsHTML(){const ms=ACC&&ACC.kind==='s'&&ACC.mats||[];if(!ms.length)return'';
-  return`<h2 class="th2 stth">Materials from the teacher</h2><div class="note f smats">${mGroups(ms,null,false)}</div>`}
+function stMatsHTML(){const st=ACC&&ACC.kind==='s',ms=st&&ACC.mats||[],nt=st&&ACC.notice;
+  return(nt?`<div class="note snotice" role="status"><b>Teacher’s announcement</b><p>${esc(nt).replace(/\n/g,'<br>')}</p>${ACC.notice_at?`<small>${fmtDT(ACC.notice_at)}</small>`:''}</div>`:'')
+    +(ms.length?`<h2 class="th2 stth">Materials from the teacher</h2><div class="note f smats">${mGroups(ms,null,false)}</div>`:'')}
 async function stMatsLoad(){if(!ACC||ACC.kind!=='s'||SRV!=='on')return;let r;try{r=await rpc('s_materials',{p_token:ACC.token})}catch(_){return}
-  if(!r||r.err||!ACC)return;const ch=JSON.stringify(r.mats)!==JSON.stringify(ACC.mats||[]);ACC.mats=r.mats;saveAcc();
+  if(!r||r.err||!ACC)return;const ch=JSON.stringify([r.mats,r.notice||''])!==JSON.stringify([ACC.mats||[],ACC.notice||'']);ACC.mats=r.mats;ACC.notice=r.notice||'';ACC.notice_at=r.notice_at||null;saveAcc();
   if(ch){const b=$('#smats');if(b)b.innerHTML=stMatsHTML();const w=$('#wmats');if(w&&cur)w.outerHTML=wMatsHTML(cur.id)}}
 function wMatsHTML(id){const ms=(ACC&&ACC.kind==='s'&&ACC.mats||[]).filter(m=>m.target==='work:'+id);
   return`<div id="wmats">${ms.length?`<div class="note f smats"><b>Materials from the teacher for this work</b><ul class="mlist">${ms.map(m=>mItem(m,false)).join('')}</ul></div>`:''}</div>`}
@@ -3922,7 +3962,67 @@ function tcTLHTML(){const ts=TC.tests||[];
   return`<p class="tmsg">Build a test from four question types: single choice, multiple choice, number (each student can get their own numbers) and short answer. Correct answers are stored only on the server — students never see them. Each student can get a random subset of questions in their own order.</p>
     ${ts.length?`<div class="twork">${ts.map(t=>`<div class="twrow"><span class="twk"><span>${esc(t.title)}<small class="db">${pl3(t.n,'question','questions','questions')}${t.pick?', each student gets '+t.pick:''} · ${t.minutes} min${t.used?' · already taken':''}</small></span></span>
       <span class="tact"><button class="mini" data-k="tedit" data-id="${t.id}">Edit</button><button class="mini" data-k="tcopy" data-id="${t.id}">Copy</button><button class="mini del" data-k="tdel" data-id="${t.id}">Delete</button></span></div>`).join('')}</div>`:''}
-    <div class="tools"><button class="btn main" data-k="tnew">+ New test</button></div>`}
+    <div class="tools"><button class="btn main" data-k="tnew">+ New test</button><button class="btn" data-k="tlib" aria-expanded="${!!TC.lib}">Ready-made tests by topic</button></div>
+    ${TC.lib?`<div class="note f tlib"><b>Ready-made Year 7 physics tests</b><p class="tmsg">Take a test — it opens in the editor: you can adjust the questions and time, then save it as your own.</p>
+      <div class="twork">${TLIB.map((t,i)=>`<div class="twrow"><span class="twk"><span>${esc(t.title)}<small class="db">${pl3(t.qs.length,'question','questions','questions')} · ${t.minutes} min${t.qs.some(q=>q.v)?' · own numbers for each student':''}</small></span></span><span class="tact"><button class="mini" data-k="tlibuse" data-id="${i}">Take</button></span></div>`).join('')}</div></div>`:''}`}
+/* готовые тесты по темам 7 класса: учитель берёт тест, при желании правит и сохраняет как свой */
+const TLIB=[
+ {title:'Structure of matter',minutes:10,qs:[
+  {k:'one',t:'What are all substances made of?',o:['Molecules (atoms)','A continuous material with no gaps','Droplets','Light'],a:0},
+  {k:'one',t:'What is diffusion?',o:['The mutual penetration of the molecules of one substance between the molecules of another','Liquid turning into vapour','Expansion of bodies when heated','Attraction of bodies to the Earth'],a:0},
+  {k:'one',t:'Where is diffusion fastest at the same temperature?',o:['In gases','In liquids','In solids','Equally everywhere'],a:0},
+  {k:'many',t:'Mark the true statements about molecules.',o:['Molecules move continuously and randomly','There are gaps between molecules','Molecules attract and repel each other','Molecules of the same substance are different'],a:[0,1,2]},
+  {k:'one',t:'How does the speed of molecules change when heated?',o:['It increases','It decreases','It does not change','Molecules stop'],a:0},
+  {k:'text',t:'In what state does a substance keep both its shape and its volume? Answer in one word.',a:['solid','solid','solid','solid']}]},
+ {title:'Mechanical motion and speed',minutes:15,qs:[
+  {k:'one',t:'What is a trajectory?',o:['The line along which a body moves','The distance between the start and end points','The time of motion','The speed of the body'],a:0},
+  {k:'one',t:'In what SI units is speed measured?',o:['m/s','km/h','m','s'],a:0},
+  {k:'num',t:'A cyclist rode {s} m in {t} s. Find the speed in m/s.',v:{s:[60,300,20],t:[10,30,5]},a:'s/t',tol:2},
+  {k:'num',t:'How many metres per second is a speed of 72 km/h?',a:20,tol:0},
+  {k:'num',t:'A car moves at {v} m/s. What distance (in metres) does it cover in {t} s?',v:{v:[10,30,1],t:[5,20,1]},a:'v*t',tol:1},
+  {k:'one',t:'Motion in which a body covers equal distances in any equal time intervals is called…',o:['uniform','non-uniform','oscillating','rotational'],a:0}]},
+ {title:'Density of matter',minutes:15,qs:[
+  {k:'one',t:'How do you find the density of a substance?',o:['Divide the mass by the volume','Multiply the mass by the volume','Divide the volume by the mass','Add the mass and the volume'],a:0},
+  {k:'one',t:'In what SI units is density measured?',o:['kg/m³','g/cm³','kg','m³'],a:0},
+  {k:'num',t:'A block has a mass of {m} g and a volume of {v} cm³. Find its density in g/cm³.',v:{m:[54,270,27],v:[20,100,10]},a:'m/v',tol:2},
+  {k:'num',t:'The density of aluminium is 2.7 g/cm³. What is the mass (in grams) of an aluminium part with a volume of {v} cm³?',v:{v:[10,200,10]},a:'2.7*v',tol:2},
+  {k:'one',t:'Two cubes of the same volume: steel and aluminium. Which has the greater mass?',o:['The steel one','The aluminium one','The same','Impossible to say'],a:0},
+  {k:'num',t:'How many kg/m³ is a density of 1 g/cm³?',a:1000,tol:0}]},
+ {title:'Forces: gravity, elasticity, friction',minutes:15,qs:[
+  {k:'num',t:'Find the force of gravity (in newtons) acting on a body of mass {m} kg. Take g = 10 N/kg.',v:{m:[2,50,1]},a:'m*10',tol:1},
+  {k:'one',t:'What is the instrument for measuring force called?',o:['Spring scale','Barometer','Manometer','Measuring cylinder'],a:0},
+  {k:'num',t:'A spring with stiffness {k} N/m stretched by {x} m. What is the elastic force in newtons?',v:{k:[20,200,10],x:[0.02,0.2,0.02]},a:'k*x',tol:2},
+  {k:'one',t:'How can friction be reduced?',o:['Use lubricant or wheels','Make the surfaces rougher','Increase the mass of the body','Press the body down harder'],a:0},
+  {k:'many',t:'Mark the forces measured in newtons.',o:['Gravity','Elastic force','Weight','Body mass'],a:[0,1,2]},
+  {k:'one',t:'Two forces of 30 N and 50 N act in the same direction along a line. What is the resultant?',o:['80 N','20 N','50 N','1500 N'],a:0}]},
+ {title:'Pressure of solids, liquids and gases',minutes:15,qs:[
+  {k:'one',t:'How do you find the pressure of a solid on its support?',o:['Divide the force by the area','Multiply the force by the area','Divide the area by the force','Add the force and the area'],a:0},
+  {k:'num',t:'A box weighing {f} N stands on an area of {s} m². Find the pressure in pascals.',v:{f:[200,1000,50],s:[0.1,0.5,0.1]},a:'f/s',tol:2},
+  {k:'num',t:'Find the water pressure (in pascals) at a depth of {h} m. Water density 1000 kg/m³, g = 10 N/kg.',v:{h:[1,10,1]},a:'1000*10*h',tol:1},
+  {k:'one',t:'Why does a tractor have wide tracks?',o:['To reduce the pressure on the soil','To increase the pressure on the soil','To increase the mass','For looks'],a:0},
+  {k:'one',t:'How does atmospheric pressure change with height?',o:['It decreases','It increases','It does not change','First rises, then falls'],a:0},
+  {k:'text',t:'What is the law called: pressure in a liquid or gas is transmitted equally in all directions? Answer with the scientist’s surname.',a:['Pascal','Pascal','Pascal’s law']}]},
+ {title:'Buoyant force and floating',minutes:15,qs:[
+  {k:'one',t:'What does the buoyant (Archimedes) force depend on?',o:['On the density of the liquid and the volume of the submerged part of the body','On the mass of the body','On the shape of the body','On the depth of immersion'],a:0},
+  {k:'num',t:'A body with a volume of {v} m³ is fully submerged in water (1000 kg/m³). Find the buoyant force in newtons (g = 10 N/kg).',v:{v:[0.001,0.01,0.001]},a:'1000*10*v',tol:2},
+  {k:'one',t:'A body sinks if…',o:['gravity is greater than the buoyant force','the buoyant force is greater than gravity','the forces are equal','the body is hollow'],a:0},
+  {k:'one',t:'Why does a steel ship float?',o:['The average density of the ship with the air inside is less than the density of water','Steel is lighter than water','Water pushes it up harder than any stone','The ship is painted'],a:0},
+  {k:'one',t:'A block with a density of 600 kg/m³ is put in water. What fraction of its volume will be submerged?',o:['0,6','0,4','The whole block','Half'],a:0},
+  {k:'many',t:'Which bodies will float in water?',o:['Cork (240 kg/m³)','Ice (900 kg/m³)','Aluminium (2700 kg/m³)','Lead (11,300 kg/m³)'],a:[0,1]}]},
+ {title:'Work, power, energy',minutes:15,qs:[
+  {k:'num',t:'A load was lifted with a force of {f} N to a height of {h} m. How much work (in joules) was done?',v:{f:[50,500,50],h:[1,10,1]},a:'f*h',tol:1},
+  {k:'num',t:'A motor did {a} J of work in {t} s. Find the power in watts.',v:{a:[1000,10000,500],t:[5,50,5]},a:'a/t',tol:2},
+  {k:'one',t:'In what units is power measured?',o:['W','J','N','Pa'],a:0},
+  {k:'one',t:'What energy does a stone lifted above the ground have?',o:['Potential','Kinetic','None','Thermal'],a:0},
+  {k:'num',t:'Find the potential energy (in joules) of a body of mass {m} kg at a height of {h} m (g = 10 N/kg).',v:{m:[1,20,1],h:[1,10,1]},a:'m*10*h',tol:1},
+  {k:'one',t:'Is mechanical work done if a person holds a heavy bag while standing still?',o:['No: the body does not move','Yes: the person applies a force','Yes, but negative','Only if the bag is heavier than 10 kg'],a:0}]},
+ {title:'Simple machines and efficiency',minutes:15,qs:[
+  {k:'one',t:'State the rule for the balance of a lever.',o:['The forces are inversely proportional to their arms','The forces are directly proportional to the arms','The forces are always equal','The arms are always equal'],a:0},
+  {k:'num',t:'A force of {f} N acts on a lever arm of 0.2 m. On what arm (in metres) will a force of 20 N balance it?',v:{f:[40,200,20]},a:'f*0.2/20',tol:2},
+  {k:'one',t:'What force gain does a movable pulley give?',o:['2 times','None','4 times','It depends on the load’s mass'],a:0},
+  {k:'one',t:'The “golden rule” of mechanics: as many times as we gain in force, we…',o:['lose the same in distance','gain the same in distance','gain the same in work','lose the same in mass'],a:0},
+  {k:'num',t:'Useful work is {p} J, total work is {z} J. Find the efficiency in percent.',v:{p:[200,600,50],z:[700,1000,50]},a:'p/z*100',tol:2},
+  {k:'one',t:'Can the efficiency of a machine be greater than 100 %?',o:['No','Yes, for good machines','Yes, for a lever','Yes, if there is no friction'],a:0}]}];
 const qBlank=k=>({k,t:'',o:k==='one'||k==='many'?['','']:[],cor:[],ans:'',tol:1,vars:[]});
 function qFromSrv(q){const u=qBlank(q.k);u.t=q.t;if(q.k==='one'||q.k==='many'){u.o=q.o.slice();u.cor=q.k==='one'?[q.a]:q.a.slice()}
   else if(q.k==='num'){u.vars=Object.entries(q.v||{}).map(([n,r])=>[n,decRu(r[0]),decRu(r[1]),decRu(r[2])]);u.ans=u.vars.length?q.a:decRu(q.a);u.tol=q.tol!=null?q.tol:1}

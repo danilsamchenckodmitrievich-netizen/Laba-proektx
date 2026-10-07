@@ -1,7 +1,7 @@
 # Сервер «Лаборатории Сириус»
 
 Сейчас сервер работает на Supabase (регион eu-north-1, Стокгольм). Всё устройство сервера — в файлах
-`schema.sql` (классы, ученики, работы, журнал) `tests.sql` (тесты учителя), `stats.sql` (счётчик посещений) `applications.sql` (заявки учителей) `accounts.sql` (удаление аккаунта) `observe.sql` (просмотр учителей администратором) `materials.sql` (учебные материалы и хранилище файлов) и `progress.sql` (прогресс ученика): таблицы (схема `lab`, снаружи закрыта) и функции, которые вызывает сайт
+`schema.sql` (классы, ученики, работы, журнал) `tests.sql` (тесты учителя), `stats.sql` (счётчик посещений) `applications.sql` (заявки учителей) `accounts.sql` (удаление аккаунта) `observe.sql` (просмотр учителей администратором) `materials.sql` (учебные материалы и хранилище файлов) `progress.sql` (прогресс ученика) и `classinfo.sql` (объявление классу и данные для ведомости): таблицы (схема `lab`, снаружи закрыта) и функции, которые вызывает сайт
 (`POST /rest/v1/rpc/<функция>`). Вход учителей и учеников сделан на самих функциях, без Supabase Auth,
 поэтому сервер можно перенести на любой хостинг.
 
@@ -19,7 +19,7 @@
 ## Как перенести на свой сервер (например, в России)
 
 1. Поставьте PostgreSQL 15+ и PostgREST (или используйте хостинг, где они есть).
-2. Создайте роли `anon` и `authenticated` (PostgREST работает от `anon`) и выполните `schema.sql`, затем `tests.sql`, `stats.sql`, `applications.sql`, `accounts.sql`, `observe.sql`, `materials.sql` и `progress.sql`. Файлы материалов хранятся в Supabase Storage (bucket `materials`); на другом сервере нужен свой файловый сервер или S3-хранилище.
+2. Создайте роли `anon` и `authenticated` (PostgREST работает от `anon`) и выполните `schema.sql`, затем `tests.sql`, `stats.sql`, `applications.sql`, `accounts.sql`, `observe.sql`, `materials.sql`, `progress.sql` и `classinfo.sql`. Файлы материалов хранятся в Supabase Storage (bucket `materials`); на другом сервере нужен свой файловый сервер или S3-хранилище.
 3. Перенесите данные: `pg_dump --schema=lab` со старого сервера и загрузка на новый.
 4. В `index.html` поменяйте адрес и ключ в строке `const API=…` и запустите `python3 tools/build_en.py`.
 
