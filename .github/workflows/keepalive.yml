@@ -1,0 +1,33 @@
+# Раз в день обращаемся к серверу Supabase, чтобы бесплатный проект не уснул
+# (он засыпает после недели без запросов), и проверяем, что сайт открывается.
+# Если что-то не отвечает, проверка падает, и GitHub присылает письмо владельцу репозитория.
+name: Сервер не засыпает
+on:
+  schedule:
+    - cron: '17 3 * * *'   # каждый день в 06:17 по Москве
+  workflow_dispatch:
+permissions: {}
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      API: https://meloatifwjyulrzalnfm.supabase.co
+      KEY: sb_publishable_mY3QMOIzexBmm-OdN5R9lg_guAzHqkk
+      SITE: https://danilsamchenckodmitrievich-netizen.github.io/Laba-proektx/
+    steps:
+      - name: Сервер отвечает
+        run: |
+          for i in 1 2 3; do
+            r=$(curl -sS -m 30 -X POST "$API/rest/v1/rpc/ping" -H "apikey: $KEY" -H "Content-Type: application/json" -d '{}' || true)
+            if echo "$r" | grep -q '"ok"'; then echo "Сервер отвечает: $r"; exit 0; fi
+            echo "Попытка $i: нет ответа ($r)"; sleep 30
+          done
+          echo "::error::Сервер Supabase не отвечает. Откройте supabase.com/dashboard и проверьте, не приостановлен ли проект."
+          exit 1
+      - name: Сайт открывается
+        run: |
+          code=$(curl -sS -m 30 -o page.html -w '%{http_code}' "$SITE" || true)
+          if [ "$code" = "200" ] && grep -q 'Лаборатория' page.html; then echo "Сайт открывается"; exit 0; fi
+          echo "::error::Сайт не открывается (код $code)."
+          exit 1
