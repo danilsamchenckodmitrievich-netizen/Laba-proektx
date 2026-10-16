@@ -370,6 +370,8 @@ table.jtab td.jw{color:#B5531A}
 .snotice{border:2px solid var(--brand);margin:12px 8px}.snotice p{margin:6px 0 4px;font-size:17px;font-weight:600}.snotice small{color:var(--muted)}
 #tntext{width:100%;font:inherit;color:var(--ink);background:var(--surf);border:2px solid var(--line);border-radius:14px;padding:10px 12px;resize:vertical}
 .tsum td,.tsum th{text-align:center}.tsum td:first-child,.tsum th:first-child{text-align:left}
+.carch{font-size:11px;font-weight:700;margin-left:6px;opacity:.75;text-transform:uppercase}.carchb{opacity:.85}.tarch{margin:10px 0;border:2px dashed var(--line)}
+.wpair{margin:10px 8px}.wpair .tmsg{display:block;margin:4px 0 8px}.wpair.on{border:2px solid #367A55}.wpair .mini{margin-top:4px}
 .jerr{margin:8px 0 0}.jerr summary{cursor:pointer;font-weight:700}.jerr ul{margin:6px 0 0;padding-left:18px;font-size:14px}
 .jlive{display:flex;gap:8px;align-items:flex-start}.jlive svg{flex:none;width:18px;height:18px;margin-top:2px}
 .bigcode{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:12px 0 4px;padding:14px 16px;border-radius:16px;background:var(--surf);border:2px dashed var(--brand)}
@@ -3039,7 +3041,7 @@ function tableHTML(w){
 }
 function openWork(id){
   if(!cur)worksScroll=window.scrollY;
-  stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};lastRes=null;TLOCK=null;WSEED=Math.floor(Math.random()*4294967296);cur.init(S);wSnap();WSTART=Date.now();WATT=0;WGR=null;
+  stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};lastRes=null;TLOCK=null;WSEED=Math.floor(Math.random()*4294967296);cur.init(S);wSnap();WSTART=Date.now();WATT=0;WGR=null;if(PAIR&&PAIR.work!==id)PAIR=null;
   T=Array.from({length:cur.rows},()=>({key:null,k:{}}));
   const w=cur,idx=WORKS.indexOf(w),tw=inTask(w.id),tn=tw?taskNext(w.id):null,nx=WORKS.find(x=>x.id===tn)||WORKS[(idx+1)%WORKS.length];
   document.title=w.title+' — Лаборатория Сириус';
@@ -3077,7 +3079,7 @@ function openWork(id){
     <h2>Вывод</h2>
     <div class="note f quiz" role="radiogroup" aria-label="${w.quiz.q}"><b>${w.quiz.q}</b>${shuffled(w.quiz.opts.length).map(i=>`<label><input type="radio" name="wq" value="${i}"><span>${w.quiz.opts[i]}</span></label>`).join('')}</div>
     ${testHTML(w)}
-    ${gated()&&ACC?accLine():`<label class="sname">Ученик<input id="sname" maxlength="60" autocomplete="name" placeholder="Фамилия Имя, класс" value="${esc(SNAME)}"><small>Попадёт в отчёт и в код результата для учителя</small></label>`}
+    ${gated()&&ACC?accLine()+`<div id="wpair">${pairHTML()}</div>`:`<label class="sname">Ученик<input id="sname" maxlength="60" autocomplete="name" placeholder="Фамилия Имя, класс" value="${esc(SNAME)}"><small>Попадёт в отчёт и в код результата для учителя</small></label>`}
     <div class="tools">
       <button class="btn main" data-act="check">${ICON.check}Проверить работу</button>
       <button class="btn" data-act="report">${ICON.doc}Отчёт (PDF)</button>
@@ -3171,7 +3173,7 @@ function wGrade(){const w=cur;let tot=0,err=0;const fix=[],dg=t=>t>=1?0:t>=.1?1:
   const ex=wCheckExtra(w,fix);if(w.prec){tot+=2;err+=ex.perr||0}
   const g=err===0?5:err/tot<=.15?4:err/tot<=.4?3:2;
   const data=T.map((r,i)=>[r,i]).filter(([r])=>r.key!==null&&r.m).map(([r,i])=>{const o=rowM(w,i);return w.cols.filter(c=>c.src==='m').map(c=>Math.round(o[c.id]*10**c.d)/10**c.d)});
-  WATT++;WGR={g,err,tot,fix,ex,data,rows:data.length};gAdd(w.id,{g,e:err,q:tot,t:ex.test||null,at:Date.now()});doneW.add(w.id);saveDone();wLock(true);wGraph();
+  WATT++;WGR={g,err,tot,fix,ex,data,rows:data.length};gAdd(w.id,{g,e:err,q:tot,t:ex.test||null,at:Date.now()});doneW.add(w.id);saveDone();wLock(true);wGraph();{const wp=$('#wpair');if(wp)wp.innerHTML=pairHTML()}
   if(gated()&&ACC&&ACC.kind==='s'&&wAssigned(w.id)==='yes')wSend(w.id,{r:data,n:data.length,t:ex.test||null,p:ex.prec||null,g,e:err,q:tot,x:fix.slice(0,20).map(s=>s.replace(/<[^>]+>/g,'')),a:WATT,sec:Math.round((Date.now()-WSTART)/1000)});
   wVerdict(true)}
 function wVerdict(sent){const w=cur,R=WGR,ex=R.ex,el=$('#verdict');el.hidden=false;el.className='note '+(R.g>=4?'ok':'');
@@ -3315,6 +3317,7 @@ app.addEventListener('click',e=>{
   if(!cur)return;
   if(cur.kind==='work'){const a=t.dataset.act;
     if(a==='rec')wRecord();else if(a==='meas')wMeasure();else if(a==='wreset')wRestart();else if(a==='check')wCheck();
+    else if(a==='pairadd'){pairAdd()}else if(a==='pairoff'){PAIR=null;$('#wpair').innerHTML=pairHTML()}
     else if(a==='redo'){if(confirm('Переделать работу заново? Таблица и ответы очистятся, а новая попытка получит новую оценку.')){const n=WATT;openWork(cur.id);WATT=n}}
     else if(a==='report')printReport();else if(a==='copycode'){if(lastRes&&lastRes.code)copyText(lastRes.code,t)}
     else if(a==='tclear'){T.forEach((r,i)=>wClearRow(i));$('#verdict').hidden=true}
@@ -3369,7 +3372,7 @@ const ERRS={slow:'Слишком много попыток. Подождите 1
   pass:'Пароль должен быть не короче 8 символов.',taken:'Учитель с такой почтой уже зарегистрирован — войдите.',login:'Неверная почта или пароль.',blocked:'Аккаунт заблокирован. Напишите авторам проекта.',
   session:'Вход устарел — войдите ещё раз.',code:'Такого кода нет. Проверьте буквы и цифры.',device:'Этот код уже открыт на другом устройстве. Попросите учителя нажать «Новое устройство» рядом с вашим именем.',
   closed:'Эта работа сейчас закрыта.',late:'Срок сдачи этой работы прошёл.',limit:'Достигнут предел: не больше 40 классов и 60 учеников в классе.',self:'Нельзя заблокировать свой аккаунт.',
-  school:'Укажите школу и город.',target:'Выберите, к чему прикрепить материал.',url:'Ссылка должна начинаться с https:// или http://.',mlimit:'В классе уже 100 материалов — удалите ненужные.',
+  school:'Укажите школу и город.',archived:'Класс уже в архиве.',pair:'Такого кода нет в вашем классе. Напарник вписывает свой личный код.',target:'Выберите, к чему прикрепить материал.',url:'Ссылка должна начинаться с https:// или http://.',mlimit:'В классе уже 100 материалов — удалите ненужные.',
   ftype:'Такой файл прикрепить нельзя. Подойдут: презентация, PDF, документ, таблица, картинка, видео mp4 или текст.',fsize:'Файл больше 20 МБ. Сожмите его или прикрепите ссылкой на Яндекс Диск или Google Диск.',
   quota:'Место для файлов закончилось (200 МБ на учителя). Удалите старые файлы или прикрепите ссылку.',upload:'Файл не загрузился — попробуйте ещё раз.',selfdel:'Свой аккаунт удаляется в блоке «Пароль и аккаунт».',lastadmin:'Вы единственный администратор. Сначала выдайте приглашение администратора другому человеку.',decided:'По этой заявке уже принято решение.',
   work:'Неизвестная работа.',data:'Слишком большой результат.',net:'Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.'};
@@ -3401,15 +3404,26 @@ function waitHome(){stop();cur=null;
 function qGet(){try{return JSON.parse(localStorage.getItem('lab-sirius-queue')||'[]')}catch(_){return[]}}
 function qSet(q){try{q.length?localStorage.setItem('lab-sirius-queue',JSON.stringify(q)):localStorage.removeItem('lab-sirius-queue')}catch(_){}}
 async function qFlush(){const q=qGet();if(!q.length)return;const left=[];
-  for(const it of q){try{const r=await rpc('s_submit',{p_token:it.token,p_work:it.work,p_ok:true,p_data:it.data});
+  for(const it of q){try{const r=it.partner?await rpc('s_submit_pair',{p_token:it.token,p_work:it.work,p_ok:true,p_data:it.data,p_partner:it.partner})
+        :await rpc('s_submit',{p_token:it.token,p_work:it.work,p_ok:true,p_data:it.data});
       if(!r.err&&ACC&&ACC.token===it.token&&!ACC.done.includes(it.work)){ACC.done.push(it.work);saveAcc()}}catch(_){left.push(it)}}
   qSet(left)}
 async function wSend(id,d){const say=(t,ok)=>{const b=$('#wsend');if(b&&cur&&cur.id===id)b.innerHTML=`<small class="${ok?'sok':''}">${t}</small><a class="btn main" href="#works">К списку работ${ICON.next}</a>`};
-  const tok=ACC.token;
-  try{const r=await rpc('s_submit',{p_token:tok,p_work:id,p_ok:true,p_data:d});
+  const tok=ACC.token,pr=PAIR&&PAIR.work===id?PAIR:null;
+  try{const r=pr?await rpc('s_submit_pair',{p_token:tok,p_work:id,p_ok:true,p_data:d,p_partner:pr.code}):await rpc('s_submit',{p_token:tok,p_work:id,p_ok:true,p_data:d});
     if(r.err){say(errText(r.err));return}
-    if(ACC&&!ACC.done.includes(id)){ACC.done.push(id);saveAcc()}say('✓ Результат отправлен учителю — он уже в журнале класса.',true)}
-  catch(_){const q=qGet();q.push({token:tok,work:id,data:d});qSet(q);say('Нет связи с сервером. Результат сохранён на этом устройстве и отправится сам, когда появится интернет.')}}
+    if(ACC&&!ACC.done.includes(id)){ACC.done.push(id);saveAcc()}say(pr?`✓ Результат отправлен учителю — вам и напарнику (${esc(r.partner||pr.name)}).`:'✓ Результат отправлен учителю — он уже в журнале класса.',true)}
+  catch(_){const q=qGet();q.push(pr?{token:tok,work:id,data:d,partner:pr.code}:{token:tok,work:id,data:d});qSet(q);say('Нет связи с сервером. Результат сохранён на этом устройстве и отправится сам, когда появится интернет.')}}
+/* работа в паре: напарник из того же класса вписывает свой код — результат и оценка запишутся обоим */
+let PAIR=null;
+function pairHTML(){if(!(ACC&&ACC.kind==='s'&&cur&&cur.kind==='work'&&wAssigned(cur.id)==='yes'))return'';const p=PAIR&&PAIR.work===cur.id?PAIR:null;
+  if(p)return`<div class="note f wpair on"><b>Работаете в паре с ${esc(p.name)} ✓</b><span class="tmsg">Результат и оценка запишутся вам обоим.</span>${WGR?'':'<button class="mini" data-act="pairoff">Убрать напарника</button>'}</div>`;
+  if(WGR)return'';
+  return`<div class="note f wpair"><b>Работаете в паре?</b><span class="tmsg">Напарник из вашего класса вписывает свой личный код — результат и оценка запишутся вам обоим.</span>
+    <div class="acode"><input id="pcode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Код напарника" aria-label="Личный код напарника"><button class="btn" data-act="pairadd">Добавить</button></div><span class="aerr" id="pairerr" role="alert"></span></div>`}
+async function pairAdd(){const inp=$('#pcode'),er=$('#pairerr'),code=(inp&&inp.value||'').trim();if(!code){if(inp)inp.focus();return}
+  er.textContent='Проверяем…';let r;try{r=await rpc('s_pair_check',{p_token:ACC.token,p_code:code})}catch(_){er.textContent=errText('net');return}
+  if(r.err){er.textContent=errText(r.err);return}PAIR={work:cur.id,code,name:r.name,id:r.id};$('#wpair').innerHTML=pairHTML()}
 function accLine(){const a=accLive();if(!a)return'';
   if(a.kind==='s'){const as=cur?wAssigned(cur.id):'no';return`<p class="sacc">${ICON.teacher}<span>Ученик: <b>${esc(a.name)}</b> · ${esc(a.cls)}. ${as==='yes'?'После проверки результат сам уйдёт учителю.':as==='late'?'Срок сдачи прошёл — результат учителю не отправится.':'Эту работу учитель не задавал: можно потренироваться, результат не отправляется.'}</span></p>`}
   return`<p class="sacc">${ICON.teacher}<span>${a.kind==='d'?'Демо-режим':'Вы вошли как учитель'}: результаты не сохраняются.</span></p>`}
@@ -3539,7 +3553,7 @@ async function tcHome(){
   window.scrollTo(0,0);clearInterval(TC.poll);TC.poll=setInterval(tcPoll,10000);await tcLoad()}
 async function tcLoad(){const r=await tcCall('t_me',{});if(!r){const b=$('#tc');if(b&&!b.querySelector('.tcme'))b.innerHTML=`<p class="gempty">${errText('net')}</p>`;return}
   TC.me=r.me;TC.classes=r.classes;TC.demo=r.demo;ACC.name=r.me.name;ACC.me=r.me;saveAcc();
-  if(!TC.classes.some(c=>c.id===TC.cls)){TC.cls=(TC.classes[0]||{}).id||null;TC.cd=null;TC.jr=null;TC.sel=null}
+  if(!TC.classes.some(c=>c.id===TC.cls)){TC.cls=(TC.classes.find(c=>!c.archived)||TC.classes[0]||{}).id||null;TC.cd=null;TC.jr=null;TC.sel=null}
   tcRender();await tcTestsList();if(TC.cls)await tcClass();if(TC.me.admin)await tcAdmin()}
 function tcRender(){const m=TC.me,box=$('#tc');if(!box)return;
   box.innerHTML=`<div class="taskbar tcme"><div><small>${m.admin?'Учитель · администратор':'Учитель'}</small><b>${esc(m.name)}</b><span>${esc(m.email)}</span></div>
@@ -3553,7 +3567,7 @@ function tcRender(){const m=TC.me,box=$('#tc');if(!box)return;
       <label class="tfield">Пароль для подтверждения<input type="password" id="tdp" autocomplete="current-password" required></label>
       <div class="tools"><button class="btn tdanger" type="submit">Удалить навсегда</button></div></form>
     <h2 class="th2">Классы</h2>
-    <div class="chips tcls" role="group" aria-label="Классы">${TC.classes.map(c=>`<button class="chip" data-k="cls" data-id="${c.id}" aria-pressed="${c.id===TC.cls}">${esc(c.name)}<span class="n" title="вошли / всего учеников">${c.joined}/${c.students}</span></button>`).join('')}<button class="chip cadd" data-k="newcls" aria-pressed="false">+ Новый класс</button></div>
+    <div class="chips tcls" role="group" aria-label="Классы">${TC.classes.filter(c=>!c.archived||TC.arch||c.id===TC.cls).map(c=>`<button class="chip" data-k="cls" data-id="${c.id}" aria-pressed="${c.id===TC.cls}">${esc(c.name)}${c.archived?'<small class="carch">архив</small>':''}<span class="n" title="вошли / всего учеников">${c.joined}/${c.students}</span></button>`).join('')}<button class="chip cadd" data-k="newcls" aria-pressed="false">+ Новый класс</button>${TC.classes.some(c=>c.archived)?`<button class="chip carchb" data-k="arch" aria-pressed="${!!TC.arch}">Архив · ${TC.classes.filter(c=>c.archived).length}</button>`:''}</div>
     <form class="note f tline" data-form="tclass" id="tclassf"${TC.classes.length?' hidden':''}><b>${TC.classes.length?'Новый класс':'Создайте первый класс'}</b>
       <div class="trow"><input id="tclassn" maxlength="40" placeholder="Например, 7Б" aria-label="Название класса" required><button class="btn main" type="submit">Создать класс</button></div></form>
     <div id="tcclass">${TC.cls?'<p class="gempty">Загружаем класс…</p>':''}</div>
@@ -3568,7 +3582,9 @@ function tcDemoHTML(){const d=TC.demo&&Date.parse(TC.demo.expires)>srvNow()?TC.d
 async function tcClass(){const r=await tcCall('t_class',{p_class:TC.cls});if(!r)return;TC.cd=r;TC.jr={since:0,res:[],students:r.students,works:r.works};
   TC.mats=null;TC.ex=null;tcClassRender();await tcPoll(true);await tcCTests();await tcMatLoad();await tcExtra()}
 function tcClassRender(){const box=$('#tcclass');if(!box||!TC.cd)return;const c=TC.cd,ws=c.works;
-  box.innerHTML=`<div class="note f tclass"><div class="tchead"><b>${esc(c.class.name)}</b><span class="tbtns"><button class="btn" data-k="ren">Переименовать</button><button class="btn" data-k="delcls">Удалить класс</button></span></div>
+  const ci=TC.classes.find(x=>x.id===c.class.id)||{};
+  box.innerHTML=`<div class="note f tclass"><div class="tchead"><b>${esc(c.class.name)}</b><span class="tbtns">${ci.archived?'<button class="btn" data-k="unarch">Вернуть из архива</button>':'<button class="btn" data-k="newyear">Новый учебный год…</button>'}<button class="btn" data-k="ren">Переименовать</button><button class="btn" data-k="delcls">Удалить класс</button></span></div>
+    ${ci.archived?`<p class="note tarch"><b>Класс в архиве${ci.archived_at?' с '+new Date(ci.archived_at).toLocaleDateString(LOC):''}.</b> ${ci.next?`Ученики перешли в класс «${esc(ci.next)}» с теми же кодами. `:''}Журнал, оценки и тесты сохранены — их можно смотреть и скачать.</p>`:''}
     <h3>Задания для класса</h3><p class="tmsg">Отметьте работы, которые задаёте классу: результаты по ним придут в журнал. Срок сдачи можно не ставить. Все работы и модели открыты всем и без входа — остальные ученики могут делать для тренировки.</p>
     <div class="twork">${WORKS.map(w=>{const o=ws.find(x=>x.work===w.id);return`<div class="twrow${o?' on':''}"><label class="twk"><input type="checkbox" data-wk="${w.id}"${o?' checked':''}><span>№ ${w.num}. ${w.title}</span></label>
       <label class="tdl"><span>Срок</span><input type="datetime-local" data-wd="${w.id}" value="${o&&o.deadline?toLocalInput(o.deadline):''}"${o?'':' disabled'} aria-label="Срок сдачи: ${esc(w.title)}"></label></div>`}).join('')}</div>
@@ -3613,7 +3629,7 @@ function tcSumPrint(){const d=tcSumData();if(!d)return;let el=$('#print');if(!el
   document.body.classList.add('printing');const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);setTimeout(()=>window.print(),60)}
 function tcStudHTML(){const ss=TC.jr?TC.jr.students:TC.cd.students,codes=Object.fromEntries(TC.cd.students.map(s=>[s.id,s.code]));
   if(!ss.length)return'<p class="gempty">Учеников пока нет — добавьте их выше.</p>';
-  return`<div class="tblwrap"><table class="res tst"><thead><tr><th>Ученик</th><th>Код для входа</th><th>Вход</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${ss.map(s=>`<tr><td>${esc(s.name)}</td><td><code class="scode">${codes[s.id]||''}</code></td>
+  return`<div class="tblwrap"><table class="res tst"><thead><tr><th>Ученик</th><th>Код для входа</th><th>Вход</th><th><span class="sr">Действия</span></th></tr></thead><tbody>${ss.map(s=>`<tr><td>${esc(s.name)}</td><td>${String(codes[s.id]||'').startsWith('old-')?'<span class="jn">перешёл в новый класс</span>':`<code class="scode">${codes[s.id]||''}</code>`}</td>
     <td>${s.joined?`<span class="jy">✓ вход ${fmtDT(s.joined)}</span>`:'<span class="jn">ещё нет входа</span>'}</td>
     <td class="tact"><button class="mini" data-k="sreset" data-id="${s.id}" title="Разрешить вход с другого телефона или компьютера">Новое устройство</button><button class="mini" data-k="sren" data-id="${s.id}">Изменить имя</button><button class="mini del" data-k="sdel" data-id="${s.id}">Удалить</button></td></tr>`).join('')}</tbody></table></div>
     <div class="tools"><button class="btn" data-k="copycodes">Копировать коды</button><button class="btn" data-k="printcodes">${ICON.doc}Распечатать карточки с кодами</button></div>
@@ -3661,7 +3677,7 @@ let JRX=null;const jrCur=()=>JRX||TC.jr;
 function jrLatest(){const by={};(jrCur()?jrCur().res:[]).forEach(r=>{if(r.ok)by[r.student+'|'+r.work]=r});return by}
 const jrTries=(st,wk)=>(jrCur()?jrCur().res:[]).filter(x=>x.ok&&x.student===st&&x.work===wk);
 function jrFlags(r,by){const f=[],k=JSON.stringify(r.data&&r.data.r),w=WORKS.find(x=>x.id===r.work);
-  if(w&&w.vary&&r.data&&Array.isArray(r.data.r)&&r.data.r.length){const same=Object.values(by).filter(x=>x!==r&&x.work===r.work&&x.student!==r.student&&JSON.stringify(x.data&&x.data.r)===k).map(x=>stName(x.student));
+  if(w&&w.vary&&r.data&&Array.isArray(r.data.r)&&r.data.r.length){const same=Object.values(by).filter(x=>x!==r&&x.work===r.work&&x.student!==r.student&&!(r.data&&r.data.pair===x.student)&&JSON.stringify(x.data&&x.data.r)===k).map(x=>stName(x.student));
     if(same.length)f.push('Те же показания приборов, что у: '+same.join(', '))}
   if(r.data&&r.data.sec>0&&r.data.sec<90)f.push('Выполнена очень быстро: '+r.data.sec+' с');
   return f}
@@ -3673,7 +3689,7 @@ function tcJHTML(view){const jr=jrCur();if(!jr)return'';const by=jrLatest(),ss=j
   return`<div class="tblwrap"><table class="res jtab"><thead><tr><th>Ученик</th>${ws.map(w=>`<th title="${esc(w.title)}">№ ${w.num}</th>`).join('')}<th>Сдано</th></tr></thead><tbody>${ss.map(s=>{let k=0;
     const cells=ws.map(w=>{const r=by[s.id+'|'+w.id];if(!r)return'<td class="jn">—</td>';k++;const fl=jrFlags(r,by).length,t=r.data&&Array.isArray(r.data.t)?r.data.t:null;
       const gr=r.data&&r.data.g,na=jrTries(s.id,w.id).length;
-      return`<td class="jy${fl?' jw':''}"><button class="jcell" data-k="${KS}" data-id="${s.id}|${w.id}" aria-pressed="${SEL===s.id+'|'+w.id}" title="${esc(w.title)} · ${fmtDT(r.at)}">${fl?'⚠':''}${gr?`<span class="jg g${gr}">${gr}</span>`:fl?'':'✓'}${t?`<small>тест ${t[0]}/${t[1]}</small>`:''}${na>1?`<small>попыток: ${na}</small>`:''}</button></td>`}).join('');
+      return`<td class="jy${fl?' jw':''}"><button class="jcell" data-k="${KS}" data-id="${s.id}|${w.id}" aria-pressed="${SEL===s.id+'|'+w.id}" title="${esc(w.title)} · ${fmtDT(r.at)}">${fl?'⚠':''}${gr?`<span class="jg g${gr}">${gr}</span>`:fl?'':'✓'}${t?`<small>тест ${t[0]}/${t[1]}</small>`:''}${na>1?`<small>попыток: ${na}</small>`:''}${r.data&&r.data.pn?'<small>в паре</small>':''}</button></td>`}).join('');
     return`<tr><td>${esc(s.name)}</td>${cells}<td><b>${k}</b></td></tr>`}).join('')}</tbody></table></div>
     ${sel?tcDetail(sel,by):''}
     ${view?'<p class="tmsg">Нажмите на оценку, ✓ или ⚠, чтобы увидеть показания приборов и ошибки ученика.</p>':`<p class="tmsg jlive">${ICON.check}<span>Журнал обновляется сам каждые 10 секунд · <span class="jtime">${jr.at?'обновлено в '+new Date(jr.at).toLocaleTimeString(LOC):''}</span>. Нажмите на оценку, ✓ или ⚠, чтобы увидеть показания приборов и ошибки ученика.</span></p>
@@ -3682,6 +3698,7 @@ function tcDetail(r,by){const w=WORKS.find(x=>x.id===r.work),d=r.data||{},cols=w
   const num=v=>String(v).replace('.',LANG.code==='ru'?',':'.');
   return`<div class="note f jdet"><b>${esc(stName(r.student))} · № ${w?w.num+'. '+w.title:r.work}</b>
     <p class="tmsg">Сдано ${fmtDT(r.at)}${d.sec?` · время работы ${Math.floor(d.sec/60)} мин ${d.sec%60} с`:''}${d.g?'':d.a?` · проверок до успеха: ${d.a}`:''}${Array.isArray(d.t)?` · мини-тест ${d.t[0]} из ${d.t[1]}`:''}</p>
+    ${d.pn?`<p class="tmsg">Работа в паре с <b>${esc(d.pn)}</b> — результат записан обоим.</p>`:''}
     ${d.g?`<p class="tmsg">Оценка: <b>${d.g}</b> · ошибок ${d.e||0} из ${d.q||'—'}${(()=>{const a=jrTries(r.student,r.work);return a.length>1?` · попыток: ${a.length} (оценки: ${a.map(x=>x.data&&x.data.g||'✓').join(', ')})`:''})()}</p>`:''}
     ${Array.isArray(d.x)&&d.x.length?`<details class="jerr"><summary>Ошибки ученика (${d.x.length})</summary><ul>${d.x.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details>`:''}
     ${d.p?`<p class="tmsg">Результат с погрешностью: <b>${esc(d.p)}</b></p>`:''}
@@ -3709,7 +3726,7 @@ async function tcWork(id){const box=$(`.twrow input[data-wk="${id}"]`),dl=$(`.tw
   const j=$('#tcj');if(j)j.innerHTML=tcJHTML()}
 function printCodes(){const c=TC.cd;if(!c||!c.students.length)return;const url=location.href.split('#')[0];
   let el=$('#print');if(!el){el=document.createElement('div');el.id='print';document.body.appendChild(el)}
-  el.innerHTML=`<div class="pcards">${c.students.map(s=>`<div class="pcard"><small>Лаборатория Сириус · ${esc(c.class.name)}</small><b>${esc(s.name)}</b><code>${s.code}</code>
+  el.innerHTML=`<div class="pcards">${c.students.filter(s=>!s.code.startsWith('old-')).map(s=>`<div class="pcard"><small>Лаборатория Сириус · ${esc(c.class.name)}</small><b>${esc(s.name)}</b><code>${s.code}</code>
     <p>1. Откройте ${esc(url)}<br>2. Раздел «Лабораторные работы»<br>3. Введите этот код. Никому его не показывайте.</p></div>`).join('')}</div>`;
   document.body.classList.add('printing');
   const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);
@@ -3809,12 +3826,18 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
   if(k==='pw'){const f=$('#tpassf');f.hidden=!f.hidden;if(!f.hidden)$('#tpo').focus();return}
   if(k==='newcls'){const f=$('#tclassf');f.hidden=false;$('#tclassn').focus();return}
   if(k==='cls'){if(id===TC.cls)return;TC.cls=id;TC.cd=null;TC.jr=null;TC.sel=null;TC.ct=null;TC.tres=null;document.querySelectorAll('.tcls [data-k="cls"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));$('#tcclass').innerHTML='<p class="gempty">Загружаем класс…</p>';await tcClass();return}
+  if(k==='arch'){TC.arch=!TC.arch;tcRender();if(TC.cls)tcClassRender();return}
+  if(k==='newyear'){const c=TC.cd.class,ci=TC.classes.find(x=>x.id===c.id)||{},sug=c.name.replace(/\d+/,d=>String(+d+1));
+    const n=prompt('Новый учебный год. Как назвать новый класс?',sug===c.name?c.name+' (новый год)':sug);if(!n||!n.trim())return;
+    if(!confirm(`Ученики (${ci.students||0}) перейдут в класс «${n.trim()}» с теми же кодами — входить заново им не нужно.\n\nКласс «${c.name}» уйдёт в архив вместе с журналом, оценками и тестами. Работы и тесты новому классу нужно будет открыть заново.`))return;
+    const r=await tcCall('t_new_year',{p_class:c.id,p_name:n});if(r){TC.cls=r.id;TC.cd=null;TC.jr=null;TC.sel=null;toast(`Класс «${n.trim()}» создан, учеников перешло: ${r.moved}`);await tcLoad()}return}
+  if(k==='unarch'){if(await tcCall('t_class_archive',{p_class:TC.cls,p_on:false})){toast('Класс возвращён из архива');await tcLoad()}return}
   if(k==='ren'){const n=prompt('Новое название класса',TC.cd.class.name);if(!n||!n.trim())return;if(await tcCall('t_class_rename',{p_class:TC.cls,p_name:n})){await tcLoad()}return}
   if(k==='delcls'){if(!confirm(`Удалить класс «${TC.cd.class.name}» вместе с учениками и их результатами? Это нельзя отменить.`))return;if(await tcCall('t_class_delete',{p_class:TC.cls})){TC.cls=null;toast('Класс удалён');await tcLoad()}return}
   if(k==='sreset'){if(!confirm(`Разрешить «${stName(id)}» войти с другого устройства? На старом устройстве вход закроется.`))return;if(await tcCall('t_student_reset',{p_student:id})){toast('Готово: ученик может войти с нового устройства');await tcClass()}return}
   if(k==='sren'){const n=prompt('Имя ученика',stName(id));if(!n||!n.trim())return;if(await tcCall('t_student_rename',{p_student:id,p_name:n}))await tcClass();return}
   if(k==='sdel'){if(!confirm(`Удалить ученика «${stName(id)}» и все результаты ученика?`))return;if(await tcCall('t_student_delete',{p_student:id}))await tcClass();return}
-  if(k==='copycodes'){copyText(TC.cd.students.map(s=>s.name+' — '+s.code).join('\n'),t);return}
+  if(k==='copycodes'){copyText(TC.cd.students.filter(s=>!s.code.startsWith('old-')).map(s=>s.name+' — '+s.code).join('\n'),t);return}
   if(k==='printcodes'){printCodes();return}
   if(k==='jsel'){TC.sel=TC.sel===id?null:id;$('#tcj').innerHTML=tcJHTML();const d=$('#tcj .jdet');if(d)d.scrollIntoView({behavior:'smooth',block:'nearest'});return}
   if(k==='jcsv2'){jCSV2();return}
