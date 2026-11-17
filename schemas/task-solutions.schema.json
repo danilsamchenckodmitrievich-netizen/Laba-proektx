@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Axiora backend task solutions v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "solutions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "solutions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "method",
+          "variables",
+          "answer",
+          "steps",
+          "hints"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "method": {
+            "enum": [
+              "sympy",
+              "reasoning"
+            ]
+          },
+          "variables": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "symbol",
+                "domain",
+                "excluded_values"
+              ],
+              "properties": {
+                "symbol": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+                },
+                "domain": {
+                  "enum": [
+                    "real",
+                    "positive_real",
+                    "integer"
+                  ]
+                },
+                "excluded_values": {
+                  "type": "array",
+                  "uniqueItems": true,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          },
+          "answer": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "latex"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "solution_set",
+                  "expression",
+                  "quantity",
+                  "proof"
+                ]
+              },
+              "latex": {
+                "type": "string",
+                "minLength": 1
+              },
+              "values": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "unit": {
+                "type": "string",
+                "minLength": 1
+              },
+              "absolute_tolerance": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "solution_set",
+                        "expression",
+                        "quantity"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "values"
+                  ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "quantity"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "unit",
+                    "absolute_tolerance"
+                  ]
+                }
+              }
+            ]
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "latex",
+                "explanation"
+              ],
+              "properties": {
+                "latex": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "explanation": {
+                  "$ref": "#/$defs/localized"
+                }
+              }
+            }
+          },
+          "hints": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/localized"
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "answer": {
+                  "properties": {
+                    "kind": {
+                      "const": "proof"
+                    }
+                  }
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "method": {
+                  "const": "reasoning"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "localized": {
+      "type": "object",
+      "required": [
+        "ru",
+        "en"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "ru": {
+          "type": "string",
+          "minLength": 1
+        },
+        "en": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

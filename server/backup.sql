@@ -1,4 +1,4 @@
--- Лаборатория Сириус: резервная копия данных для администратора (кнопка в кабинете).
+-- Аксиора: резервная копия данных для администратора (кнопка в кабинете).
 -- В копию не входят хэши паролей, сессии и отметки устройств учеников; IP-хэши заявок тоже не выгружаются.
 -- Выполнять после всех остальных файлов.
 
@@ -7,7 +7,7 @@ language plpgsql security definer set search_path = '' as $$
 declare t lab.teachers := lab.teacher(p_token);
 begin
   if t.id is null or not t.is_admin then return jsonb_build_object('err', 'session'); end if;
-  return jsonb_build_object('format', 'lab-sirius-backup-1', 'created', now(), 'by', t.email,
+  return jsonb_build_object('format', 'axiora-backup-1', 'created', now(), 'by', t.email,
     'teachers', (select coalesce(jsonb_agg(jsonb_build_object('id', x.id, 'email', x.email, 'name', x.name, 'is_admin', x.is_admin, 'blocked', x.blocked, 'created_at', x.created_at) order by x.created_at), '[]') from lab.teachers x),
     'invites', (select coalesce(jsonb_agg(to_jsonb(x) order by x.created_at), '[]') from lab.invites x),
     'applications', (select coalesce(jsonb_agg(to_jsonb(x) - 'ip_hash' order by x.created_at), '[]') from lab.applications x),

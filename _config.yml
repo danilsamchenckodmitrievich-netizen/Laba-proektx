@@ -1,0 +1,13 @@
+# GitHub Pages serves the application and public catalog. Backend references and
+# development material are excluded from its Jekyll output. The Git repository
+# itself is public; these exclusions do not make reference answers secret.
+exclude:
+  - backend
+  - schemas
+  - tools
+  - tests
+  - notes
+  - CLAUDE.md
+  - DESIGN.md
+  - .impeccable
+  - docs/archive

@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "subjects": [
+    {
+      "id": "algebra",
+      "label": {
+        "ru": "Алгебра",
+        "en": "Algebra"
+      }
+    },
+    {
+      "id": "geometry",
+      "label": {
+        "ru": "Геометрия",
+        "en": "Geometry"
+      }
+    },
+    {
+      "id": "physics",
+      "label": {
+        "ru": "Физика",
+        "en": "Physics"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": "algebra-linear-001",
+      "subject": "algebra",
+      "topic": {
+        "ru": "Линейные уравнения",
+        "en": "Linear equations"
+      },
+      "title": {
+        "ru": "Неизвестное в уравнении",
+        "en": "Find the unknown"
+      },
+      "grade": 7,
+      "difficulty": "beginner",
+      "statement": {
+        "ru": "Решите уравнение \\(3x+5=26\\). Запишите преобразования и выполните проверку подстановкой.",
+        "en": "Solve \\(3x+5=26\\). Show the transformations and check your answer by substitution."
+      },
+      "illustrations": [],
+      "skills": [
+        "linear-equations",
+        "substitution"
+      ],
+      "estimated_minutes": 4,
+      "source": "axiora-original"
+    },
+    {
+      "id": "algebra-quadratic-001",
+      "subject": "algebra",
+      "topic": {
+        "ru": "Квадратные уравнения",
+        "en": "Quadratic equations"
+      },
+      "title": {
+        "ru": "Два корня",
+        "en": "Two roots"
+      },
+      "grade": 8,
+      "difficulty": "intermediate",
+      "statement": {
+        "ru": "Решите уравнение \\(x^2-5x+6=0\\). Обоснуйте, что найдены все действительные корни.",
+        "en": "Solve \\(x^2-5x+6=0\\). Explain why you have found every real root."
+      },
+      "illustrations": [],
+      "skills": [
+        "quadratic-equations",
+        "factorization"
+      ],
+      "estimated_minutes": 6,
+      "source": "axiora-original"
+    },
+    {
+      "id": "algebra-domain-001",
+      "subject": "algebra",
+      "topic": {
+        "ru": "Рациональные уравнения",
+        "en": "Rational equations"
+      },
+      "title": {
+        "ru": "Не потеряйте ограничение",
+        "en": "Keep the domain restriction"
+      },
+      "grade": 8,
+      "difficulty": "advanced",
+      "statement": {
+        "ru": "Решите уравнение \\(\\frac{x^2-4}{x-2}=5\\). Укажите область допустимых значений и проверьте корень в исходном уравнении.",
+        "en": "Solve \\(\\frac{x^2-4}{x-2}=5\\). State the domain restriction and check the root in the original equation."
+      },
+      "illustrations": [],
+      "skills": [
+        "rational-equations",
+        "domain-restrictions",
+        "factorization"
+      ],
+      "estimated_minutes": 8,
+      "source": "axiora-original"
+    },
+    {
+      "id": "geometry-area-001",
+      "subject": "geometry",
+      "topic": {
+        "ru": "Площадь прямоугольника",
+        "en": "Rectangle area"
+      },
+      "title": {
+        "ru": "Площадь по двум сторонам",
+        "en": "Area from two sides"
+      },
+      "grade": 7,
+      "difficulty": "beginner",
+      "statement": {
+        "ru": "Стороны прямоугольника равны \\(6\\,\\text{см}\\) и \\(4\\,\\text{см}\\). Найдите его площадь. Укажите единицу измерения.",
+        "en": "A rectangle has sides of \\(6\\,\\text{cm}\\) and \\(4\\,\\text{cm}\\). Find its area and state the unit."
+      },
+      "illustrations": [
+        {
+          "src": "assets/tasks/rectangle.svg",
+          "alt": {
+            "ru": "Прямоугольник со сторонами 6 см и 4 см. Чертёж условный.",
+            "en": "Rectangle with sides of 6 cm and 4 cm. Not to scale."
+          }
+        }
+      ],
+      "skills": [
+        "rectangle-area",
+        "units"
+      ],
+      "estimated_minutes": 3,
+      "source": "axiora-original"
+    },
+    {
+      "id": "geometry-pythagoras-001",
+      "subject": "geometry",
+      "topic": {
+        "ru": "Теорема Пифагора",
+        "en": "Pythagorean theorem"
+      },
+      "title": {
+        "ru": "Найдите гипотенузу",
+        "en": "Find the hypotenuse"
+      },
+      "grade": 8,
+      "difficulty": "intermediate",
+      "statement": {
+        "ru": "В прямоугольном треугольнике \\(ABC\\) угол \\(C\\) прямой, \\(AC=6\\,\\text{см}\\), \\(BC=8\\,\\text{см}\\). Найдите \\(AB\\).",
+        "en": "In right triangle \\(ABC\\), angle \\(C\\) is a right angle, \\(AC=6\\,\\text{cm}\\), and \\(BC=8\\,\\text{cm}\\). Find \\(AB\\)."
+      },
+      "illustrations": [
+        {
+          "src": "assets/tasks/right-triangle.svg",
+          "alt": {
+            "ru": "Треугольник ABC: прямой угол C, AC = 6 см, BC = 8 см. Чертёж условный.",
+            "en": "Triangle ABC: right angle at C, AC = 6 cm, BC = 8 cm. Not to scale."
+          }
+        }
+      ],
+      "skills": [
+        "pythagorean-theorem",
+        "positive-length"
+      ],
+      "estimated_minutes": 6,
+      "source": "axiora-original"
+    },
+    {
+      "id": "geometry-median-proof-001",
+      "subject": "geometry",
+      "topic": {
+        "ru": "Равенство треугольников",
+        "en": "Congruent triangles"
+      },
+      "title": {
+        "ru": "Почему медиана — высота?",
+        "en": "Why is the median an altitude?"
+      },
+      "grade": 7,
+      "difficulty": "advanced",
+      "statement": {
+        "ru": "В треугольнике \\(ABC\\) известно, что \\(AB=AC\\), а \\(M\\) — середина \\(BC\\). Докажите, что \\(AM\\perp BC\\). Обоснуйте каждый переход.",
+        "en": "In triangle \\(ABC\\), \\(AB=AC\\) and \\(M\\) is the midpoint of \\(BC\\). Prove that \\(AM\\perp BC\\). Justify every step."
+      },
+      "illustrations": [
+        {
+          "src": "assets/tasks/isosceles-median.svg",
+          "alt": {
+            "ru": "Равнобедренный треугольник ABC с медианой AM. Прямой угол заранее не отмечен.",
+            "en": "Isosceles triangle ABC with median AM. No right angle is assumed."
+          }
+        }
+      ],
+      "skills": [
+        "triangle-congruence",
+        "geometric-proof"
+      ],
+      "estimated_minutes": 10,
+      "source": "axiora-original"
+    },
+    {
+      "id": "physics-speed-001",
+      "subject": "physics",
+      "topic": {
+        "ru": "Равномерное движение",
+        "en": "Uniform motion"
+      },
+      "title": {
+        "ru": "Скорость велосипедиста",
+        "en": "A cyclist’s speed"
+      },
+      "grade": 7,
+      "difficulty": "beginner",
+      "statement": {
+        "ru": "Велосипедист движется равномерно и проезжает \\(150\\,\\text{м}\\) за \\(30\\,\\text{с}\\). Найдите скорость в метрах в секунду.",
+        "en": "A cyclist moves at a constant speed and travels \\(150\\,\\text{m}\\) in \\(30\\,\\text{s}\\). Find the speed in metres per second."
+      },
+      "illustrations": [],
+      "skills": [
+        "speed",
+        "units"
+      ],
+      "estimated_minutes": 4,
+      "source": "axiora-original"
+    },
+    {
+      "id": "physics-density-001",
+      "subject": "physics",
+      "topic": {
+        "ru": "Плотность вещества",
+        "en": "Density"
+      },
+      "title": {
+        "ru": "Плотность в СИ",
+        "en": "Density in SI units"
+      },
+      "grade": 7,
+      "difficulty": "intermediate",
+      "statement": {
+        "ru": "Масса образца \\(540\\,\\text{г}\\), объём \\(200\\,\\text{см}^3\\). Найдите плотность в \\(\\text{кг/м}^3\\). Покажите перевод единиц.",
+        "en": "A sample has a mass of \\(540\\,\\text{g}\\) and a volume of \\(200\\,\\text{cm}^3\\). Find its density in \\(\\text{kg/m}^3\\). Show the unit conversions."
+      },
+      "illustrations": [],
+      "skills": [
+        "density",
+        "si-conversion"
+      ],
+      "estimated_minutes": 7,
+      "source": "axiora-original"
+    },
+    {
+      "id": "physics-efficiency-001",
+      "subject": "physics",
+      "topic": {
+        "ru": "КПД простых механизмов",
+        "en": "Efficiency of simple machines"
+      },
+      "title": {
+        "ru": "Наклонная плоскость",
+        "en": "An inclined plane"
+      },
+      "grade": 7,
+      "difficulty": "advanced",
+      "statement": {
+        "ru": "Груз массой \\(8\\,\\text{кг}\\) равномерно поднимают по наклонной плоскости длиной \\(2\\,\\text{м}\\) на высоту \\(1\\,\\text{м}\\). Сила тяги \\(50\\,\\text{Н}\\) направлена вдоль плоскости. Найдите КПД в процентах. Примите \\(g=10\\,\\text{Н/кг}\\).",
+        "en": "A load of mass \\(8\\,\\text{kg}\\) is pulled at constant speed along an incline of length \\(2\\,\\text{m}\\) to a height of \\(1\\,\\text{m}\\). A pulling force of \\(50\\,\\text{N}\\) acts along the incline. Find the efficiency as a percentage. Use \\(g=10\\,\\text{N/kg}\\)."
+      },
+      "illustrations": [
+        {
+          "src": "assets/tasks/inclined-plane.svg",
+          "alt": {
+            "ru": "Груз на наклонной плоскости: длина 2 м, высота 1 м, сила тяги вдоль плоскости. Чертёж условный.",
+            "en": "Load on an incline: length 2 m, height 1 m, pulling force along the incline. Not to scale."
+          }
+        }
+      ],
+      "skills": [
+        "work",
+        "efficiency",
+        "inclined-plane"
+      ],
+      "estimated_minutes": 9,
+      "source": "axiora-original"
+    }
+  ]
+}

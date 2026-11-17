@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">Inclined plane / Наклонная плоскость</title>
+  <desc id="desc">Incline length 2 m, vertical rise 1 m, load 8 kg, pulling force 50 N along the incline. Not to scale.</desc>
+  <rect width="480" height="300" rx="16" fill="#FBFBF7"/>
+  <g stroke="#1F2340" stroke-width="3" fill="none" stroke-linejoin="round">
+    <path d="M70 242 380 87v155Z"/><path d="M363 242v-17h17" stroke-width="2"/>
+    <g transform="translate(215 169.5) rotate(-26.565)">
+      <rect x="-36" y="-42" width="72" height="40" rx="3" fill="#F3F1F7"/>
+      <path d="M36-22h88m-12-9 12 9-12 9" stroke="#5B3C9E"/>
+    </g>
+  </g>
+  <g font-family="sans-serif" font-size="20" fill="#1F2340" text-anchor="middle">
+    <text x="150" y="220">2 m</text><text x="420" y="176">1 m</text><text x="185" y="113">8 kg</text><text x="303" y="75">F = 50 N</text>
+  </g>
+</svg>

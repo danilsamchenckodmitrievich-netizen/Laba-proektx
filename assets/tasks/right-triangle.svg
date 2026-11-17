@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-labelledby="title desc">
+  <title id="title">Right triangle ABC / Прямоугольный треугольник ABC</title>
+  <desc id="desc">Right angle at C. AC = 6 cm, BC = 8 cm. Not to scale.</desc>
+  <rect width="480" height="300" rx="16" fill="#FBFBF7"/>
+  <g stroke="#1F2340" stroke-width="3" fill="none" stroke-linejoin="round">
+    <path d="M115 65V230H360Z"/><path d="M115 210h20v20" stroke-width="2"/>
+  </g>
+  <g font-family="sans-serif" font-size="22" fill="#1F2340" text-anchor="middle">
+    <text x="106" y="47">A</text><text x="100" y="257">C</text><text x="378" y="252">B</text>
+    <text x="66" y="158">6 cm</text><text x="240" y="267">8 cm</text><text x="259" y="130">?</text>
+  </g>
+</svg>

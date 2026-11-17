@@ -28,6 +28,6 @@ jobs:
       - name: Сайт открывается
         run: |
           code=$(curl -sS -m 30 -o page.html -w '%{http_code}' "$SITE" || true)
-          if [ "$code" = "200" ] && grep -q 'Лаборатория' page.html; then echo "Сайт открывается"; exit 0; fi
+          if [ "$code" = "200" ] && grep -q '<title>Аксиора' page.html; then echo "Сайт открывается"; exit 0; fi
           echo "::error::Сайт не открывается (код $code)."
           exit 1

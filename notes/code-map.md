@@ -31,7 +31,9 @@ tags: [code]
 
 `#lab/<id>`, `#work/<id>`, `#task/<base64>`, `#test/<uuid>`, `#teacher`, `#install`, `#works`, `#progress`, иначе главная.
 
-## Ключи localStorage (`lab-sirius-…`)
+## Ключи localStorage (`axiora-…`)
+
+Перенос старых ключей и совместимость кодов результатов — `assets/brand.js`, [ребрендинг](branding.md).
 
 acc, device, queue (неотправленные результаты), grades, mtasks, journal, task, name, works, visited, filter, theme, backup, vid.
 

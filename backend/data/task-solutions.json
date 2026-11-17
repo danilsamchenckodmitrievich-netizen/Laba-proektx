@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "solutions": [
+    {
+      "task_id": "algebra-linear-001",
+      "method": "sympy",
+      "variables": [
+        {
+          "symbol": "x",
+          "domain": "real",
+          "excluded_values": []
+        }
+      ],
+      "answer": {
+        "kind": "solution_set",
+        "latex": "x=7",
+        "values": [
+          "7"
+        ]
+      },
+      "steps": [
+        {
+          "latex": "3x=26-5",
+          "explanation": {
+            "ru": "Вычтите 5 из обеих частей уравнения.",
+            "en": "Subtract 5 from both sides."
+          }
+        },
+        {
+          "latex": "x=21/3=7",
+          "explanation": {
+            "ru": "Разделите обе части на 3.",
+            "en": "Divide both sides by 3."
+          }
+        },
+        {
+          "latex": "3\\cdot7+5=26",
+          "explanation": {
+            "ru": "Подстановка подтверждает ответ.",
+            "en": "Substitution confirms the answer."
+          }
+        }
+      ],
+      "hints": [
+        {
+          "ru": "Сначала освободите слагаемое с неизвестным.",
+          "en": "First isolate the term containing the unknown."
+        }
+      ]
+    },
+    {
+      "task_id": "algebra-quadratic-001",
+      "method": "sympy",
+      "variables": [
+        {
+          "symbol": "x",
+          "domain": "real",
+          "excluded_values": []
+        }
+      ],
+      "answer": {
+        "kind": "solution_set",
+        "latex": "x\\in\\{2,3\\}",
+        "values": [
+          "2",
+          "3"
+        ]
+      },
+      "steps": [
+        {
+          "latex": "x^2-5x+6=(x-2)(x-3)",
+          "explanation": {
+            "ru": "Разложите трёхчлен на множители.",
+            "en": "Factor the quadratic."
+          }
+        },
+        {
+          "latex": "(x-2)(x-3)=0",
+          "explanation": {
+            "ru": "Произведение равно нулю, если хотя бы один множитель равен нулю.",
+            "en": "A product is zero when at least one factor is zero."
+          }
+        },
+        {
+          "latex": "x=2\\;\\text{или}\\;x=3",
+          "explanation": {
+            "ru": "Оба корня удовлетворяют исходному уравнению.",
+            "en": "Both roots satisfy the original equation."
+          }
+        }
+      ],
+      "hints": [
+        {
+          "ru": "Найдите два числа, произведение которых 6, а сумма 5.",
+          "en": "Find two numbers whose product is 6 and whose sum is 5."
+        }
+      ]
+    },
+    {
+      "task_id": "algebra-domain-001",
+      "method": "sympy",
+      "variables": [
+        {
+          "symbol": "x",
+          "domain": "real",
+          "excluded_values": [
+            "2"
+          ]
+        }
+      ],
+      "answer": {
+        "kind": "solution_set",
+        "latex": "x=3,\\quad x\\ne2",
+        "values": [
+          "3"
+        ]
+      },
+      "steps": [
+        {
+          "latex": "x\\ne2",
+          "explanation": {
+            "ru": "Знаменатель исходной дроби не должен равняться нулю.",
+            "en": "The original denominator must be nonzero."
+          }
+        },
+        {
+          "latex": "\\frac{(x-2)(x+2)}{x-2}=5",
+          "explanation": {
+            "ru": "Разложите разность квадратов на множители.",
+            "en": "Factor the difference of two squares."
+          }
+        },
+        {
+          "latex": "x+2=5\\Rightarrow x=3",
+          "explanation": {
+            "ru": "Сокращение допустимо при указанном ограничении.",
+            "en": "Cancellation is valid under the stated restriction."
+          }
+        },
+        {
+          "latex": "\\frac{3^2-4}{3-2}=5",
+          "explanation": {
+            "ru": "Корень входит в область допустимых значений.",
+            "en": "The root belongs to the permitted domain."
+          }
+        }
+      ],
+      "hints": [
+        {
+          "ru": "До сокращения дроби запишите, при каком x её знаменатель обращается в ноль.",
+          "en": "Before cancelling, find the value of x that makes the denominator zero."
+        }
+      ]
+    },
+    {
+      "task_id": "geometry-area-001",
+      "method": "sympy",
+      "variables": [],
+      "answer": {
+        "kind": "quantity",
+        "latex": "S=24\\,\\text{см}^2",
+        "values": [
+          "24"
+        ],
+        "unit": "cm^2",
+        "absolute_tolerance": 0
+      },
+      "steps": [
+        {
+          "latex": "S=ab",
+          "explanation": {
+            "ru": "Площадь прямоугольника равна произведению его сторон.",
+            "en": "Multiply the two side lengths."
+          }
+        },
+        {
+          "latex": "S=6\\cdot4=24\\,\\text{см}^2",
+          "explanation": {
+            "ru": "При умножении длин получаются квадратные единицы.",
+            "en": "Multiplying lengths gives square units."
+          }
+        }
+      ],
+      "hints": [
+        {
+          "ru": "Вспомните формулу площади прямоугольника.",
+          "en": "Recall the formula for the area of a rectangle."
+        }
+      ]
+    },
+    {
+      "task_id": "geometry-pythagoras-001",
+      "method": "sympy",
+      "variables": [],
+      "answer": {
+        "kind": "quantity",
+        "latex": "AB=10\\,\\text{см}",
+        "values": [
+          "10"
+        ],
+        "unit": "cm",
+        "absolute_tolerance": 0
+      },
+      "steps": [
+        {
+          "latex": "AB^2=AC^2+BC^2",
+          "explanation": {
+            "ru": "Примените теорему Пифагора к гипотенузе AB.",
+            "en": "Apply the Pythagorean theorem to hypotenuse AB."
+          }
+        },
+        {
+          "latex": "AB^2=6^2+8^2=100",
+          "explanation": {
+            "ru": "Подставьте длины катетов.",
+            "en": "Substitute the leg lengths."
+          }
+        },
+        {
+          "latex": "AB=\\sqrt{100}=10\\,\\text{см}",
+          "explanation": {
+            "ru": "Длина положительна, поэтому берём положительный корень.",
+            "en": "A length is positive, so take the positive root."
+          }
+        }
+      ],
+      "hints": [
+        {
+          "ru": "Сторона напротив прямого угла — гипотенуза.",
+          "en": "The side opposite the right angle is the hypotenuse."
+        }
+      ]
+    },
+    {
+      "task_id": "geometry-median-proof-001",
+      "method": "reasoning",
+      "variables": [],
+      "answer": {
+        "kind": "proof",
+        "latex": "AM\\perp BC"
+      },
+      "steps": [
+        {
+          "latex": "AB=AC,\\quad BM=MC,\\quad AM=AM",
+          "explanation": {
+            "ru": "Две стороны равны по условию, третья сторона общая.",
+            "en": "Two pairs of sides are equal by the givens, and the third side is shared."
+          }
+        },
+        {
+          "latex": "\\triangle ABM\\cong\\triangle ACM",
+          "explanation": {
+            "ru": "Треугольники равны по трём сторонам.",
+            "en": "The triangles are congruent by SSS."
+          }
+        },
+        {
+          "latex": "\\angle BMA=\\angle AMC",
+          "explanation": {
+            "ru": "Соответствующие углы равных треугольников равны.",
+            "en": "Corresponding angles in congruent triangles are equal."
+          }
+        },
+        {
+          "latex": "\\angle BMA+\\angle AMC=180^\\circ",
+          "explanation": {
+            "ru": "Углы смежные, так как B, M и C лежат на одной прямой.",
+            "en": "The angles form a straight angle because B, M and C are collinear."
+          }
+        },
+        {
+          "latex": "\\angle BMA=\\angle AMC=90^\\circ",
+          "explanation": {
+            "ru": "Равные смежные углы прямые, значит AM перпендикулярна BC.",
+            "en": "Equal adjacent angles on a straight line are right angles, so AM is perpendicular to BC."
+          }
+        }
+      ],
+      "hints": [
+        {
+          "ru": "Сравните треугольники ABM и ACM по трём сторонам.",
+          "en": "Compare triangles ABM and ACM using their three sides."
+        }
+      ]
+    },
+    {
+      "task_id": "physics-speed-001",
+      "method": "sympy",
+      "variables": [],
+      "answer": {
+        "kind": "quantity",
+        "latex": "v=5\\,\\text{м/с}",
+        "values": [
+          "5"
+        ],
+        "unit": "m/s",
+        "absolute_tolerance": 0
+      },
+      "steps": [
+        {
+          "latex": "v=s/t",
+          "explanation": {
+            "ru": "Для равномерного движения скорость равна отношению пути ко времени.",
+            "en": "For uniform motion, divide distance by time."
+          }
+        },
+        {
+          "latex": "v=150/30=5\\,\\text{м/с}",
+          "explanation": {
+            "ru": "Значения уже выражены в метрах и секундах.",
+            "en": "The values are already in metres and seconds."
+          }
+        }
+      ],
+      "hints": [
+        {
+          "ru": "Разделите пройденный путь на время движения.",
+          "en": "Divide the distance travelled by the travel time."
+        }
+      ]
+    },
+    {
+      "task_id": "physics-density-001",
+      "method": "sympy",
+      "variables": [],
+      "answer": {
+        "kind": "quantity",
+        "latex": "\\rho=2700\\,\\text{кг/м}^3",
+        "values": [
+          "2700"
+        ],
+        "unit": "kg/m^3",
+        "absolute_tolerance": 0
+      },
+      "steps": [
+        {
+          "latex": "m=0.54\\,\\text{кг}",
+          "explanation": {
+            "ru": "Переведите граммы в килограммы.",
+            "en": "Convert grams to kilograms."
+          }
+        },
+        {
+          "latex": "V=200\\cdot10^{-6}=0.0002\\,\\text{м}^3",
+          "explanation": {
+            "ru": "Один кубический сантиметр равен одной миллионной кубического метра.",
+            "en": "One cubic centimetre is one millionth of a cubic metre."
+          }
+        },
+        {
+          "latex": "\\rho=m/V=0.54/0.0002=2700\\,\\text{кг/м}^3",
+          "explanation": {
+            "ru": "Разделите массу на объём в единицах СИ.",
+            "en": "Divide the mass by the volume in SI units."
+          }
+        }
+      ],
+      "hints": [
+        {
+          "ru": "При переводе объёма коэффициент перевода длины нужно возвести в куб.",
+          "en": "When converting volume, cube the length conversion factor."
+        }
+      ]
+    },
+    {
+      "task_id": "physics-efficiency-001",
+      "method": "sympy",
+      "variables": [],
+      "answer": {
+        "kind": "quantity",
+        "latex": "\\eta=80\\%",
+        "values": [
+          "80"
+        ],
+        "unit": "%",
+        "absolute_tolerance": 0
+      },
+      "steps": [
+        {
+          "latex": "A_{\\text{п}}=mgh=8\\cdot10\\cdot1=80\\,\\text{Дж}",
+          "explanation": {
+            "ru": "Полезная работа равна увеличению потенциальной энергии груза.",
+            "en": "Useful work equals the increase in the load’s potential energy."
+          }
+        },
+        {
+          "latex": "A_{\\text{з}}=Fl=50\\cdot2=100\\,\\text{Дж}",
+          "explanation": {
+            "ru": "Сила направлена вдоль перемещения по наклонной плоскости.",
+            "en": "The force acts along the displacement on the incline."
+          }
+        },
+        {
+          "latex": "\\eta=\\frac{A_{\\text{п}}}{A_{\\text{з}}}\\cdot100\\%=80\\%",
+          "explanation": {
+            "ru": "КПД — отношение полезной работы к затраченной, выраженное в процентах.",
+            "en": "Efficiency is useful work divided by input work, expressed as a percentage."
+          }
+        }
+      ],
+      "hints": [
+        {
+          "ru": "Различайте высоту подъёма и путь вдоль наклонной плоскости.",
+          "en": "Distinguish the vertical rise from the distance along the incline."
+        }
+      ]
+    }
+  ]
+}

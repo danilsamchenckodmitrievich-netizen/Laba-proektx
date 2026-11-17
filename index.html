@@ -3,15 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Лаборатория Сириус — физика 7 класса</title>
+<title>Аксиора — физика 7 класса</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="alternate" hreflang="ru" href="https://danilsamchenckodmitrievich-netizen.github.io/Laba-proektx/">
 <link rel="alternate" hreflang="en" href="https://danilsamchenckodmitrievich-netizen.github.io/Laba-proektx/en/">
 <meta name="theme-color" content="#5B3C9E">
+<meta name="description" content="Аксиора — интерактивные модели и лабораторные работы по физике 7 класса.">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Сириус">
+<meta name="apple-mobile-web-app-title" content="Аксиора">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -53,7 +54,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid var(-
 .logo svg{width:38px;height:auto;flex:none}
 .logo b{font-size:22px;font-weight:800;color:var(--brand);letter-spacing:-.2px}
 .logo span{font-size:22px;font-weight:500;color:var(--muted)}
-.logo{min-width:0;flex:0 1 auto}
+.logo{min-width:0;min-height:44px;flex:0 1 auto}
 .logo div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 @media(max-width:460px){.logo{gap:8px}.logo svg{width:32px}.logo b,.logo span{font-size:19px}.top{padding:14px 10px 14px 16px;gap:2px}.chev svg{width:20px;height:20px}.theme svg{width:23px;height:23px}.burger svg{width:27px;height:27px}}
 @media(max-width:380px){.logo svg{width:28px}.logo b,.logo span{font-size:16px}}
@@ -456,9 +457,11 @@ table.jtab td.jx{color:#C4245F;font-weight:800;text-align:center}td.jfl{color:#B
 <body>
 <div class="wrap" id="app"></div>
 
+<script src="assets/brand.js"></script>
 <script>
 (function(){
 'use strict';
+AxioraBrand.migrate(window);
 /* совместимость: roundRect у холста есть не во всех браузерах (Safari до 16, старые Firefox) */
 if(window.CanvasRenderingContext2D&&!CanvasRenderingContext2D.prototype.roundRect){
   CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){
@@ -2764,7 +2767,7 @@ const MTASKS={
     {q:'Чему равен КПД сейчас? Ответ — в процентах.',ans:P=>{const a=P.ang*Math.PI/180;return Math.sin(a)/(Math.sin(a)+P.mu*Math.cos(a))*100},u:'%',why:'η = Aп / Aз · 100 % = m · g · h / (F · l) · 100 %.'}],
   energy:[{q:'Какова потенциальная энергия мяча в начале? Ответ — в джоулях (g = 9,8 Н/кг).',ans:P=>P.m*G*P.h,u:'Дж',why:'Eп = m · g · h.'},
     {q:'Сделайте так, чтобы после первого удара мяч подскочил ровно на половину начальной высоты.',ok:P=>P.loss===50,why:'После удара остаётся (100 − потери) % энергии, а высота подскока пропорциональна энергии: потери 50 % — подскок вдвое ниже.'}]};
-let MSOLVED=new Set();try{MSOLVED=new Set(JSON.parse(localStorage.getItem('lab-sirius-mtasks')||'[]'))}catch(_){}
+let MSOLVED=new Set();try{MSOLVED=new Set(JSON.parse(localStorage.getItem('axiora-mtasks')||'[]'))}catch(_){}
 function mtHTML(l){const ts=MTASKS[l.id];if(!ts)return'';
   return`<div class="note f mtasks" id="mtasks"><b>Задачи · решено ${ts.filter((t,i)=>MSOLVED.has(l.id+':'+i)).length} из ${ts.length}</b><p class="tmsg">Подберите параметры или посчитайте и нажмите «Проверить». Подсказок нет — пробуйте, пока не получится.</p>
     ${ts.map((t,i)=>{const sv=MSOLVED.has(l.id+':'+i);return`<div class="mtask${sv?' done':''}" data-i="${i}"><p><b>${i+1}.</b> ${t.q}</p>
@@ -2774,24 +2777,24 @@ function mtCheck(i){const l=cur,t=MTASKS[l.id][i],r=$('#mtr'+i);let ok;
   if(t.ans){const v=num(($('#mta'+i)||{}).value||''),e=t.ans(P,S);if(isNaN(v)){r.className='mtres';r.textContent='Впишите ответ числом.';return}
     ok=Math.abs(v-e)<=Math.max(Math.abs(e)*.03,.05)}else ok=!!t.ok(P,S);
   r.className='mtres '+(ok?'ok':'bad');
-  if(ok){MSOLVED.add(l.id+':'+i);try{localStorage.setItem('lab-sirius-mtasks',JSON.stringify([...MSOLVED]))}catch(_){}
+  if(ok){MSOLVED.add(l.id+':'+i);try{localStorage.setItem('axiora-mtasks',JSON.stringify([...MSOLVED]))}catch(_){}
     r.textContent=`✓ Верно! ${t.ans?'Ответ: '+f1(t.ans(P,S),2).replace(/[,.]?0+$/,'')+' '+t.u+'. ':''}${t.why}`;r.closest('.mtask').classList.add('done');
     const h=$('#mtasks>b');if(h){const ts=MTASKS[l.id];h.textContent=`Задачи · решено ${ts.filter((x,j)=>MSOLVED.has(l.id+':'+j)).length} из ${ts.length}`}}
   else r.textContent=t.ans?'Пока неверно — пересчитайте.':'Пока не получилось — измените параметры и проверьте ещё раз.'}
 /* ===================== APP ===================== */
 const app=$('#app');
 let visited=new Set();
-try{visited=new Set(JSON.parse(localStorage.getItem('lab-sirius-visited')||'[]').filter(id=>LABS.some(l=>l.id===id)))}catch(e){}
-function saveVisited(){try{localStorage.setItem('lab-sirius-visited',JSON.stringify([...visited]))}catch(e){}}
+try{visited=new Set(JSON.parse(localStorage.getItem('axiora-visited')||'[]').filter(id=>LABS.some(l=>l.id===id)))}catch(e){}
+function saveVisited(){try{localStorage.setItem('axiora-visited',JSON.stringify([...visited]))}catch(e){}}
 let doneW=new Set();
-try{doneW=new Set(JSON.parse(localStorage.getItem('lab-sirius-works')||'[]').filter(id=>WORKS.some(w=>w.id===id)))}catch(e){}
-function saveDone(){try{localStorage.setItem('lab-sirius-works',JSON.stringify([...doneW]))}catch(e){}}
+try{doneW=new Set(JSON.parse(localStorage.getItem('axiora-works')||'[]').filter(id=>WORKS.some(w=>w.id===id)))}catch(e){}
+function saveDone(){try{localStorage.setItem('axiora-works',JSON.stringify([...doneW]))}catch(e){}}
 /* ученик, задание от учителя и код результата (сайт без сервера: данные живут в ссылке и в коде) */
 let SNAME='',TASK=null,lastRes=null;
-try{SNAME=localStorage.getItem('lab-sirius-name')||''}catch(_){}
-try{TASK=JSON.parse(localStorage.getItem('lab-sirius-task')||'null')}catch(_){}
+try{SNAME=localStorage.getItem('axiora-name')||''}catch(_){}
+try{TASK=JSON.parse(localStorage.getItem('axiora-task')||'null')}catch(_){}
 if(TASK&&!Array.isArray(TASK.w))TASK=null;if(TASK){TASK.done=TASK.done||[];TASK.codes=TASK.codes||{}}
-function setTask(t){TASK=t;try{t?localStorage.setItem('lab-sirius-task',JSON.stringify(t)):localStorage.removeItem('lab-sirius-task')}catch(_){}}
+function setTask(t){TASK=t;try{t?localStorage.setItem('axiora-task',JSON.stringify(t)):localStorage.removeItem('axiora-task')}catch(_){}}
 let showAllW=false;
 const inTask=id=>!gated()&&!!TASK&&TASK.w.includes(id);
 /* следующая невыполненная работа задания (после after по кругу); null — всё выполнено */
@@ -2800,18 +2803,15 @@ function taskNext(after){if(!TASK)return null;const w=TASK.w,i=Math.max(0,w.inde
 const esc=v=>String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const b64e=v=>{const b=new TextEncoder().encode(v);let t='';b.forEach(x=>t+=String.fromCharCode(x));return btoa(t).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
 const b64d=v=>{v=v.replace(/-/g,'+').replace(/_/g,'/');while(v.length%4)v+='=';const t=atob(v),b=new Uint8Array(t.length);for(let i=0;i<t.length;i++)b[i]=t.charCodeAt(i);return new TextDecoder().decode(b)};
-function fnv(v){let h=0x811c9dc5;for(let i=0;i<v.length;i++){h^=v.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}return h.toString(36)}
-const SALT='lab-sirius-7';
-function makeCode(w,name,rows,d,s,gr){const p=b64e(JSON.stringify({v:1,n:name,w:w.id,t:Math.round(Date.now()/60000),r:rows,d,s,g:gr||undefined}));return'LS-'+p+'-'+fnv(p+SALT)}
-function readCode(c){const m=String(c).trim().match(/^LS-([A-Za-z0-9_-]+)-([0-9a-z]+)$/);if(!m)return null;let o;try{o=JSON.parse(b64d(m[1]))}catch(_){return null}
-  if(!o||typeof o!=='object')return null;return{o,ok:fnv(m[1]+SALT)===m[2]}}
+function makeCode(w,name,rows,d,s,gr){return AxioraBrand.makeCode({n:name,w:w.id,t:Math.round(Date.now()/60000),r:rows,d,s,g:gr||undefined})}
+function readCode(c){return AxioraBrand.readCode(c)}
 function copyText(v,btn){const done=()=>{if(!btn)return;const o=btn.textContent;btn.textContent='Скопировано ✓';setTimeout(()=>{btn.textContent=o},1600)};
   const fb=()=>{const ta=document.createElement('textarea');ta.value=v;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,v.length);try{document.execCommand('copy');done()}catch(_){}ta.remove()};
   if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(v).then(done,fb);else fb()}
 
 const CATS=['Все',...Array.from(new Set(LABS.map(l=>l.cat)))];
 let filter='Все',cur=null,P={},S={},paused=false,raf=0,last=0,outT=0,cv=null,g=null,homeScroll=0,worksScroll=0,fromHome=false,outEls=[],T=[];
-try{const f=sessionStorage.getItem('lab-sirius-filter');if(f&&CATS.includes(f))filter=f}catch(e){}
+try{const f=sessionStorage.getItem('axiora-filter');if(f&&CATS.includes(f))filter=f}catch(e){}
 
 const ICON={
   play:'<svg viewBox="0 0 18 18" fill="currentColor" aria-hidden="true"><path d="M5 3.5v11a1 1 0 0 0 1.5.86l9-5.5a1 1 0 0 0 0-1.72l-9-5.5A1 1 0 0 0 5 3.5z"/></svg>',
@@ -2839,9 +2839,9 @@ const ICON={
   teacher:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v4c0 1.5 2.2 3 5 3s5-1.5 5-3v-4M21 9v5"/></svg>',
   hand:'<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10V4.5a1.5 1.5 0 0 1 3 0V9m0-1.5a1.5 1.5 0 0 1 3 0V9m0-.5a1.5 1.5 0 0 1 3 0V12a6 6 0 0 1-6 6h-.6a5 5 0 0 1-4-2L3 12.6a1.5 1.5 0 0 1 2.3-1.9L7 12.5"/></svg>'
 };
-const logoSVG='<svg viewBox="0 0 50 36" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" style="color:var(--brand)" aria-hidden="true"><path d="M3 4h16c3 0 6 2 6 5v23c0-3-3-5-6-5H3z"/><path d="M47 4H31c-3 0-6 2-6 5v23c0-3 3-5 6-5h16z"/></svg>';
-function header(){return `<header class="top"><button class="logo" data-act="home" aria-label="На главную">${logoSVG}<div><b>Лаборатория</b> <span>Сириус</span></div></button><button class="chev" data-act="menu" aria-label="Разделы" aria-haspopup="dialog">${ICON.chev}</button><a class="lang" href="${LANG.other}" lang="${LANG.code==='ru'?'en':'ru'}" aria-label="${LANG.name}">${LANG.label}</a><button class="theme" data-act="theme" aria-label="${C.dark?'Светлая тема':'Тёмная тема'}">${C.dark?ICON.sun:ICON.moon}</button><button class="burger" data-act="menu" aria-label="Меню" aria-haspopup="dialog">${ICON.burger}</button></header>`}
-/* меню разделов в стиле «Сириус.Школы» */
+const logoSVG='<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" style="color:var(--brand)" aria-hidden="true"><path d="M10 35 24 10l8 14"/><path d="m38 35-7-12H17"/></svg>';
+function header(){return `<header class="top"><button class="logo" data-act="home" aria-label="На главную">${logoSVG}<div><b>Аксиора</b></div></button><button class="chev" data-act="menu" aria-label="Разделы" aria-haspopup="dialog">${ICON.chev}</button><a class="lang" href="${LANG.other}" lang="${LANG.code==='ru'?'en':'ru'}" aria-label="${LANG.name}">${LANG.label}</a><button class="theme" data-act="theme" aria-label="${C.dark?'Светлая тема':'Тёмная тема'}">${C.dark?ICON.sun:ICON.moon}</button><button class="burger" data-act="menu" aria-label="Меню" aria-haspopup="dialog">${ICON.burger}</button></header>`}
+/* меню разделов */
 /* язык: английская версия собирается скриптом tools/build_en.py в en/index.html */
 const LANG={code:'ru',other:'en/',label:'EN',name:'English version'};
 const menuEl=document.createElement('div');menuEl.className='menu';menuEl.id='menu';menuEl.hidden=true;document.body.appendChild(menuEl);
@@ -2861,7 +2861,7 @@ menuEl.addEventListener('click',e=>{
   if(e.target===menuEl||e.target.closest('[data-m="close"]')){closeMenu();return}
   const a=e.target.closest('a');if(!a)return;e.preventDefault();closeMenu();fromHome=false;
   const href=a.getAttribute('href');if(href&&href!=='#'){location.hash=href.slice(1);return}
-  filter=CATS.includes(a.dataset.cat)?a.dataset.cat:'Все';try{sessionStorage.setItem('lab-sirius-filter',filter)}catch(_){}
+  filter=CATS.includes(a.dataset.cat)?a.dataset.cat:'Все';try{sessionStorage.setItem('axiora-filter',filter)}catch(_){}
   homeScroll=0;if(location.hash&&location.hash!=='#')location.hash='';else{setFilter(filter);window.scrollTo({top:0,behavior:'smooth'})}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menuEl.hidden){e.stopImmediatePropagation();closeMenu()}},true);
@@ -2880,7 +2880,7 @@ function cardsHTML(){
     </a>`).join('');
 }
 function home(){
-  const back=cur&&cur.kind!=='work';stop();cur=null;document.title='Лаборатория Сириус — физика 7 класса';
+  const back=cur&&cur.kind!=='work';stop();cur=null;document.title='Аксиора — физика 7 класса';
   const done=LABS.filter(l=>visited.has(l.id)).length;
   const count=c=>c==='Все'?LABS.length:LABS.filter(l=>l.cat===c).length;
   app.innerHTML=`<div class="view">`+header()+`
@@ -2893,7 +2893,7 @@ function home(){
 }
 function worksHome(){
   if(gated()){worksGated();return}
-  const back=cur&&cur.kind==='work';stop();cur=null;document.title='Лабораторные работы — Лаборатория Сириус';
+  const back=cur&&cur.kind==='work';stop();cur=null;document.title='Лабораторные работы — Аксиора';
   const inT=inTask,only=!!TASK&&!showAllW;
   const list=only?TASK.w.map(id=>WORKS.find(w=>w.id===id)):TASK?WORKS.filter(w=>inT(w.id)).concat(WORKS.filter(w=>!inT(w.id))):WORKS;
   const isDone=id=>only?TASK.done.includes(id):doneW.has(id);
@@ -2921,7 +2921,7 @@ function worksHome(){
 let instEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();instEv=e;const b=$('#instbtn');if(b)b.hidden=false});
 const standalone=()=>(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
 /* мой прогресс: оценки по работам и тестам, что осталось сдать */
-async function progressHome(){stop();cur=null;document.title='Мой прогресс — Лаборатория Сириус';
+async function progressHome(){stop();cur=null;document.title='Мой прогресс — Аксиора';
   const a=accLive(),st=a&&a.kind==='s';
   app.innerHTML=`<div class="view">`+header()+`<section class="hero"><h1>Мой прогресс</h1><p>${st?`${esc(a.name)} · ${esc(a.cls)}. Оценки по работам и тестам и то, что осталось сдать.`:'Оценки по работам, выполненным на этом устройстве. Войдите по личному коду, чтобы видеть и задания учителя.'}</p></section><main class="sheet tsheet" id="prog"><p class="gempty">Загружаем…</p></main></div>`;window.scrollTo(0,0);
   let res=null,tests=[];
@@ -2945,12 +2945,12 @@ async function progressHome(){stop();cur=null;document.title='Мой прогр�
     ${st?`<h2 class="th2">Тесты</h2>${tests.length?`<div class="tblwrap"><table class="res tadm"><thead><tr><th>Тест</th><th>Результат</th><th>Статус</th></tr></thead><tbody>${tests.map(t=>`<tr><td>${esc(t.title)}</td><td>${t.state==='done'&&t.max?`<b>${decRu(+t.score)} из ${t.max}</b>`:'—'}</td><td>${t.state==='done'?'сдан':t.state==='active'?`<a href="#test/${t.id}">идёт — продолжить</a>`:t.state==='new'?'не начат'+(t.deadline?' · до '+fmtDT(t.deadline):''):'срок прошёл'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="gempty">Учитель пока не открыл тестов.</p>'}`:''}
     ${st&&SRV!=='on'?'<p class="tmsg">Нет связи с сервером — показаны оценки с этого устройства.</p>':''}
     <div class="tools"><a class="btn main" href="#works">К лабораторным работам${ICON.next}</a></div>`}
-function installHome(){stop();cur=null;document.title='Установить — Лаборатория Сириус';
+function installHome(){stop();cur=null;document.title='Установить — Аксиора';
   const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   app.innerHTML=`<div class="view">`+header()+`
-  <section class="hero"><h1>Установить на телефон</h1><p>Значок «Сириус» появится на экране телефона, а сайт будет открываться и без интернета.</p></section>
+  <section class="hero"><h1>Установить на телефон</h1><p>Значок «Аксиора» появится на экране телефона, а сайт будет открываться и без интернета.</p></section>
   <main class="sheet tsheet">
-    ${standalone()?'<div class="note ok"><b>Уже установлено.</b> Вы открыли «Сириус» с экрана телефона — он работает и без интернета.</div>':''}
+    ${standalone()?'<div class="note ok"><b>Уже установлено.</b> Вы открыли «Аксиора» с экрана телефона — он работает и без интернета.</div>':''}
     <div class="note f"><b>Android и компьютер (Chrome, Edge, Яндекс Браузер)</b>
       <div class="tools"><button class="btn main" id="instbtn" data-act="inst"${instEv?'':' hidden'}>${ICON.dl}Установить</button></div>
       <ol><li>Откройте меню браузера (три точки).</li><li>Выберите «Установить приложение» или «Добавить на главный экран».</li></ol></div>
@@ -2958,8 +2958,8 @@ function installHome(){stop();cur=null;document.title='Установить — 
     <p class="hint">${ICON.check}<span>Чтобы сайт работал без интернета, откройте его хотя бы один раз с интернетом. Новые версии подгружаются сами, когда интернет есть.</span></p>
   </main></div>`;window.scrollTo(0,0)}
 /* журнал класса: проверенные коды на устройстве учителя */
-let JOURNAL=[];try{JOURNAL=JSON.parse(localStorage.getItem('lab-sirius-journal')||'[]').filter(x=>x&&x.c&&x.w)}catch(_){}
-function jSave(){try{localStorage.setItem('lab-sirius-journal',JSON.stringify(JOURNAL))}catch(_){}}
+let JOURNAL=[];try{JOURNAL=JSON.parse(localStorage.getItem('axiora-journal')||'[]').filter(x=>x&&x.c&&x.w)}catch(_){}
+function jSave(){try{localStorage.setItem('axiora-journal',JSON.stringify(JOURNAL))}catch(_){}}
 function jAdd(list){let n=0;list.forEach(([c,o])=>{if(JOURNAL.some(x=>x.c===c))return;JOURNAL.push({c,n:String(o.n||'—').slice(0,60),w:o.w,t:+o.t||0,r:+o.r||0,d:Array.isArray(o.d)?o.d:[],s:Array.isArray(o.s)?o.s:null,g:+o.g||0});n++});if(n)jSave();return n}
 const jWhen=t=>new Date(t*60000).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 function jRender(){const box=$('#tjournal');if(!box)return;
@@ -2974,7 +2974,7 @@ function jCSV(){if(!JOURNAL.length){$('#tjournal').innerHTML='<p class="gempty">
   const q=v=>'"'+String(v).replace(/"/g,'""')+'"',lines=[['Ученик','Работа','Когда','Оценка','Опытов','Мини-тест','Показания приборов'].map(q).join(';')];
   JOURNAL.slice().sort((a,b)=>a.n.localeCompare(b.n,'ru')||a.t-b.t).forEach(x=>{const w=WORKS.find(y=>y.id===x.w);
     lines.push([x.n,w?'№ '+w.num+'. '+w.title:x.w,jWhen(x.t),x.g||'',x.r,x.s?x.s[0]+' из '+x.s[1]:'',x.d.map(r=>(Array.isArray(r)?r:[]).map(v=>String(v).replace('.',',')).join(' / ')).join(' · ')].map(q).join(';'))});
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='zhurnal-laboratoriya-sirius.csv';
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download='zhurnal-axiora.csv';
   document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 function jClear(){if(!JOURNAL.length)return;if(!confirm('Очистить журнал класса на этом устройстве? Коды учеников можно будет проверить заново.'))return;JOURNAL=[];jSave();jRender()}
 function tLink(){const ids=[...document.querySelectorAll('.tchecks input:checked')].map(x=>x.value);
@@ -2993,7 +2993,7 @@ function tVerify(){const codes=$('#tcodes').value.split(/\s+/).filter(Boolean),o
   const added=jAdd(codes.map((c,i)=>[c.trim(),all[i]]).filter(([c,r])=>r&&r.ok&&WORKS.some(w=>w.id===r.o.w)).map(([c,r])=>[c,r.o]));
   jRender();if(added)out.insertAdjacentHTML('beforeend',`<p class="tmsg">В журнал класса добавлено: ${pl3(added,'работа','работы','работ')}.</p>`)}
 function setFilter(c){
-  filter=c;try{sessionStorage.setItem('lab-sirius-filter',c)}catch(e){}
+  filter=c;try{sessionStorage.setItem('axiora-filter',c)}catch(e){}
   document.querySelectorAll('.chips .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cat===c));
   const el=$('#cards');if(el){el.innerHTML=cardsHTML();el.querySelectorAll('.card').forEach(c=>c.classList.add('ready'))}
 }
@@ -3005,7 +3005,7 @@ function openLab(id){
   stop();cur=LABS.find(l=>l.id===id);visited.add(id);saveVisited();paused=false;
   P={};cur.params.forEach(p=>P[p.id]=p.val);S={};cur.init(S,P);
   const l=cur,idx=LABS.indexOf(l),nx=LABS[(idx+1)%LABS.length];
-  document.title=l.title+' — Лаборатория Сириус';
+  document.title=l.title+' — Аксиора';
   app.innerHTML=`<div class="view">`+header()+`
   <section class="labhead" style="--lab:${l.color}">
     <button class="back" data-act="back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg>Все явления</button>
@@ -3044,7 +3044,7 @@ function openWork(id){
   stop();cur=WORKS.find(w=>w.id===id);paused=false;P={};S={};lastRes=null;TLOCK=null;WSEED=Math.floor(Math.random()*4294967296);cur.init(S);wSnap();WSTART=Date.now();WATT=0;WGR=null;if(PAIR&&PAIR.work!==id)PAIR=null;
   T=Array.from({length:cur.rows},()=>({key:null,k:{}}));
   const w=cur,idx=WORKS.indexOf(w),tw=inTask(w.id),tn=tw?taskNext(w.id):null,nx=WORKS.find(x=>x.id===tn)||WORKS[(idx+1)%WORKS.length];
-  document.title=w.title+' — Лаборатория Сириус';
+  document.title=w.title+' — Аксиора';
   app.innerHTML=`<div class="view">`+header()+`
   <section class="labhead" style="--lab:${w.color}">
     <button class="back" data-act="back"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3L5 8l5 5"/></svg>Все работы</button>
@@ -3126,8 +3126,8 @@ function wMeasure(){
 /* проверка работы. Пока работа не закончена, сайт говорит только, чего не хватает, — без подсказок о верности.
    Первая полная проверка ставит оценку, показывает ошибки и как их исправить и закрывает работу; дальше — только «Переделать работу». */
 let WGR=null,GRADES={};
-try{GRADES=JSON.parse(localStorage.getItem('lab-sirius-grades')||'{}')||{}}catch(_){}
-function gAdd(id,x){(GRADES[id]=GRADES[id]||[]).push(x);GRADES[id]=GRADES[id].slice(-20);try{localStorage.setItem('lab-sirius-grades',JSON.stringify(GRADES))}catch(_){}}
+try{GRADES=JSON.parse(localStorage.getItem('axiora-grades')||'{}')||{}}catch(_){}
+function gAdd(id,x){(GRADES[id]=GRADES[id]||[]).push(x);GRADES[id]=GRADES[id].slice(-20);try{localStorage.setItem('axiora-grades',JSON.stringify(GRADES))}catch(_){}}
 const vli=a=>a.map(m=>`<li>${m}</li>`).join('');
 function wLock(on){document.querySelectorAll('#wtab input,#wtab select,.quiz input,.prec input,#mtest input').forEach(x=>x.disabled=on);
   document.querySelectorAll('[data-act="rec"],[data-act="tclear"],[data-act="rowclr"]').forEach(b=>b.disabled=on)}
@@ -3209,7 +3209,7 @@ function printReport(){
     ${done&&lastRes.test?`<p><b>Мини-тест:</b> ${lastRes.test[0]} из ${lastRes.test[1]}.</p>`:''}
     ${done&&lastRes.g?`<p><b>Оценка:</b> ${lastRes.g}.</p>`:''}
     ${done?`<p>${w.concl}</p><p class="pv"><b>Работа выполнена и проверена на сайте.</b>${lastRes.code?`<br>Код результата: <code>${lastRes.code}</code>`:''}</p>`:'<p class="pv">Работа ещё не проверена на сайте.</p>'}
-    <p class="pf">Лаборатория Сириус · ${esc(location.href.split('#')[0])}</p>`;
+    <p class="pf">Аксиора · ${esc(location.href.split('#')[0])}</p>`;
   {const pg=$('#pgraph');if(pg&&!renderGraph(pg,w,620)){pg.previousElementSibling.remove();pg.remove()}}
   document.body.classList.add('printing');
   const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);
@@ -3302,7 +3302,7 @@ app.addEventListener('click',e=>{
   const a=e.target.closest('a.card,a.nextlab');if(a){if(!cur)fromHome=true;return}
   const t=e.target.closest('button');if(!t)return;
   if(t.dataset.act==='menu'){openMenu();return}
-  if(t.dataset.act==='theme'){const th=C.dark?'light':'dark';document.documentElement.dataset.theme=th;try{localStorage.setItem('lab-sirius-theme',th)}catch(_){}
+  if(t.dataset.act==='theme'){const th=C.dark?'light':'dark';document.documentElement.dataset.theme=th;try{localStorage.setItem('axiora-theme',th)}catch(_){}
     t.innerHTML=th==='dark'?ICON.sun:ICON.moon;t.setAttribute('aria-label',th==='dark'?'Светлая тема':'Тёмная тема');return}
   if(t.dataset.act==='home'){if(cur)goHome();else if(location.hash&&location.hash!=='#')location.hash='';else window.scrollTo({top:0,behavior:'smooth'});return}
   {const ac=t.dataset.act;
@@ -3334,7 +3334,7 @@ app.addEventListener('click',e=>{
 });
 app.addEventListener('input',e=>{
   const el=e.target;if(el.closest&&el.closest('#wtab')){el.classList.remove('ok','bad');wGraphSoon();return}
-  if(el.id==='sname'){SNAME=el.value;try{localStorage.setItem('lab-sirius-name',SNAME)}catch(_){}return}
+  if(el.id==='sname'){SNAME=el.value;try{localStorage.setItem('axiora-name',SNAME)}catch(_){}return}
   if(!el.dataset.p||!cur)return;
   const p=cur.params.find(x=>x.id===el.dataset.p);P[p.id]=parseFloat(el.value);setFill(el);
   const v=$('#v_'+p.id);v.textContent=fmtVal(p,P[p.id]);bump(v);clearPresets();changed(p.id);updateOuts();
@@ -3351,11 +3351,11 @@ document.addEventListener('keydown',e=>{
    сайт работает как раньше: работы открыты, результат передаётся кодом. */
 const API=Object.assign({url:'https://meloatifwjyulrzalnfm.supabase.co',key:'sb_publishable_mY3QMOIzexBmm-OdN5R9lg_guAzHqkk'},window.LAB_API||{});
 let SRV='?',ACC=null,SKEW=0,FLASH='',WSTART=0,WATT=0;
-try{ACC=JSON.parse(localStorage.getItem('lab-sirius-acc')||'null')}catch(_){}
+try{ACC=JSON.parse(localStorage.getItem('axiora-acc')||'null')}catch(_){}
 if(!ACC||!ACC.token||!ACC.kind)ACC=null;
-function saveAcc(){try{ACC?localStorage.setItem('lab-sirius-acc',JSON.stringify(ACC)):localStorage.removeItem('lab-sirius-acc')}catch(_){}}
-function devId(){let d='';try{d=localStorage.getItem('lab-sirius-device')||''}catch(_){}
-  if(d.length<16){d=Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');try{localStorage.setItem('lab-sirius-device',d)}catch(_){}}return d}
+function saveAcc(){try{ACC?localStorage.setItem('axiora-acc',JSON.stringify(ACC)):localStorage.removeItem('axiora-acc')}catch(_){}}
+function devId(){let d='';try{d=localStorage.getItem('axiora-device')||''}catch(_){}
+  if(d.length<16){d=Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');try{localStorage.setItem('axiora-device',d)}catch(_){}}return d}
 async function rpc(fn,args,ms){const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),ms||12000);
   try{const r=await fetch(API.url+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':API.key,'Content-Type':'application/json'},body:JSON.stringify(args||{}),signal:ac.signal,cache:'no-store'});
     if(!r.ok)throw new Error('http '+r.status);const j=await r.json();
@@ -3401,8 +3401,8 @@ const lockText=a=>a==='late'?'Срок сдачи этой работы прош
 function waitHome(){stop();cur=null;
   app.innerHTML=`<div class="view">`+header()+`<section class="hero"><h1>Лабораторные работы</h1><p>Подключаемся к серверу школы…</p></section><main class="sheet tsheet"><p class="gempty">Проверяем связь с сервером…</p></main></div>`}
 /* результаты, которые не удалось отправить, ждут интернета на устройстве */
-function qGet(){try{return JSON.parse(localStorage.getItem('lab-sirius-queue')||'[]')}catch(_){return[]}}
-function qSet(q){try{q.length?localStorage.setItem('lab-sirius-queue',JSON.stringify(q)):localStorage.removeItem('lab-sirius-queue')}catch(_){}}
+function qGet(){try{return JSON.parse(localStorage.getItem('axiora-queue')||'[]')}catch(_){return[]}}
+function qSet(q){try{q.length?localStorage.setItem('axiora-queue',JSON.stringify(q)):localStorage.removeItem('axiora-queue')}catch(_){}}
 async function qFlush(){const q=qGet();if(!q.length)return;const left=[];
   for(const it of q){try{const r=it.partner?await rpc('s_submit_pair',{p_token:it.token,p_work:it.work,p_ok:true,p_data:it.data,p_partner:it.partner})
         :await rpc('s_submit',{p_token:it.token,p_work:it.work,p_ok:true,p_data:it.data});
@@ -3445,7 +3445,7 @@ function loginBar(){if(SRV==='off')return'';const fl=FLASH?`<span class="aflash"
     <form class="acode" data-form="slogin"><input id="scode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Код, например K7M2QX" aria-label="Личный код ученика"><button class="btn main" type="submit">Войти</button></form>
     <span class="aerr" id="aerr" role="alert"></span></div></div>`}
 function worksGated(){
-  const back=cur&&cur.kind==='work';stop();cur=null;document.title='Лабораторные работы — Лаборатория Сириус';
+  const back=cur&&cur.kind==='work';stop();cur=null;document.title='Лабораторные работы — Аксиора';
   const a=accLive(),st=a&&a.kind==='s',isDone=id=>st?a.done.includes(id):doneW.has(id);
   const list=WORKS.map(w=>[w,wAssigned(w.id)]).sort((x,y)=>(x[1]==='no'?1:0)-(y[1]==='no'?1:0));
   const asg=list.filter(x=>x[1]!=='no'),open=st?asg.length:WORKS.length,done=(st?asg:list).filter(x=>isDone(x[0].id)).length;
@@ -3494,7 +3494,7 @@ function offlineHTML(open){return`<details class="offl"${open?' open':''}><summa
     </div>
     <div class="note f"><b>2. Проверка кодов результатов</b>
       <p class="tmsg">Без сервера ученик получает код результата. Вставьте коды сюда, каждый с новой строки. Одинаковые показания приборов у разных учеников будут отмечены.</p>
-      <textarea id="tcodes" rows="5" placeholder="LS-…" aria-label="Коды результатов"></textarea>
+      <textarea id="tcodes" rows="5" placeholder="AX-…" aria-label="Коды результатов"></textarea>
       <div class="tools"><button class="btn main" data-act="tverify">${ICON.check}Проверить коды</button></div>
       <div id="tres"></div>
     </div>
@@ -3504,7 +3504,7 @@ function offlineHTML(open){return`<details class="offl"${open?' open':''}><summa
       <div class="tools"><button class="btn" data-act="jcsv">${ICON.dl}Скачать для Excel</button><button class="btn" data-act="jclear">Очистить журнал</button></div>
     </div></details>`}
 function teacherHome(){
-  stop();cur=null;document.title='Для учителя — Лаборатория Сириус';
+  stop();cur=null;document.title='Для учителя — Аксиора';
   if(ACC&&ACC.kind==='t'&&SRV!=='off'){tcHome();return}
   app.innerHTML=`<div class="view">`+header()+`
   <section class="hero"><h1>Для учителя</h1><p>Кабинет учителя: классы, личные коды учеников, открытие лабораторных работ и журнал результатов.</p></section>
@@ -3625,7 +3625,7 @@ function tcSumCSV(){const d=tcSumData();if(!d)return;const q=v=>'"'+String(v).re
 function tcSumPrint(){const d=tcSumData();if(!d)return;let el=$('#print');if(!el){el=document.createElement('div');el.id='print';document.body.appendChild(el)}
   el.innerHTML=`<h1>Итоговая ведомость</h1><h2>Класс ${esc(TC.cd?TC.cd.class.name:'')}</h2><p><b>Учитель:</b> ${esc(TC.me?TC.me.name:'')}&nbsp;&nbsp; <b>Дата:</b> ${new Date().toLocaleDateString(LOC)}</p>
     <table><tr><th>Ученик</th>${d.ws.map(w=>`<th>№ ${w.num}</th>`).join('')}${d.ts.map(t=>`<th>${esc(t.title)}</th>`).join('')}<th>Средняя</th></tr>${d.rows.map(r=>`<tr><td>${esc(r.name)}</td>${r.wc.map(x=>`<td>${x||'—'}</td>`).join('')}${r.tc.map(x=>`<td>${x||'—'}</td>`).join('')}<td>${r.avg||'—'}</td></tr>`).join('')}</table>
-    <p>${d.ws.map(w=>`№ ${w.num} — ${w.title}`).join('; ')}.</p><p class="pf">Лаборатория Сириус · ${esc(location.href.split('#')[0])}</p>`;
+    <p>${d.ws.map(w=>`№ ${w.num} — ${w.title}`).join('; ')}.</p><p class="pf">Аксиора · ${esc(location.href.split('#')[0])}</p>`;
   document.body.classList.add('printing');const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);setTimeout(()=>window.print(),60)}
 function tcStudHTML(){const ss=TC.jr?TC.jr.students:TC.cd.students,codes=Object.fromEntries(TC.cd.students.map(s=>[s.id,s.code]));
   if(!ss.length)return'<p class="gempty">Учеников пока нет — добавьте их выше.</p>';
@@ -3726,7 +3726,7 @@ async function tcWork(id){const box=$(`.twrow input[data-wk="${id}"]`),dl=$(`.tw
   const j=$('#tcj');if(j)j.innerHTML=tcJHTML()}
 function printCodes(){const c=TC.cd;if(!c||!c.students.length)return;const url=location.href.split('#')[0];
   let el=$('#print');if(!el){el=document.createElement('div');el.id='print';document.body.appendChild(el)}
-  el.innerHTML=`<div class="pcards">${c.students.filter(s=>!s.code.startsWith('old-')).map(s=>`<div class="pcard"><small>Лаборатория Сириус · ${esc(c.class.name)}</small><b>${esc(s.name)}</b><code>${s.code}</code>
+  el.innerHTML=`<div class="pcards">${c.students.filter(s=>!s.code.startsWith('old-')).map(s=>`<div class="pcard"><small>Аксиора · ${esc(c.class.name)}</small><b>${esc(s.name)}</b><code>${s.code}</code>
     <p>1. Откройте ${esc(url)}<br>2. Раздел «Лабораторные работы»<br>3. Введите этот код. Никому его не показывайте.</p></div>`).join('')}</div>`;
   document.body.classList.add('printing');
   const off=()=>{document.body.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);
@@ -3742,12 +3742,12 @@ function jCSV2(){const jr=TC.jr;if(!jr||!jr.res.length){toast('В журнале
 async function tcAdmin(){const r=await tcCall('a_overview',{});if(!r)return;TC.adm=r;tcAdminRender();tcStats();tcApps()}
 async function tcApps(){const r=await tcCall('a_apps',{});const b=$('#tcapps');if(!r||!b)return;TC.apps=r;b.innerHTML=tcAppsHTML()}
 function appLetter(a){const url=location.href.split('#')[0];
-  return`Здравствуйте, ${a.name}!\n\nВаша заявка на «Лабораторию Сириус» одобрена. Ваш код-приглашение: ${a.code}\nОн действует 30 дней.\n\nКак зарегистрироваться:\n1. Откройте ${url}#teacher\n2. В блоке «Регистрация учителя» введите код, своё имя, почту и пароль.\n3. В кабинете создайте класс, добавьте учеников и задайте им работы.\n\nЛаборатория Сириус`}
+  return`Здравствуйте, ${a.name}!\n\nВаша заявка на «Аксиору» одобрена. Ваш код-приглашение: ${a.code}\nОн действует 30 дней.\n\nКак зарегистрироваться:\n1. Откройте ${url}#teacher\n2. В блоке «Регистрация учителя» введите код, своё имя, почту и пароль.\n3. В кабинете создайте класс, добавьте учеников и задайте им работы.\n\nАксиора`}
 function tcAppsHTML(){const r=TC.apps;if(!r)return'<b>Заявки учителей</b><p class="gempty">Загружаем…</p>';const ap=r.apps||[];
   return`<b>Заявки учителей${r.new?` <span class="anew">новых: ${r.new}</span>`:''}</b>
     ${TC.letter?`<div class="aletter"><p class="tmsg">Заявка одобрена. Отправьте учителю письмо с кодом — на почту <b>${esc(TC.letter.email)}</b>:</p>
       <textarea readonly rows="9" id="aletter">${esc(appLetter(TC.letter))}</textarea>
-      <div class="tools"><a class="btn main" href="mailto:${encodeURIComponent(TC.letter.email)}?subject=${encodeURIComponent('Код-приглашение: Лаборатория Сириус')}&body=${encodeURIComponent(appLetter(TC.letter))}">Открыть в почте</a><button class="btn" data-k="copy" data-v="${esc(appLetter(TC.letter))}">Копировать письмо</button></div></div>`:''}
+      <div class="tools"><a class="btn main" href="mailto:${encodeURIComponent(TC.letter.email)}?subject=${encodeURIComponent('Код-приглашение: Аксиора')}&body=${encodeURIComponent(appLetter(TC.letter))}">Открыть в почте</a><button class="btn" data-k="copy" data-v="${esc(appLetter(TC.letter))}">Копировать письмо</button></div></div>`:''}
     ${ap.length?ap.map(a=>`<div class="aapp st-${a.status}"><div class="aapph"><b>${esc(a.name)}</b><span>${fmtDT(a.at)}</span></div>
       <p>${esc(a.email)} · ${esc(a.school)}${a.classes?' · '+esc(a.classes):''}</p>${a.comment?`<p class="acom">«${esc(a.comment)}»</p>`:''}
       ${a.status==='new'?`<div class="tools"><button class="btn main" data-k="aok" data-id="${a.id}">Одобрить</button><button class="btn" data-k="ano" data-id="${a.id}">Отклонить</button></div>`
@@ -3851,7 +3851,7 @@ async function kAct(t){const k=t.dataset.k,id=t.dataset.id;
     if(await tcCall('a_teacher_delete',{p_teacher:id})){toast('Аккаунт учителя удалён');TC.newPw=null;if(TC.view&&TC.view.id===id)TC.view=null;await tcAdmin()}return}
   if(k==='tview'){tcView(id);return}
   if(k==='backup'){t.disabled=true;const r=await tcCall('a_backup',{});t.disabled=false;if(!r)return;
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(r,null,1)],{type:'application/json'}));a.download='lab-sirius-backup-'+new Date().toISOString().slice(0,10)+'.json';
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(AxioraBrand.normalizeBackup(r),null,1)],{type:'application/json'}));a.download='axiora-backup-'+new Date().toISOString().slice(0,10)+'.json';
     document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);toast('Резервная копия скачана');return}
   if(k==='sumcsv'){tcSumCSV();return}
   if(k==='sumprint'){tcSumPrint();return}
@@ -3910,7 +3910,7 @@ async function stTestsLoad(){const box=$('#stests');if(!box||!ACC||ACC.kind!=='s
 let TT=null;
 function testHome(id){stop();cur=null;clearInterval(TT&&TT.tick);TT=null;
   if(!ACC||ACC.kind!=='s'){FLASH='Тесты проходят после входа по личному коду.';location.replace('#works');return}
-  document.title='Тест — Лаборатория Сириус';
+  document.title='Тест — Аксиора';
   app.innerHTML=`<div class="view">`+header()+`<section class="hero"><h1>Тест</h1><p>Загружаем вопросы…</p></section><main class="sheet tsheet" id="tst"><p class="gempty">Загружаем…</p></main></div>`;window.scrollTo(0,0);
   rpc('s_test_start',{p_token:ACC.token,p_test:id}).then(v=>{if(location.hash!=='#test/'+id)return;
     if(v.err){FLASH=v.err==='done'?'Этот тест уже сдан. Вторая попытка не даётся.':errText(v.err);location.replace('#works');return}
@@ -4113,8 +4113,8 @@ async function tcTestOpen(id,copy){const r=await tcCall('t_test_get',{p_test:id}
 /* счётчик посещений: случайный номер браузера, без личных данных; автотесты не считаются */
 let hitLast='';
 function hitPage(h){const pg=(h||'#').slice(1).replace(/^task\/.*/,'task').replace(/^test\/.*/,'test')||'home';if(pg===hitLast||navigator.webdriver)return;hitLast=pg;
-  let vid='';try{vid=localStorage.getItem('lab-sirius-vid')||''}catch(_){}
-  if(!/^[0-9a-f]{16,64}$/.test(vid)){vid=Array.from(crypto.getRandomValues(new Uint8Array(12)),x=>x.toString(16).padStart(2,'0')).join('');try{localStorage.setItem('lab-sirius-vid',vid)}catch(_){}}
+  let vid='';try{vid=localStorage.getItem('axiora-vid')||''}catch(_){}
+  if(!/^[0-9a-f]{16,64}$/.test(vid)){vid=Array.from(crypto.getRandomValues(new Uint8Array(12)),x=>x.toString(16).padStart(2,'0')).join('');try{localStorage.setItem('axiora-vid',vid)}catch(_){}}
   rpc('hit',{p_vid:vid,p_page:pg,p_mobile:!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches),p_lang:LANG.code},6000).catch(()=>{})}
 function route(){
   const h=location.hash;let m;bigOff();hitPage(h);
@@ -4156,7 +4156,7 @@ if(window.matchMedia){const mq=matchMedia('(prefers-color-scheme: dark)');mq.add
 new MutationObserver(themeUpdate).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class','style']});
 document.addEventListener('visibilitychange',()=>{last=performance.now()});
 
-try{const th=localStorage.getItem('lab-sirius-theme');if(th==='light'||th==='dark')document.documentElement.dataset.theme=th}catch(_){}
+try{const th=localStorage.getItem('axiora-theme');if(th==='light'||th==='dark')document.documentElement.dataset.theme=th}catch(_){}
 readColors();route();srvInit();
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 })();
