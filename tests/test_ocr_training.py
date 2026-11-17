@@ -1,10 +1,12 @@
 from dataclasses import asdict
 import json
+import contextlib
+import io
 from pathlib import Path
 import tempfile
-from types import SimpleNamespace
+from types import SimpleNamespace, ModuleType
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import nbformat
 
@@ -98,7 +100,7 @@ class OcrTrainingTests(unittest.TestCase):
     def test_notebooks_validate_compile_and_contain_no_execution_outputs(self):
         root = Path(__file__).resolve().parents[1]
         notebooks = list((root / "notebooks").glob("*.ipynb"))
-        self.assertEqual(len(notebooks), 2)
+        self.assertEqual({path.name for path in notebooks}, {"00_run_ocr_end_to_end.ipynb", "01_prepare_ocr_dataset.ipynb", "02_train_ocr_colab.ipynb"})
         for path in notebooks:
             notebook = nbformat.read(path, as_version=4)
             nbformat.validate(notebook)
@@ -108,6 +110,31 @@ class OcrTrainingTests(unittest.TestCase):
                     self.assertEqual(cell.outputs, [])
                     self.assertIsNone(cell.execution_count)
             self.assertNotRegex(json.dumps(notebook), r"hf_[A-Za-z0-9]{20,}")
+
+    def test_single_run_can_train_without_hub_credentials_and_does_not_print_them(self):
+        root = Path(__file__).resolve().parents[1]
+        notebook = nbformat.read(root / "notebooks/00_run_ocr_end_to_end.ipynb", as_version=4)
+        source = next(cell.source for cell in notebook.cells if "hub-preflight" in cell.metadata.get("tags", []))
+        for missing, invalid in [(True, False), (False, True), (False, False)]:
+            with self.subTest(missing=missing, invalid=invalid):
+                google = ModuleType("google")
+                colab = ModuleType("google.colab")
+                colab.userdata = Mock()
+                colab.userdata.get.return_value = None if missing else "fixture-secret"
+                google.colab = colab
+                hub = ModuleType("huggingface_hub")
+                hub.HfApi = Mock()
+                hub.HfApi.return_value.whoami.return_value = {"name": "fixture-owner"}
+                if invalid:
+                    hub.HfApi.return_value.whoami.side_effect = RuntimeError("invalid credentials")
+                namespace = {"PUSH_TO_HUB": True}
+                output = io.StringIO()
+                with patch.dict("sys.modules", {"google": google, "google.colab": colab, "huggingface_hub": hub}), contextlib.redirect_stdout(output):
+                    exec(compile(source, "notebook-hub-preflight", "exec"), namespace)
+                self.assertEqual(namespace["PUSH_TO_HUB"], not (missing or invalid))
+                self.assertNotIn("fixture-secret", output.getvalue())
+                if missing:
+                    hub.HfApi.assert_not_called()
 
 
 if __name__ == "__main__":

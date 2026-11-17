@@ -7,6 +7,17 @@
 
 ## Открыть ноутбуки
 
+**Для полного запуска одной командой:** [открыть единый ноутбук](https://colab.research.google.com/github/danilsamchenckodmitrievich-netizen/Laba-proektx/blob/main/notebooks/00_run_ocr_end_to_end.ipynb).
+Выберите T4, разрешите Drive и доступ к `HF_TOKEN`, затем **Среда выполнения → Выполнить все**.
+Если ZIP отсутствует, данные подготовятся автоматически; если есть совместимый checkpoint — обучение продолжится.
+Отсутствующий или недоступный `HF_TOKEN` не останавливает обучение: готовые веса сохраняются на Drive,
+а отправка на Hub откладывается. При этом варианте T4-сессия используется и во время подготовки данных;
+для экономии GPU-времени можно выбрать раздельные ноутбуки ниже.
+Чат ChatGPT можно закрыть после старта. Сама вкладка Colab должна оставаться открытой, если ваш тариф
+не предоставляет фоновое выполнение; бессрочная работа не гарантируется. [Условия Colab](https://research.google.com/colaboratory/faq.html).
+
+Для раздельной подготовки на CPU и обучения на GPU:
+
 1. [Подготовить данные в Colab](https://colab.research.google.com/github/danilsamchenckodmitrievich-netizen/Laba-proektx/blob/main/notebooks/01_prepare_ocr_dataset.ipynb).
 2. [Обучить модель и выгрузить веса в Colab](https://colab.research.google.com/github/danilsamchenckodmitrievich-netizen/Laba-proektx/blob/main/notebooks/02_train_ocr_colab.ipynb).
 
@@ -120,7 +131,7 @@ MathWriting: **CC BY-NC-SA 4.0**, Google LLC. Часть исходных LaTeX-
 - `benchmark.py` — отдельный CPU-процесс; справка: `python -m training.benchmark --help`.
 - `requirements-colab.txt` — закреплённые ML-зависимости. PyTorch/torchvision берутся из согласованной среды Colab;
   нужен PyTorch не ниже 2.6 для безопасной загрузки исходного PyTorch bin. Результат сохраняется в safetensors.
-- `tools/build_ocr_notebooks.py` — воспроизводимая сборка обоих `.ipynb`, без выводов и секретов.
+- `tools/build_ocr_notebooks.py` — воспроизводимая сборка трёх `.ipynb`, без выводов и секретов.
 
 Быстрые проверки: `python -m unittest discover -s tests -p 'test_*.py'`, `python tools/build_ocr_notebooks.py`.
 Зависимости проверок — `tools/requirements-dev.txt`. GPU и скачивание весов для CI не требуются.
