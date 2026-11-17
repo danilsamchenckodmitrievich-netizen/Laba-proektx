@@ -11,3 +11,5 @@ exclude:
   - DESIGN.md
   - .impeccable
   - docs/archive
+  - notebooks
+  - training
