@@ -409,7 +409,7 @@ train = [
         print("Версия для будущего Space:", uploaded_model["revision"])
         del upload_model, upload_processor
     else:
-        print("Автовыгрузка отключена настройкой; каталог экспорта:", upload_dir)
+        print("Выгрузка не выполнялась; каталог экспорта:", upload_dir)
     ''', "push-to-hub", "colab", "network"),
     md('''
     Подготовка Этапа 2 завершена. Реальные веса и оценка качества появятся после вашего полного запуска в Colab.
@@ -419,14 +419,131 @@ train = [
 ]
 
 
+def single_run_cells():
+    """One Colab Run all: reuse the tested trainer, prepare data only if absent."""
+    cells = json.loads(json.dumps(train))
+    cells[0] = md('''
+    # Аксиора: полный запуск OCR одной командой
+
+    Выберите аккаунт с нужным Drive, **T4 GPU** и нажмите **Среда выполнения → Выполнить все**.
+    Когда Colab запросит доступ к Drive, подтвердите его. Для автоматической выгрузки на Hub
+    добавьте `HF_TOKEN` в Секреты Colab и разрешите ноутбуку доступ.
+    Ноутбук сам подготовит данные при отсутствии ZIP, обучит модель и сохранит контрольные точки.
+    При доступном `HF_TOKEN` веса автоматически отправятся на Hub; без ключа обучение завершится с экспортом на Drive.
+    Готовый ZIP используется повторно, а совместимое обучение продолжается с последней контрольной точки.
+
+    Чат ChatGPT после старта можно закрыть: вычисления выполняются в Colab. Саму вкладку Colab лучше оставить
+    открытой. Непрерывное выполнение после её закрытия зависит от тарифа и условий Colab; Google AI Pro
+    не следует считать гарантией фонового выполнения. При обрыве можно восстановиться с Drive.
+
+    Основной профиль: полный MathWriting, 12 000 train, 1000 validation, 500 test, одна T4, FP16, три эпохи.
+    Подготовка полного архива требует загрузки около 2,9 ГБ. MathWriting имеет некоммерческую лицензию CC BY-NC-SA 4.0.
+    Для быстрой проверки выберите `RUN_MODE = "smoke"` и `DATASET_VARIANT = "excerpt"`; эти веса не пригодны для учеников.
+    ''')
+    result = []
+    for item in cells:
+        tags = item["metadata"].get("tags", [])
+        source = "".join(item["source"])
+        if "config" in tags:
+            item = code(source + '''
+
+DATASET_VARIANT = "full"
+PREPARE_LIMITS = {"train": 12000, "validation": 1000, "test": 500}
+SYNTHETIC_COUNT = 300
+DATASET_DIR = Path("/content") / ("axiora-ocr-data-" + DATASET_VARIANT)
+''', "config")
+        elif item["cell_type"] == "markdown" and source.startswith("## Восстановление данных"):
+            item = md('''
+            ## Данные: восстановление или автоматическая подготовка
+
+            Если ZIP на Drive уже есть, восстанавливаем его. Иначе загружаем MathWriting, формируем выборки
+            и сохраняем ZIP для последующих сессий. Отдельно открывать первый ноутбук не требуется.
+            ''')
+        elif "data" in tags:
+            item = code('''
+            from training.data import (download_mathwriting, prepare_dataset, zip_dataset,
+                                       unpack_dataset, audit_dataset, sha256_file)
+            import time
+
+            DATASET_ZIP = PERSIST_DIR / ("axiora-ocr-dataset-" + DATASET_VARIANT + ".zip")
+            original_zip = PERSIST_DIR / "axiora-ocr-dataset.zip"
+            if not DATASET_ZIP.exists() and original_zip.exists():
+                import zipfile
+                import json
+                with zipfile.ZipFile(original_zip) as existing_archive:
+                    original_variant = json.loads(existing_archive.read("dataset_report.json"))["variant"]
+                if original_variant == DATASET_VARIANT or original_variant == "custom":
+                    DATASET_ZIP = original_zip
+            if not DATASET_DIR.exists():
+                if DATASET_ZIP.exists():
+                    checksum_file = DATASET_ZIP.with_suffix(".zip.sha256")
+                    if checksum_file.exists() and sha256_file(DATASET_ZIP) != checksum_file.read_text().strip():
+                        raise RuntimeError("SHA-256 архива не совпадает. Восстановите целый архив перед продолжением.")
+                    unpack_dataset(DATASET_ZIP, DATASET_DIR)
+                else:
+                    print("Готового набора нет. Автоматически подготавливаем MathWriting:", DATASET_VARIANT)
+                    last_message = [0.0]
+                    def progress(written, total):
+                        if time.monotonic() - last_message[0] > 5:
+                            print(f"Загружено {written / 2**20:.0f} МБ" + (f" из {total / 2**20:.0f}" if total else ""))
+                            last_message[0] = time.monotonic()
+                    archive_path = download_mathwriting(DATASET_VARIANT, Path("/content") / f"mathwriting-{DATASET_VARIANT}.tgz", progress)
+                    prepare_dataset(archive_path, DATASET_DIR, PREPARE_LIMITS,
+                                    variant=DATASET_VARIANT, synthetic_count=SYNTHETIC_COUNT, seed=config.seed)
+            dataset_audit = audit_dataset(DATASET_DIR)
+            if RUN_MODE == "t4" and dataset_audit["report"]["variant"] == "excerpt":
+                raise RuntimeError("Найден excerpt: выберите smoke либо подготовьте full в новом DATASET_DIR и DATASET_ZIP.")
+            if not DATASET_ZIP.exists():
+                checksum = zip_dataset(DATASET_DIR, DATASET_ZIP)
+                DATASET_ZIP.with_suffix(".zip.sha256").write_text(checksum + "\\n")
+            print("Выборки:", dataset_audit["counts"])
+            print("Отпечаток данных:", dataset_audit["fingerprint"])
+            ''', "data", "auto-prepare")
+        result.append(item)
+        if tags == ["requires-gpu"]:
+            result.append(md('''
+            ## Проверка доступа к Hub до долгого обучения
+
+            Проверяем наличие `HF_TOKEN` и авторизацию заранее. Сам ключ не печатается и не сохраняется.
+            Для выгрузки создайте токен с правом записи. При отсутствии ключа или ошибке авторизации обучение
+            продолжается с экспортом на Drive, а выгрузка откладывается до настройки доступа.
+            '''))
+            result.append(code('''
+            if PUSH_TO_HUB:
+                from google.colab import userdata
+                from huggingface_hub import HfApi
+                def check_hub_access():
+                    try:
+                        token = userdata.get("HF_TOKEN")
+                    except Exception:
+                        return None
+                    if not token:
+                        return None
+                    try:
+                        return HfApi(token=token).whoami()["name"]
+                    except Exception:
+                        return None
+                hub_owner = check_hub_access()
+                if hub_owner:
+                    print("Аккаунт Hub:", hub_owner)
+                else:
+                    PUSH_TO_HUB = False
+                    print("Доступ к Hub пока не подтверждён. Обучение продолжится; веса сохранятся на Drive.")
+                    print("Для последующей выгрузки добавьте HF_TOKEN, включите PUSH_TO_HUB и выполните последнюю ячейку.")
+            else:
+                print("Выгрузка отключена: готовые веса сохранятся на Drive.")
+            ''', "hub-preflight", "colab", "network"))
+    return result
+
+
 def build():
     notebooks = ROOT / "notebooks"
     notebooks.mkdir(exist_ok=True)
-    for filename, cells in [("01_prepare_ocr_dataset.ipynb", prepare), ("02_train_ocr_colab.ipynb", train)]:
+    for filename, cells in [("00_run_ocr_end_to_end.ipynb", single_run_cells()), ("01_prepare_ocr_dataset.ipynb", prepare), ("02_train_ocr_colab.ipynb", train)]:
         metadata = {"kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
                     "language_info": {"name": "python", "version": "3.12"},
                     "colab": {"name": filename, "provenance": []}}
-        if filename.startswith("02"):
+        if not filename.startswith("01"):
             metadata["accelerator"] = "GPU"
             metadata["colab"]["gpuType"] = "T4"
         notebook = {"cells": cells, "metadata": metadata, "nbformat": 4, "nbformat_minor": 5}

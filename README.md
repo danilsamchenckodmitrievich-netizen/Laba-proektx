@@ -14,6 +14,9 @@
 фотографий и дообучения TrOCR-small на одной T4. Есть checkpoint/resume, CPU/INT8-бенчмарк и автоматический
 экспорт на Hugging Face Hub. Реальные веса и итоговое качество появятся после полного запуска обучения.
 
+Также доступен [единый запуск в Colab](https://colab.research.google.com/github/danilsamchenckodmitrievich-netizen/Laba-proektx/blob/main/notebooks/00_run_ocr_end_to_end.ipynb):
+подготовка при отсутствии данных, обучение и выгрузка весов проходят в одной последовательности ячеек.
+
 Сайт: https://danilsamchenckodmitrievich-netizen.github.io/Laba-proektx/
 
 Статический сайт: `index.html` и ресурсы в `assets/`. Открывается в браузере без сборки;
