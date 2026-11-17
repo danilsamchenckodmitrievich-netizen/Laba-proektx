@@ -17,6 +17,7 @@
 | Английская версия | `en/index.html` собирается из `index.html` + `i18n/en.json` ([notes/workflow.md](notes/workflow.md)) |
 | Бренд и совместимость | `assets/brand.js`, `assets/brand/` — [notes/branding.md](notes/branding.md) |
 | Основа будущей практики | `data/tasks/`, `backend/data/`, `schemas/` — [notes/tasks.md](notes/tasks.md) |
+| Обучение OCR в Colab | `notebooks/`, `training/` — [training/README.md](training/README.md) |
 | Сервер (Supabase, SQL) | `server/*.sql` — правила: [notes/server.md](notes/server.md) |
 | Офлайн | `sw.js` (видео/аудио не кэшируются) |
 | Ежедневная проверка сервера | `.github/workflows/keepalive.yml` |

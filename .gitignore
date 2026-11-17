@@ -7,3 +7,10 @@ tools/dev/node_modules/
 __pycache__/
 *.pyc
 .impeccable/review/
+.env
+.env.*
+!.env.example
+training/artifacts/
+training/data-cache/
+checkpoint-*/
+*.safetensors

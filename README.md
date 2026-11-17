@@ -10,6 +10,10 @@
 в `backend/data/task-solutions.json`. [Структура и проверки](notes/tasks.md).
 Каталог, Canvas для решения, OCR и ИИ-проверка подключаются на следующих этапах.
 
+**Обучение OCR:** подготовлены два [ноутбука Google Colab](training/README.md) для MathWriting/собственных
+фотографий и дообучения TrOCR-small на одной T4. Есть checkpoint/resume, CPU/INT8-бенчмарк и автоматический
+экспорт на Hugging Face Hub. Реальные веса и итоговое качество появятся после полного запуска обучения.
+
 Сайт: https://danilsamchenckodmitrievich-netizen.github.io/Laba-proektx/
 
 Статический сайт: `index.html` и ресурсы в `assets/`. Открывается в браузере без сборки;
