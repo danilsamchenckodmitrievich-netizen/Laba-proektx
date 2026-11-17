@@ -1,7 +1,7 @@
 /* Аксиора: работа без интернета.
    Страница — сначала из сети (чтобы обновления приходили сразу), без сети — из кэша.
    Русская и английская версии кэшируются отдельно. Иконки, манифест и шрифты — из кэша. */
-const V='axiora-v1';
+const V='axiora-v2';
 const CORE=['./','./index.html','./en/','./en/index.html','./assets/brand.js','./assets/brand/mark.svg','./manifest.webmanifest','./icon-192.png','./icon-512.png','./apple-touch-icon.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
