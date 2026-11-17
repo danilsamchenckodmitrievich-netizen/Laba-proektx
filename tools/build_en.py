@@ -41,12 +41,12 @@ def main():
          ("'ru-RU'","'en-GB'"),
          (".replace('.',',')",".replace(',','.')"),
          ('№ ','No. '),('№','No.'),('«','“'),('»','”'),
-         ('<b>Lab</b> <span>Sirius</span>','<b>Sirius</b> <span>Lab</span>'),
+         ('src="assets/brand.js"','src="../assets/brand.js"'),
          ('href="manifest.webmanifest"','href="../manifest.webmanifest"'),
          ('href="icon-192.png"','href="../icon-192.png"'),
          ('href="apple-touch-icon.png"','href="../apple-touch-icon.png"'),
          ("register('sw.js')","register('../sw.js')"),
-         ("'zhurnal-laboratoriya-sirius.csv'","'class-journal-sirius-lab.csv'")]
+         ("'zhurnal-axiora.csv'","'class-journal-axiora.csv'")]
     for a,b in rep:
         if a not in s:print('нет в файле:',a,file=sys.stderr)
         s=s.replace(a,b)

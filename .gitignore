@@ -4,3 +4,6 @@
 .obsidian/cache
 .obsidian/plugins/*/data.json
 tools/dev/node_modules/
+__pycache__/
+*.pyc
+.impeccable/review/

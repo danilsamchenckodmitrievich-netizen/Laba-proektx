@@ -1,6 +1,6 @@
 // мини-PostgREST для тестов: POST /rest/v1/rpc/<fn> -> select public.<fn>(...) от имени anon
 const http=require('http'),{Pool}=require('pg');
-const D=process.env.PGDIR||'/var/lib/postgresql/sirius',pool=new Pool({host:D,port:5433,user:'postgres',database:'postgres'});
+const D=process.env.PGDIR||'/var/lib/postgresql/axiora',pool=new Pool({host:D,port:5433,user:'postgres',database:'postgres'});
 let DOWN=false;const FILES=new Map();
 http.createServer(async(req,res)=>{
   const h={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'apikey,content-type,authorization,x-upsert,cache-control','Access-Control-Allow-Methods':'GET,POST,DELETE,OPTIONS'};

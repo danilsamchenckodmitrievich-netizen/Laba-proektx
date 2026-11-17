@@ -11,6 +11,8 @@ tags: [workflow]
    - Скрипт режет строки по `${…}`, кавычкам и тегам — каждый кусок с кириллицей нужен отдельным ключом.
    - Ключи с `\n\n` в JSON пишутся с буквальными обратными слэшами.
 3. Проверка в браузере ([Проверка сайта локально](testing.md)).
+   Дополнительно: `node --test tests/brand.test.cjs`, `python3 tools/validate_tasks.py`,
+   `python3 -m unittest discover -s tests -p 'test_*.py'` (зависимости — `tools/requirements-dev.txt`).
 4. Обновить `README.md` (список возможностей) и при надобности `server/README.md`.
 5. Коммит → `git push -u origin <ветка>` → PR в `main` (инструменты GitHub MCP) → merge. Pages публикует сам за 1–2 минуты.
 6. Крупные возможности — дописать в презентацию и документы ([Презентация, документы, ролики](artifacts.md)).

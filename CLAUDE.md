@@ -1,4 +1,4 @@
-# Лаборатория Сириус — памятка для Claude
+# Аксиора — памятка для Claude
 
 Сайт по физике 7 класса: https://danilsamchenckodmitrievich-netizen.github.io/Laba-proektx/
 (GitHub Pages публикует ветку `main`). Подробные заметки — [notes/INDEX.md](notes/INDEX.md); читать по нужде, не целиком.
@@ -13,8 +13,10 @@
 
 | Что | Где |
 |---|---|
-| Весь сайт (≈4200 строк, Canvas 2D) | `index.html` — карта: [notes/code-map.md](notes/code-map.md) |
+| Основной интерфейс (≈4200 строк, Canvas 2D) | `index.html` — карта: [notes/code-map.md](notes/code-map.md) |
 | Английская версия | `en/index.html` собирается из `index.html` + `i18n/en.json` ([notes/workflow.md](notes/workflow.md)) |
+| Бренд и совместимость | `assets/brand.js`, `assets/brand/` — [notes/branding.md](notes/branding.md) |
+| Основа будущей практики | `data/tasks/`, `backend/data/`, `schemas/` — [notes/tasks.md](notes/tasks.md) |
 | Сервер (Supabase, SQL) | `server/*.sql` — правила: [notes/server.md](notes/server.md) |
 | Офлайн | `sw.js` (видео/аудио не кэшируются) |
 | Ежедневная проверка сервера | `.github/workflows/keepalive.yml` |
