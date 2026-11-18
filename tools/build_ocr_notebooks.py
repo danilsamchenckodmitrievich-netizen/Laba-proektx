@@ -212,7 +212,7 @@ train = [
     code('''
     USE_GOOGLE_DRIVE = True
     RUN_MODE = "t4"  # "smoke" для excerpt и двух проверочных шагов.
-    RUN_NAME = "trocr-small-v1"  # Новые данные/гиперпараметры требуют нового имени.
+    RUN_NAME = "trocr-small-v2"  # Новые данные/гиперпараметры требуют нового имени.
     RESUME = True
     HUB_REPO_ID = None  # None → <ваш-логин>/axiora-ocr, для smoke добавляется -smoke.
     HUB_PRIVATE = True
@@ -330,13 +330,23 @@ train = [
     from training.ocr import export_model
     from training.data import json_write
     test_dataset = FormulaDataset(DATASET_DIR, records["test"], processor)
+    # Inspect held-out validation examples alongside aggregate scores.
+    sample_rows = validation_rows[:12]
+    preview = trainer.predict(FormulaDataset(DATASET_DIR, sample_rows, processor))
+    import numpy as np
+    token_ids = np.where(preview.predictions == -100, processor.tokenizer.pad_token_id, preview.predictions)
+    texts = processor.batch_decode(token_ids, skip_special_tokens=True)
+    validation_examples = [{"id": row["id"], "expected": row["latex"], "predicted": text}
+                           for row, text in zip(sample_rows, texts)]
+    for example in validation_examples:
+        print(example["expected"], "→", example["predicted"])
     test_metrics = trainer.evaluate(test_dataset, metric_key_prefix="test")
     run_report = {
         "schema_version": 1, "config": asdict(config), "source_commit": SOURCE_COMMIT,
         "training_code_fingerprint": training_code_fingerprint(),
         "dataset": dataset_audit, "label_audit": label_audit,
         "retained_counts": {split: len(rows) for split, rows in records.items()},
-        "validation_selection_count": len(validation_rows),
+        "validation_selection_count": len(validation_rows), "validation_examples": validation_examples,
         "train_metrics": train_result.metrics, "test_metrics": test_metrics,
         "best_checkpoint": Path(trainer.state.best_model_checkpoint).name if trainer.state.best_model_checkpoint else None,
         "environment": environment_report(), "peak_vram_gib": peak_vram_gib,

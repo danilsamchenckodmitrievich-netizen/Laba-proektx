@@ -126,12 +126,17 @@ def load_base_model(config: TrainConfig):
     # Upstream publishes a PyTorch bin. torch >= 2.6 is required by transformers'
     # safe weights-only loader. Our trained export is always safetensors.
     model = VisionEncoderDecoderModel.from_pretrained(config.base_model, revision=config.base_revision)
-    model.config.decoder_start_token_id = processor.tokenizer.cls_token_id
+    # Preserve the pretrained shift-right prefix. The tokenizer already adds BOS
+    # to the targets; TrOCR-small starts the decoder with EOS before that BOS.
+    start_id = model.config.decoder.decoder_start_token_id
+    if start_id is None:
+        raise ValueError("Missing pretrained TrOCR decoder start token")
+    model.config.decoder_start_token_id = start_id
     model.config.pad_token_id = processor.tokenizer.pad_token_id
     model.config.eos_token_id = processor.tokenizer.eos_token_id
     model.config.vocab_size = model.config.decoder.vocab_size
     model.decoder.config.use_cache = False
-    model.generation_config.decoder_start_token_id = processor.tokenizer.cls_token_id
+    model.generation_config.decoder_start_token_id = start_id
     model.generation_config.pad_token_id = processor.tokenizer.pad_token_id
     model.generation_config.eos_token_id = processor.tokenizer.eos_token_id
     model.generation_config.num_beams = 1
